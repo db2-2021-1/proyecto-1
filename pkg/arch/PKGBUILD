@@ -1,16 +1,16 @@
 # Maintainer: Otreblan <otreblain@gmail.com>
 
-pkgname=hello-git
-pkgver=v4.0.r21.g2684a5d
+pkgname=proyecto-1-git
+pkgver=0.0.0.r0.gaaa06c7
 pkgrel=1
 epoch=
-pkgdesc="A C++ template"
+pkgdesc="Proyecto 1"
 arch=('x86_64')
-url="https://github.com/otreblan/hello"
+url="https://github.com/db2-2021-1/proyecto-1"
 license=('GPL3')
 groups=()
 depends=('gcc-libs')
-makedepends=('git' 'asciidoctor' 'cmake')
+makedepends=('git' 'cmake')
 checkdepends=()
 optdepends=()
 provides=(${pkgname%-git})
