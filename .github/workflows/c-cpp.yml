@@ -45,11 +45,11 @@ jobs:
 
   arch-linux:
     runs-on: ubuntu-latest
-    container: greyltc/archlinux-aur:paru
+    container: greyltc/archlinux-aur
 
     steps:
     - name: Syu
-      run: sudo -u ab paru -Syu --noconfirm jq
+      run: sudo -u ab yay -Syu --noconfirm jq
 
     - name: Get last tag
       id: tag
