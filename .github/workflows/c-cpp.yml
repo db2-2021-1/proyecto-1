@@ -45,11 +45,11 @@ jobs:
 
   arch-linux:
     runs-on: ubuntu-latest
-    container: oblique/archlinux-yay
+    container: greyltc/archlinux-aur:paru
 
     steps:
     - name: Syu
-      run: sudo -u aur yay -Syu --noconfirm jq
+      run: sudo -u ab paru -Syu --noconfirm jq
 
     - name: Get last tag
       id: tag
@@ -77,17 +77,14 @@ jobs:
           git checkout FETCH_HEAD
           git log --decorate=on
 
-    - name: Zstd
-      run: sed -i 's/tar\.xz/tar.zst/' /etc/makepkg.conf
-
     - name: chown
-      run: chown --recursive aur pkg/arch
+      run: chown --recursive ab pkg/arch
 
     - name: makepkg
       working-directory: ./pkg/arch
       run: |
           export MAKEFLAGS=-j$(nproc)
-          sudo -Eu aur makepkg -s --noconfirm
+          sudo -Eu ab makepkg -s --noconfirm
 
     - uses: actions/upload-artifact@v2
       with:
