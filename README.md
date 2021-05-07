@@ -1,17 +1,15 @@
-[![C/C++ CI](https://github.com/otreblan/hello/workflows/C/C++%20CI/badge.svg)](https://github.com/otreblan/hello/actions?query=workflow%3A%22C%2FC%2B%2B+CI%22)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/otreblan/hello?logo=github)
-![GitHub](https://img.shields.io/github/license/otreblan/hello?logo=gnu)
+[![C/C++ CI](https://github.com/db2-2021-1/proyecto-1/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/db2-2021-1/proyecto-1/actions/workflows/c-cpp.yml)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/db2-2021-1/proyecto-1?logo=github)
+![GitHub](https://img.shields.io/github/license/db2-2021-1/proyecto-1?logo=gnu)
 
-# A C++ template
+# Proyecto 1
 
-## Dependencies
+## Dependencias
 
-* `asciidoctor`
 * `cmake`
 
-## Build
+## Compilación
 ``` bash
-git clone https://github.com/otreblan/hello
-cd hello/pkg/arch
-makepkg -si
+cmake -B build
+cmake --build build
 ```
