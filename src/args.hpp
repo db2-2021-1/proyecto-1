@@ -14,15 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
+#pragma once
 
-#include "args.hpp"
-
-int main(int argc, char* argv[])
+namespace db2
 {
-	db2::args a;
 
-	a.parse(argc, argv);
+struct args
+{
+	void parse(int argc, char* argv[]);
 
-	return EXIT_SUCCESS;
-}
+	[[noreturn]]
+	void usage(int exit_code);
+};
+
+};
