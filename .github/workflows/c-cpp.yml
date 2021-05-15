@@ -84,6 +84,8 @@ jobs:
       working-directory: ./pkg/arch
       run: |
           export MAKEFLAGS=-j$(nproc)
+          export PKGDEST=./
+          export PKGEXT=.pkg.tar.zst
           sudo -Eu ab makepkg -s --noconfirm
 
     - uses: actions/upload-artifact@v2
