@@ -16,6 +16,9 @@
 
 #include <iostream>
 
+#include <readline/history.h>
+#include <readline/readline.h>
+
 #include "args.hpp"
 
 int main(int argc, char* argv[])
@@ -23,6 +26,17 @@ int main(int argc, char* argv[])
 	db2::args a;
 
 	a.parse(argc, argv);
+
+	while(char* line = readline("SQL> "))
+	{
+		if(strlen(line) > 0)
+		{
+			add_history(line);
+			puts(line);
+		}
+
+		free(line);
+	}
 
 	return EXIT_SUCCESS;
 }

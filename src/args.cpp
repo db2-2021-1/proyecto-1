@@ -22,9 +22,6 @@
 
 void db2::args::parse(int argc, char* argv[])
 {
-	if(argc < 2)
-		usage(EXIT_FAILURE);
-
 	int c;
 	static char shortopts[] = "hc:";
 	static option options[] =

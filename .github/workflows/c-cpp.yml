@@ -15,12 +15,12 @@ jobs:
     - uses: ammaraskar/gcc-problem-matcher@master
 
     - name: deps
-      run: sudo apt install g++-10
+      run: sudo apt install libreadline-dev
 
     - name: configure
       run: cmake
-        -DCMAKE_CXX_COMPILER=g++-10
-        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-11
+        -DCMAKE_C_COMPILER=gcc-11
         -DCMAKE_CXX_FLAGS="-O2 -pipe -fno-plt -Wall -Wextra"
         -DCMAKE_C_FLAGS="-O2 -pipe -fno-plt -Wall -Wextra"
         -DCMAKE_BUILD_TYPE=Release

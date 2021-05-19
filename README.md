@@ -7,9 +7,12 @@
 ## Dependencias
 
 * `cmake`
+* `readline`
 
 ## Compilación
 ``` bash
+sudo apt install libreadline-dev
 cmake -B build
+
 cmake --build build
 ```
