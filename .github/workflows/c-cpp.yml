@@ -35,7 +35,7 @@ jobs:
 
     - name: deb
       run: |
-          strip --strip-all $(find build -maxdepth 1 -executable -type f)
+          strip --strip-all $(find build/src -maxdepth 1 -executable -type f)
           cmake --build build --target package
 
     - uses: actions/upload-artifact@v2
