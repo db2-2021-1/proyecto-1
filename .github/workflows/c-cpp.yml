@@ -15,7 +15,7 @@ jobs:
     - uses: ammaraskar/gcc-problem-matcher@master
 
     - name: deps
-      run: sudo apt install libreadline-dev libfl2 bison flex
+      run: sudo apt install libreadline-dev bison libfl-dev
 
     - name: configure
       run: cmake
