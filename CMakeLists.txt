@@ -29,23 +29,18 @@ include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CPack)
 
-# The program itself
-add_executable(${PROJECT_NAME})
+# Packages
+find_package(FLEX)
+find_package(BISON)
+
+add_subdirectory(src) # Sources list
+add_subdirectory(pkg) # Packaging
 
 # C++ version
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 		CXX_STANDARD 17
 )
-
-# Headers
-target_include_directories(${PROJECT_NAME}
-	PRIVATE
-		${PROJECT_SOURCE_DIR}/include
-)
-
-add_subdirectory(src) # Sources list
-add_subdirectory(pkg) # Packaging
 
 # Shared libraries
 pkg_check_modules(shared
