@@ -14,12 +14,14 @@ DELETE  { return DELETE;  }
 FROM    { return FROM;    }
 INSERT  { return INSERT;  }
 INTO    { return INTO;    }
+IS      { return IS;      }
 SELECT  { return SELECT;  }
 TABLE   { return TABLE;   }
 VALUES  { return VALUES;  }
 WHERE   { return WHERE;   }
 
-[a-z][a-z0-9_]* { return NAME; }
+[a-z][a-z0-9_]* { return NAME;   }
+-?[0-9]+        { return INTNUM; }
 
 [*(),;] { return yytext[0]; }
 

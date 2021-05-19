@@ -8,16 +8,16 @@ void yyerror(const char* s);
 
 %union {
 	int intval;
-	double floatval;
 	char *strval;
-	int subtok;
 }
 
 %left AND
+%left BETWEEN
+%nonassoc IS
 
 %token <strval> NAME;
+%token <intval> INTNUM;
 
-%token BETWEEN
 %token DELETE
 %token FROM
 %token INSERT
@@ -30,12 +30,22 @@ void yyerror(const char* s);
 %%
 sql: select_table;
 
-select_table: SELECT column_list FROM NAME;
+select_table:
+	| SELECT column_list FROM NAME
+	| SELECT column_list FROM NAME WHERE expr
+	;
 
 column_list: '*' | columns;
 
 columns: NAME
 	| columns ',' NAME
+	;
+
+expr:
+	| NAME
+	| INTNUM
+	| expr IS expr
+	| expr BETWEEN expr AND expr
 	;
 %%
 
