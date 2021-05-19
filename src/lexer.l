@@ -21,6 +21,8 @@ WHERE   { return WHERE;   }
 
 [a-z][a-z0-9_]* { return NAME; }
 
+[*(),;] { return yytext[0]; }
+
 [ \n\r\t]+ {}
 %%
 

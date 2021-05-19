@@ -22,6 +22,16 @@ project(proyecto-1
 	HOMEPAGE_URL "https://github.com/db2-2021-1/proyecto-1"
 )
 
+# Default flags
+if(UNIX)
+	if(NOT (DEFINED ENV{CFLAGS} OR CMAKE_C_FLAGS))
+		set(CMAKE_C_FLAGS "-Wall -Wextra -g")
+	endif()
+	if(NOT (DEFINED ENV{CXXFLAGS} OR CMAKE_CXX_FLAGS))
+		set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
+	endif()
+endif()
+
 # Without this, paths are not relative in the sources list
 cmake_policy(SET CMP0076 NEW)
 
@@ -63,16 +73,6 @@ target_link_libraries(${PROJECT_NAME}
 #	INTERFACE
 #		PkgConfig::header_only
 )
-
-# Default flags
-if(UNIX)
-	if(NOT (DEFINED ENV{CFLAGS} OR CMAKE_C_FLAGS))
-		set(CMAKE_C_FLAGS "-Wall -Wextra -g")
-	endif()
-	if(NOT (DEFINED ENV{CXXFLAGS} OR CMAKE_CXX_FLAGS))
-		set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
-	endif()
-endif()
 
 # Install target
 install(TARGETS ${PROJECT_NAME}
