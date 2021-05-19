@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "parser.h"
+#include "parser_def.h"
 %}
 
 %option caseless
@@ -22,3 +23,13 @@ WHERE   { return WHERE;   }
 
 [ \n\r\t]+ {}
 %%
+
+void parse_init(const char* str)
+{
+	yy_scan_string(str);
+}
+
+void parse_free()
+{
+	yy_delete_buffer(YY_CURRENT_BUFFER);
+}

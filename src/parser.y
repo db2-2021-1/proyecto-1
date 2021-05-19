@@ -1,9 +1,9 @@
 %{
 #include <stdio.h>
+#include "parser_def.h"
 
 int yylex();
 void yyerror(const char* s);
-
 %}
 
 %union {
@@ -39,17 +39,14 @@ columns: NAME
 	;
 %%
 
-//int main()
-//{
-//	if(!yyparse())
-//	{
-//		printf("%s\n", "ok");
-//	}
-//	else
-//	{
-//		printf("%s\n", "no");
-//	}
-//}
+void parse(const char* str)
+{
+	parse_init(str);
+
+	printf("%s\n", yyparse() == 0 ? "ok" : "no");
+
+	parse_free();
+}
 
 void yyerror(const char* s)
 {
