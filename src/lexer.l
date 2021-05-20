@@ -19,6 +19,9 @@ SELECT  { return SELECT;  }
 TABLE   { return TABLE;   }
 VALUES  { return VALUES;  }
 WHERE   { return WHERE;   }
+INT     { return INT;     }
+VARCHAR { return VARCHAR; }
+CREATE  { return CREATE;  }
 
 [a-z][a-z0-9_]* { return NAME;   }
 -?[0-9]+        { return INTNUM; }

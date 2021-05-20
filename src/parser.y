@@ -18,20 +18,34 @@ void yyerror(const char* s);
 %token <strval> NAME;
 %token <intval> INTNUM;
 
+%token CREATE
 %token DELETE
 %token FROM
 %token INSERT
+%token INT
 %token INTO
 %token SELECT
 %token TABLE
 %token VALUES
+%token VARCHAR
 %token WHERE
 
 %%
-sql: select_table
+sql: create_table
+	| select_table
 	| insert_into_table
 	| delete_from_table
 ;
+
+create_table: CREATE TABLE NAME '(' new_colums ')';
+
+new_colums: name_type | new_colums ',' name_type;
+
+name_type: NAME TYPE;
+
+TYPE: INT
+	| VARCHAR '(' INTNUM ')'
+	;
 
 
 select_table: SELECT column_list FROM NAME
