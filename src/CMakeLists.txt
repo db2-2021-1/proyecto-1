@@ -34,6 +34,7 @@ target_sources(${PROJECT_NAME}
 	${BISON_parser_OUTPUTS}
 	${FLEX_scanner_OUTPUTS}
 		args.cpp
+		completion.cpp
 		main.cpp
 		table.cpp
 )
