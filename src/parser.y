@@ -28,10 +28,12 @@ void yyerror(const char* s);
 %token WHERE
 
 %%
-sql: select_table;
+sql: select_table
+	| insert_into_table
+;
 
-select_table:
-	| SELECT column_list FROM NAME
+
+select_table: SELECT column_list FROM NAME
 	| SELECT column_list FROM NAME WHERE expr
 	;
 
@@ -41,11 +43,21 @@ columns: NAME
 	| columns ',' NAME
 	;
 
-expr:
-	| NAME
+expr: NAME
 	| INTNUM
 	| expr IS expr
 	| expr BETWEEN expr AND expr
+	;
+
+
+insert_into_table: INSERT INTO NAME VALUES insert_values;
+
+insert_values: '(' data_list ')'
+	| insert_values ',' '(' data_list ')'
+	;
+
+data_list: INTNUM
+	| data_list ',' INTNUM
 	;
 %%
 
