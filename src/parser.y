@@ -30,6 +30,7 @@ void yyerror(const char* s);
 %%
 sql: select_table
 	| insert_into_table
+	| delete_from_table
 ;
 
 
@@ -59,6 +60,9 @@ insert_values: '(' data_list ')'
 data_list: INTNUM
 	| data_list ',' INTNUM
 	;
+
+
+delete_from_table: DELETE FROM NAME WHERE expr;
 %%
 
 void parse(const char* str)
