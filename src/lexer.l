@@ -23,8 +23,9 @@ INT     { return INT;     }
 VARCHAR { return VARCHAR; }
 CREATE  { return CREATE;  }
 
-[a-z][a-z0-9_]* { return NAME;   }
--?[0-9]+        { return INTNUM; }
+\"(\\.|\"\"|[^"\n])*\" { return STRING; }
+[a-z][a-z0-9_]*        { return NAME;   }
+-?[0-9]+               { return INTNUM; }
 
 [*(),;] { return yytext[0]; }
 

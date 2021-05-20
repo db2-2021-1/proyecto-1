@@ -15,8 +15,9 @@ void yyerror(const char* s);
 %left BETWEEN
 %nonassoc IS
 
-%token <strval> NAME;
 %token <intval> INTNUM;
+%token <strval> NAME;
+%token <strval> STRING
 
 %token CREATE
 %token DELETE
@@ -60,6 +61,7 @@ columns: NAME
 
 expr: NAME
 	| INTNUM
+	| STRING
 	| expr IS expr
 	| expr BETWEEN expr AND expr
 	;
@@ -72,7 +74,9 @@ insert_values: '(' data_list ')'
 	;
 
 data_list: INTNUM
+	| STRING
 	| data_list ',' INTNUM
+	| data_list ',' STRING
 	;
 
 
