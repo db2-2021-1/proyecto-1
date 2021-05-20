@@ -16,7 +16,14 @@
 
 #pragma once
 
-void initialize_readline();
+#include <string>
+
+extern const std::string history_file;
+
+void init_readline();
+void init_history();
+
+void end_history();
 
 char** sql_completion(const char* text, int, int);
 char* key_word_generator(const char* text, int state);

@@ -15,18 +15,60 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <wordexp.h>
 
+#include <readline/history.h>
 #include <readline/readline.h>
 
 #include <completion.hpp>
 
 // https://thoughtbot.com/blog/tab-completion-in-gnu-readline
 
-void initialize_readline()
+const std::string history_file = []()
+{
+	wordexp_t p;
+
+	wordexp("~/.proyecto-1_history", &p, 0);
+
+	std::string str(p.we_wordv[0]);
+
+	wordfree(&p);
+
+	return str;
+}();
+
+void init_readline()
 {
 	rl_readline_name = "proyecto-1";
 	rl_attempted_completion_function = sql_completion;
+}
+
+void init_history()
+{
+	using_history();
+
+	if(FILE* file = fopen(history_file.c_str(), "r"))
+	{
+		fclose(file);
+
+		if(read_history(history_file.c_str()) != 0)
+			perror(history_file.c_str());
+
+		if(atexit(end_history) != 0)
+			exit(EXIT_FAILURE);
+	}
+	else
+	{
+		perror(history_file.c_str());
+	}
+}
+
+void end_history()
+{
+	if(write_history(history_file.c_str()) != 0)
+		perror(history_file.c_str());
 }
 
 char** sql_completion(const char* text, int, int)

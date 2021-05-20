@@ -29,7 +29,9 @@ int main(int argc, char* argv[])
 
 	a.parse(argc, argv);
 
-	initialize_readline();
+	init_readline();
+	init_history();
+
 	while(char* line = readline("SQL> "))
 	{
 		if(strlen(line) > 0)
@@ -41,5 +43,5 @@ int main(int argc, char* argv[])
 		free(line);
 	}
 
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }
