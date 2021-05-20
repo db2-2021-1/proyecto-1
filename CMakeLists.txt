@@ -17,7 +17,7 @@
 cmake_minimum_required(VERSION 3.13.0)
 
 project(proyecto-1
-	VERSION 0.0.0
+	VERSION 0.1.1
 	DESCRIPTION "Proyecto 1"
 	HOMEPAGE_URL "https://github.com/db2-2021-1/proyecto-1"
 )
@@ -49,6 +49,7 @@ add_subdirectory(pkg) # Packaging
 # C++ version
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		CXX_STANDARD 17
 )
 
