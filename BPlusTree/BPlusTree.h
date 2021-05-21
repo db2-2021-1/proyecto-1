@@ -2,7 +2,6 @@
 #include <fstream>
 #include <utility>
 #include <vector>
-//#include <map>
 
 #include "register.h"
 
@@ -113,11 +112,9 @@ private:
   }
 
 public:
-  //BPlusTree(){}
   BPlusTree()
   {
     std::fstream file;
-    //file.open(filename);
     file.open(filename, std::ofstream::out | std::ofstream::trunc);
     root = NULL;
   }
@@ -191,15 +188,12 @@ public:
           {
             return Register(-1, "Not found", "Not found", -1);
           }
-          //pos = getRegisterPos(key);
           std::fstream file;
           std::string line;
           file.open(filename);
           file.seekg(posicion_registro);
           auto *ptrReg = new Register;
           file.read((char *)ptrReg, sizeof(Register));
-          //getline(file, line);
-          //Register reg = textToRegisterCSV(line);
           file.close();
           return *ptrReg;
         }
@@ -211,35 +205,31 @@ public:
   void insert(Register reg)
   {
     int x = reg.id;
-    //std::cout<<"\n\n\n\n\n\n\n\n";
-    //std::cout << "x:" << x <<"\n";
     std::fstream file;
     file.open(filename);
     file.seekg(0, std::ios::end);
     long posicion_registro = file.tellg();
     long aux = posicion_registro;
-    //std::cout << "posicion_registro: " << posicion_registro << std::endl;
+
     file.write((char *)&reg, sizeof(Register));
     file.close();
 
-    if (root == NULL) //Si el root no apunta nada, es decir arbol vacio
+    if (root == NULL)
     {
-      //std::cout << "if (root == NULL) " << std::endl;
-      root = new Node;  //se crea el nodo al que root apunto
-      root->key[0] = x; // este nodo tiene como su primer elemento de sus llaves = x
+
+      root = new Node;
+      root->key[0] = x;
       firstid = x;
       (root->values).insert(std::make_pair(x, posicion_registro));
-      root->IS_LEAF = true; // el root como es el unico, tambien es una hoja
-      root->size = 1;       // el root tiene 1 elemento
+      root->IS_LEAF = true;
+      root->size = 1;
     }
     else
     {
-      //std::cout << "else sssss" << std::endl;
-      Node *cursor = root; // como el root no esta vacio, minimamente el root tiene 1 elemento
-      Node *parent;        // se crea un punto a node llamado parent
+      Node *cursor = root;
+      Node *parent;
       while (cursor->IS_LEAF == false)
       {
-        //std::cout << "while (cursor->IS_LEAF == false)" << std::endl;
         parent = cursor;
         for (int i = 0; i < cursor->size; i++)
         {
@@ -257,7 +247,6 @@ public:
       }
       if (cursor->size < MAX)
       {
-        //std::cout << "(cursor->size < MAX)" << std::endl;
         int i = 0;
         while (x > cursor->key[i] && i < cursor->size)
           i++;
@@ -267,22 +256,17 @@ public:
         }
         cursor->key[i] = x;
         cursor->size++;
-        //std::cout<<"posicion_registro: "<<posicion_registro<<"\n";
-        //std::cout<<"x: "<<x<<"\n";
         cursor->values.insert(std::make_pair(x, posicion_registro));
         cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
         cursor->ptr[cursor->size - 1] = NULL;
       }
       else
       {
-        //std::cout << "linea 301" << std::endl;
-
         Node *newLeaf = new Node;
         newLeaf->values.insert(std::make_pair(x, aux));
         int virtualNode[MAX + 1];
         for (int i = 0; i < MAX; i++)
         {
-          //std::cout<<"cursor->key[i]: "<<cursor->key[i]<<"\n";
           newLeaf->values.insert(std::make_pair(cursor->key[i], cursor->values.find(cursor->key[i])->second));
           virtualNode[i] = cursor->key[i];
         }
@@ -304,7 +288,6 @@ public:
         cursor->ptr[MAX] = NULL;
         for (i = 0; i < cursor->size; i++)
         {
-          // std::cout << "cursor->key[i]: " << cursor->key[i] << std::endl;
           cursor->key[i] = virtualNode[i];
           cursor->values.insert(std::make_pair(cursor->key[i], aux));
         }
@@ -314,12 +297,9 @@ public:
         }
         if (cursor == root)
         {
-          //std::cout << "LINEA 338" << std::endl;
-
           Node *newRoot = new Node;
           newRoot->key[0] = newLeaf->key[0];
           newRoot->ptr[0] = cursor;
-          //std::cout<<"x: "<<x<<" posicion_registro: "<<posicion_registro<<std::endl;
           newRoot->values.insert(std::make_pair(x, posicion_registro));
           newRoot->ptr[1] = newLeaf;
           newRoot->IS_LEAF = false;
@@ -414,7 +394,6 @@ public:
           return;
         }
       }
-      //return Register(-1, "NOT FOUND", "NOT FOUND", -1);
       return;
     }
   }
@@ -432,13 +411,14 @@ public:
       }
       reg = findNode(ite);
     }
-    while(reg->key[0] <= endKey ){
+    while (reg->key[0] <= endKey)
+    {
       int i = 0;
       for (i = 0; i < reg->size; i++)
       {
         if (reg->key[i] >= beginKey && reg->key[i] <= endKey)
         {
-          registros.push_back(find(reg->key[i]));    
+          registros.push_back(find(reg->key[i]));
         }
       }
       reg = reg->ptr[reg->size];

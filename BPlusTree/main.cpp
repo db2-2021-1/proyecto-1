@@ -5,6 +5,7 @@ int main()
 {
     BPlusTree bplustree; //UNCLUSTERED B+ TREE
 
+    //INSERCION DE UN ELEMENTO
     bplustree.insert(Register(25, "Esteban", "Principe", 20));
     bplustree.insert(Register(16, "Andres", "Losta", 20));
     bplustree.insert(Register(1, "Jose", "De Lama", 21));
@@ -19,13 +20,13 @@ int main()
     //bplustree.remove(9);
     register_found = bplustree.find(9);
     register_found.print();
-*/
+    */
     //BUSQUEDA POR RANGO
-    auto registros = bplustree.find(6,7);
-    for(auto& item : registros){
+    auto registros = bplustree.find(6, 7);
+    for (auto &item : registros)
+    {
         item.print();
     }
-    
 
     //bplustree.print_leaf(bplustree.getRoot());
     //bplustree.display(bplustree.getRoot());
