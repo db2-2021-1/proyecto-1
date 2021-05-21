@@ -14,34 +14,40 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
+#pragma once
 
-#include <readline/history.h>
-#include <readline/readline.h>
+#include <cstdio>
+#include <string>
+#include <utility>
 
-#include "args.hpp"
-#include "completion.hpp"
-#include "parser_def.h"
-
-int main(int argc, char* argv[])
+namespace db2
 {
-	db2::args a;
 
-	a.parse(argc, argv);
+enum class index_type
+{
+	/// Extendible hash.
+	e_hash,
 
-	init_readline();
-	init_history();
+	/// B+ tree.
+	bp_tree
+};
 
-	while(char* line = readline("SQL> "))
-	{
-		if(strlen(line) > 0)
-		{
-			add_history(line);
-			parse(line);
-		}
+/// This class manages the operations on a table.
+class table
+{
+private:
+	std::string name;
 
-		free(line);
-	}
+	/// Name of the column used as primary key.
+	std::string primary_key;
 
-	exit(EXIT_SUCCESS);
-}
+	index_type type;
+
+public:
+	table(std::string name):
+		name(std::move(name))
+	{};
+
+};
+
+};

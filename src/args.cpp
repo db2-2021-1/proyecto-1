@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include "args.hpp"
+#include "parser_def.h"
 
 void db2::args::parse(int argc, char* argv[])
 {
@@ -39,8 +40,8 @@ void db2::args::parse(int argc, char* argv[])
 				break;
 
 			case 'c':
-				std::cout << "TODO: execute SQL expression: " << optarg << '\n';
-				break;
+				::parse(optarg);
+				exit(EXIT_SUCCESS);
 
 			default:
 				exit(EXIT_FAILURE);

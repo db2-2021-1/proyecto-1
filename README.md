@@ -6,12 +6,14 @@
 
 ## Dependencias
 
+* `bison`
 * `cmake`
+* `flex`
 * `readline`
 
 ## Compilación
 ``` bash
-sudo apt install libreadline-dev
+sudo apt install libreadline-dev bison libfl-dev
 cmake -B build
 
 cmake --build build

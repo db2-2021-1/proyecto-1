@@ -14,34 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
+#pragma once
 
-#include <readline/history.h>
-#include <readline/readline.h>
+#include <string>
 
-#include "args.hpp"
-#include "completion.hpp"
-#include "parser_def.h"
+extern const std::string history_file;
 
-int main(int argc, char* argv[])
-{
-	db2::args a;
+void init_readline();
+void init_history();
 
-	a.parse(argc, argv);
+void end_history();
 
-	init_readline();
-	init_history();
-
-	while(char* line = readline("SQL> "))
-	{
-		if(strlen(line) > 0)
-		{
-			add_history(line);
-			parse(line);
-		}
-
-		free(line);
-	}
-
-	exit(EXIT_SUCCESS);
-}
+char** sql_completion(const char* text, int, int);
+char* key_word_generator(const char* text, int state);

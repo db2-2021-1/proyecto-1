@@ -17,10 +17,20 @@
 cmake_minimum_required(VERSION 3.13.0)
 
 project(proyecto-1
-	VERSION 0.0.0
+	VERSION 0.1.1
 	DESCRIPTION "Proyecto 1"
 	HOMEPAGE_URL "https://github.com/db2-2021-1/proyecto-1"
 )
+
+# Default flags
+if(UNIX)
+	if(NOT (DEFINED ENV{CFLAGS} OR CMAKE_C_FLAGS))
+		set(CMAKE_C_FLAGS "-Wall -Wextra -g")
+	endif()
+	if(NOT (DEFINED ENV{CXXFLAGS} OR CMAKE_CXX_FLAGS))
+		set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
+	endif()
+endif()
 
 # Without this, paths are not relative in the sources list
 cmake_policy(SET CMP0076 NEW)
@@ -29,23 +39,19 @@ include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CPack)
 
-# The program itself
-add_executable(${PROJECT_NAME})
+# Packages
+find_package(FLEX)
+find_package(BISON)
+
+add_subdirectory(src) # Sources list
+add_subdirectory(pkg) # Packaging
 
 # C++ version
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		CXX_STANDARD 17
 )
-
-# Headers
-target_include_directories(${PROJECT_NAME}
-	PRIVATE
-		${PROJECT_SOURCE_DIR}/include
-)
-
-add_subdirectory(src) # Sources list
-add_subdirectory(pkg) # Packaging
 
 # Shared libraries
 pkg_check_modules(shared
@@ -68,16 +74,6 @@ target_link_libraries(${PROJECT_NAME}
 #	INTERFACE
 #		PkgConfig::header_only
 )
-
-# Default flags
-if(UNIX)
-	if(NOT (DEFINED ENV{CFLAGS} OR CMAKE_C_FLAGS))
-		set(CMAKE_C_FLAGS "-Wall -Wextra -g")
-	endif()
-	if(NOT (DEFINED ENV{CXXFLAGS} OR CMAKE_CXX_FLAGS))
-		set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
-	endif()
-endif()
 
 # Install target
 install(TARGETS ${PROJECT_NAME}

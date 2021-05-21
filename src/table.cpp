@@ -14,34 +14,4 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
-
-#include <readline/history.h>
-#include <readline/readline.h>
-
-#include "args.hpp"
-#include "completion.hpp"
-#include "parser_def.h"
-
-int main(int argc, char* argv[])
-{
-	db2::args a;
-
-	a.parse(argc, argv);
-
-	init_readline();
-	init_history();
-
-	while(char* line = readline("SQL> "))
-	{
-		if(strlen(line) > 0)
-		{
-			add_history(line);
-			parse(line);
-		}
-
-		free(line);
-	}
-
-	exit(EXIT_SUCCESS);
-}
+#include "table.hpp"
