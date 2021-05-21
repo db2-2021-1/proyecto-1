@@ -2,95 +2,20 @@
 #include <fstream>
 #include <utility>
 #include <vector>
-#include <map>
+//#include <map>
 
-//#include "register.h"
-#define MAX 3
+#include "register.h"
 
-#define blockFactor 2
-#define hashSize 4
 const std::string filename = "./sample.dat";
-typedef int keyType;
-struct Register
-{
-  keyType id;
-  char firstName[16];
-  char lastName[16];
-  int age;
-
-  Register() {}
-
-  Register(keyType _id, std::string _firstName, std::string _lastName, int _age) : id(_id), age(_age)
-  {
-    for (int i = 0; i < 16; i++)
-    {
-      if (i < _firstName.size())
-      {
-        firstName[i] = _firstName[i];
-      }
-      else
-      {
-        firstName[i] = '\0';
-      }
-    }
-    for (int i = 0; i < 16; i++)
-    {
-      if (i < _lastName.size())
-      {
-        lastName[i] = _lastName[i];
-      }
-      else
-      {
-        lastName[i] = '\0';
-      }
-    }
-  }
-};
-
-struct Bucket
-{
-private:
-  int cant_registros = 3;
-  //std::vector<Register> registros;
-  std::vector<long> registros;
-
-public:
-  Bucket() {}
-
-  void insert(Register reg)
-  {
-    std::fstream file;
-    file.open(filename);
-    file.seekg(0, std::ios::end);
-    long pos = file.tellg();
-    file.write((char *)&reg, sizeof(Register));
-    //indexVec.insert(indexVec.end(), std::pair<keyType, long>(reg.id, pos));
-    file.close();
-  }
-};
-
-struct Node
-{
-  bool IS_LEAF;
-  int *key, size;
-  Node **ptr;
-  std::map<int, long> values; //int -> id, long -> posicion del registro
-  friend class BPTree;
-  Node()
-  {
-    key = new int[MAX];
-    ptr = new Node *[MAX + 1];
-  }
-  int pos_registro = 0;
-};
 
 class BPlusTree
 {
 private:
   Node *root;
+  keyType firstid;
   void insertInternal(int x, Node *cursor, Node *child, long posicion)
   {
-    std::cout << "fdsafdsafdsafds" << std::endl;
+    std::cout << "insertInternal" << std::endl;
     if (cursor->size < MAX)
     {
       int i = 0;
@@ -196,7 +121,7 @@ public:
     file.open(filename, std::ofstream::out | std::ofstream::trunc);
     root = NULL;
   }
-  void find(int id)
+  Node *findNode(int id)
   {
     if (root == NULL)
     {
@@ -225,25 +150,75 @@ public:
       {
         if (cursor->key[i] == id)
         {
-          std::cout << "Found\n";
-          return;
+          return cursor;
         }
       }
-      std::cout << "Not found\n";
+      return nullptr;
+    }
+  }
+
+  Register find(int id)
+  {
+    if (root == NULL)
+    {
+      std::cout << "Tree is empty\n";
+    }
+    else
+    {
+      Node *cursor = root;
+      while (cursor->IS_LEAF == false)
+      {
+        for (int i = 0; i < cursor->size; i++)
+        {
+          if (id < cursor->key[i])
+          {
+            cursor = cursor->ptr[i];
+            break;
+          }
+          if (i == cursor->size - 1)
+          {
+            cursor = cursor->ptr[i + 1];
+            break;
+          }
+        }
+      }
+      for (int i = 0; i < cursor->size; i++)
+      {
+        if (cursor->key[i] == id)
+        {
+          auto posicion_registro = cursor->values.find(id)->second;
+          if (id != firstid && posicion_registro == 0)
+          {
+            return Register(-1, "Not found", "Not found", -1);
+          }
+          //pos = getRegisterPos(key);
+          std::fstream file;
+          std::string line;
+          file.open(filename);
+          file.seekg(posicion_registro);
+          auto *ptrReg = new Register;
+          file.read((char *)ptrReg, sizeof(Register));
+          //getline(file, line);
+          //Register reg = textToRegisterCSV(line);
+          file.close();
+          return *ptrReg;
+        }
+      }
+      return Register(-1, "Not found", "Not found", -1);
     }
   }
 
   void insert(Register reg)
   {
     int x = reg.id;
-    std::cout<<"\n\n\n\n\n\n\n\n";
-    std::cout << "x:" << x <<"\n"; 
+    //std::cout<<"\n\n\n\n\n\n\n\n";
+    //std::cout << "x:" << x <<"\n";
     std::fstream file;
     file.open(filename);
     file.seekg(0, std::ios::end);
     long posicion_registro = file.tellg();
     long aux = posicion_registro;
-    std::cout << "posicion_registro: " << posicion_registro << std::endl;
+    //std::cout << "posicion_registro: " << posicion_registro << std::endl;
     file.write((char *)&reg, sizeof(Register));
     file.close();
 
@@ -252,6 +227,7 @@ public:
       //std::cout << "if (root == NULL) " << std::endl;
       root = new Node;  //se crea el nodo al que root apunto
       root->key[0] = x; // este nodo tiene como su primer elemento de sus llaves = x
+      firstid = x;
       (root->values).insert(std::make_pair(x, posicion_registro));
       root->IS_LEAF = true; // el root como es el unico, tambien es una hoja
       root->size = 1;       // el root tiene 1 elemento
@@ -259,7 +235,6 @@ public:
     else
     {
       //std::cout << "else sssss" << std::endl;
-
       Node *cursor = root; // como el root no esta vacio, minimamente el root tiene 1 elemento
       Node *parent;        // se crea un punto a node llamado parent
       while (cursor->IS_LEAF == false)
@@ -329,7 +304,7 @@ public:
         cursor->ptr[MAX] = NULL;
         for (i = 0; i < cursor->size; i++)
         {
-         // std::cout << "cursor->key[i]: " << cursor->key[i] << std::endl;
+          // std::cout << "cursor->key[i]: " << cursor->key[i] << std::endl;
           cursor->key[i] = virtualNode[i];
           cursor->values.insert(std::make_pair(cursor->key[i], aux));
         }
@@ -405,22 +380,69 @@ public:
       }
     }
   }
-
-  /*
-    Register find(keyType key){
-
+  void remove(keyType key)
+  {
+    if (root == NULL)
+    {
+      std::cout << "Tree is empty\n";
     }
-
-    std::vector<Register> find(keyType beginKey, keyType endKey){
-
+    else
+    {
+      Node *cursor = root;
+      while (cursor->IS_LEAF == false)
+      {
+        for (int i = 0; i < cursor->size; i++)
+        {
+          if (key < cursor->key[i])
+          {
+            cursor = cursor->ptr[i];
+            break;
+          }
+          if (i == cursor->size - 1)
+          {
+            cursor = cursor->ptr[i + 1];
+            break;
+          }
+        }
+      }
+      for (int i = 0; i < cursor->size; i++)
+      {
+        if (cursor->key[i] == key)
+        {
+          std::cout << "key: " << key;
+          cursor->values.erase(key);
+          return;
+        }
+      }
+      //return Register(-1, "NOT FOUND", "NOT FOUND", -1);
+      return;
     }
-
-    void insert(){
-
+  }
+  std::vector<Register> find(keyType beginKey, keyType endKey)
+  {
+    std::vector<Register> registros;
+    int ite = beginKey;
+    Node *reg = findNode(ite);
+    while (reg == nullptr)
+    {
+      ite++;
+      if (ite > endKey)
+      {
+        return registros;
+      }
+      reg = findNode(ite);
     }
-
-    void remove(){
-
+    while(reg->key[0] <= endKey ){
+      int i = 0;
+      for (i = 0; i < reg->size; i++)
+      {
+        if (reg->key[i] >= beginKey && reg->key[i] <= endKey)
+        {
+          registros.push_back(find(reg->key[i]));    
+        }
+      }
+      reg = reg->ptr[reg->size];
     }
-  */
+    return registros;
+  }
 };
