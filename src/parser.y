@@ -40,45 +40,49 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %token VARCHAR
 %token WHERE
 
-//%type <statement> create_table
-//%type <statement> select_table
-//%type <statement> insert_into_table
-//%type <statement> delete_from_table
-
-%type create_table
-%type select_table
-%type insert_into_table
-%type delete_from_table
+%type <statement> create_table
+%type <statement> select_table
+%type <statement> insert_into_table
+%type <statement> delete_from_table
 
 %%
-sql: create_table       { *tree = sql_create(); }
-	| select_table      { *tree = sql_select(); }
-	| insert_into_table { *tree = sql_insert(); }
-	| delete_from_table { *tree = sql_delete(); }
-;
+sql: create_table       { *tree = $1; }
+	| select_table      { *tree = $1; }
+	| insert_into_table { *tree = $1; }
+	| delete_from_table { *tree = $1; }
+	;
 
-create_table: CREATE TABLE NAME '(' new_colums ')';
+create_table
+	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create(); }
+	;
 
-new_colums: name_type | new_colums ',' name_type;
+new_colums
+	: name_type
+	| new_colums ',' name_type
+	;
 
 name_type: NAME TYPE;
 
-TYPE: INT
+TYPE
+	: INT
 	| VARCHAR '(' INTNUM ')'
 	;
 
 
-select_table: SELECT column_list FROM NAME
-	| SELECT column_list FROM NAME WHERE expr
+select_table
+	: SELECT column_list FROM NAME            { $$ = sql_select(); }
+	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select(); }
 	;
 
 column_list: '*' | columns;
 
-columns: NAME
+columns
+	: NAME
 	| columns ',' NAME
 	;
 
-expr: NAME
+expr
+	: NAME
 	| INTNUM
 	| STRING
 	| expr IS expr
@@ -86,20 +90,26 @@ expr: NAME
 	;
 
 
-insert_into_table: INSERT INTO NAME VALUES insert_values;
+insert_into_table
+	: INSERT INTO NAME VALUES insert_values { $$ = sql_insert(); }
+	;
 
-insert_values: '(' data_list ')'
+insert_values
+	: '(' data_list ')'
 	| insert_values ',' '(' data_list ')'
 	;
 
-data_list: INTNUM
+data_list
+	: INTNUM
 	| STRING
 	| data_list ',' INTNUM
 	| data_list ',' STRING
 	;
 
 
-delete_from_table: DELETE FROM NAME WHERE expr;
+delete_from_table
+	: DELETE FROM NAME WHERE expr { $$ = sql_delete(); }
+	;
 %%
 
 sql_statement_tree* parse(const char* str)
