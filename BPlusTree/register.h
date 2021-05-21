@@ -1,37 +1,8 @@
 #include <fstream>
 #include <map>
 
-#define blockFactor 2
-#define hashSize 4
-const std::string filename = "./sample.dat";
-typedef int keyType;
-struct Register{
-    keyType id;
-    char firstName[16];
-    char lastName[16];
-    int age;
 
-    Register(){}
-
-    Register(keyType _id, std::string _firstName, std::string _lastName, int _age):id(_id),age(_age){
-        for(int i = 0; i < 16; i++){
-            if(i < _firstName.size()){
-                firstName[i] = _firstName[i];
-            }else{
-                firstName[i] = '\0';
-            }
-        }
-        for(int i = 0; i < 16; i++){
-            if(i < _lastName.size()){
-                lastName[i] = _lastName[i];
-            }else{
-                lastName[i] = '\0';
-            }
-        }
-
-    }
-};
-
+/*
 class Bucket{
 private:
     std::string value;
@@ -87,4 +58,4 @@ public:
         indexVec.clear();
     }
 
-};
+};*/
