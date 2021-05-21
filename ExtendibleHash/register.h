@@ -1,34 +1,47 @@
 #include <fstream>
 
-#define blockFactor 2
-#define hashSize 4
-const std::string filename = "C:\\Users\\alost\\OneDrive\\Escritorio\\sample.dat";
-typedef int keyType;
+#define blockFactor 4
+#define hashSize 9
+typedef long long keyType;
 
 struct Register{
     keyType id;
-    char firstName[16];
-    char lastName[16];
+    std::string gender;
     int age;
+    int hypertension;
+    int heartDisease;
+    std::string everMarried;
+    std::string workType;
+    std::string residenceType;
+    int avgGlucose;
+    std::string bmi;
+    std::string everSmoke;
+    int stroke;
 
-    Register(){}
+    Register(){};
 
-    Register(keyType _id, std::string _firstName, std::string _lastName, int _age):id(_id),age(_age){
-        for(int i = 0; i < 16; i++){
-            if(i < _firstName.size()){
-                firstName[i] = _firstName[i];
-            }else{
-                firstName[i] = '\0';
-            }
-        }
-        for(int i = 0; i < 16; i++){
-            if(i < _lastName.size()){
-                lastName[i] = _lastName[i];
-            }else{
-                lastName[i] = '\0';
-            }
-        }
+    Register(keyType id, const std::string &gender, int age, int hypertension, int heartDisease,
+             const std::string &everMarried, const std::string &workType, const std::string &residenceType,
+             int avgGlucose, const std::string &bmi, const std::string &everSmoke, int stroke) : id(id), gender(gender),
+                                                                                                 age(age), hypertension(
+                    hypertension), heartDisease(heartDisease), everMarried(everMarried), workType(workType),
+                                                                                                 residenceType(
+                                                                                                         residenceType),
+                                                                                                 avgGlucose(avgGlucose),
+                                                                                                 bmi(bmi),
+                                                                                                 everSmoke(everSmoke),
+                                                                                                 stroke(stroke) {};
+    void print(){
+        std::cout<<"id: "<<id<<"\ngender: "<<gender<<"\nage: "<<age<<"\nhypertension: "<<hypertension
+                        <<"\nheart disease: "<<heartDisease<<"\never married: "<<everMarried<<"\nwork type: "
+                        <<workType<<"\nresidence type: "<<residenceType<<"\navg. glucose: "<<avgGlucose
+                        <<"\nbody mass index: "<<bmi<<"\never smoke: "<<everSmoke<<"\nstroke: "<<stroke<<"\n\n";
+    }
 
+    std::string* dataToCSV(){
+        return new std::string(std::to_string(id)+","+gender+","+std::to_string(age)+","+std::to_string(hypertension)+","+
+                               std::to_string(heartDisease)+","+everMarried+","+workType+","+residenceType+","+std::to_string(avgGlucose)+
+                               bmi+","+everSmoke+","+std::to_string(stroke)+"\n");
     }
 };
 
@@ -42,14 +55,16 @@ private:
 public:
     Bucket(std::string const &val):nextOverflowBucket(nullptr),value(val){depth = val.size();}
 
-    void insert(Register reg){
-        std::fstream file;
-        file.open(filename);
-        file.seekg(0,std::ios::end);
-        long pos = file.tellg();
-        file.write((char *)&reg, sizeof(Register));
-        indexVec.insert(indexVec.end(),std::pair<keyType,long>(reg.id,pos));
-        file.close();
+
+
+    long getRegisterPos(keyType key){
+        auto it = indexVec.find(key);
+        if(it != indexVec.end())
+            return it->second;
+        else if (this->nextOverflowBucket != nullptr)
+            return nextOverflowBucket->getRegisterPos(key);
+        else
+            return -1;
     }
 
     std::map<keyType,long> &getIndexVec() {

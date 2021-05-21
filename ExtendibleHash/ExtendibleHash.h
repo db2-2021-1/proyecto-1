@@ -3,115 +3,14 @@
 #include <map>
 #include <cmath>
 #include <bitset>
+#include <string>
 #include "Register.h"
 
 
 class ExtendedHash {
 private:
     std::map<std::string,Bucket*> hashIndex;
-
-public:
-
-    /** Construye 2^hashSize de índices y 2 buckets iniciales*/
-    ExtendedHash(){
-        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("0",new Bucket("0")));
-        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("1",new Bucket("1")));
-        std::fstream file;
-        file.open(filename, std::ifstream::out | std::ifstream::trunc);
-        file.clear();
-        file.close();
-    }
-
-    /** Toma un valor entero y devuelve los 4 primero bits binarios en string*/
-    std::string hashFunction(int key){
-        return std::bitset<hashSize>(key%(int)pow(2,hashSize)).to_string();
-    }
-
-    /**Funcional*/
-    Register find(keyType key){
-        Bucket* bucket = locateBucket(key);
-        auto it = bucket->getIndexVec().begin();
-        while(it->first != key){
-            if(it == bucket->getIndexVec().end()){
-                if(bucket->getNextOverflowBucket()!=nullptr){
-                    bucket = bucket->getNextOverflowBucket();
-                    it = bucket->getIndexVec().begin();
-                }else{
-                    Register error = Register(-1,"NOT_FOUND","NOT_FOUND",-1);
-                    return error;
-                }
-            }
-            it++;
-        }
-        long pos = it->second;
-        std::fstream file;
-        file.open(filename);
-        file.seekg(pos);
-        auto *rawReg = new Register;
-        file.read((char *)rawReg, sizeof(Register));
-        file.close();
-        return *rawReg;
-    }
-
-    /**Funcional, algoritmo costoso, pero es range query en hash asi que... ¿que debería esperar?*/
-    std::vector<Register> find(keyType beginKey, keyType endKey){
-        std::vector<Register> ansVec = std::vector<Register>();
-        auto *rawReg = new Register;
-        Bucket *bucketPointer;
-        long pos;
-        std::fstream file;
-        for(auto hashIt:hashIndex){
-            bucketPointer = hashIt.second;
-            while(bucketPointer != nullptr){
-                for(auto bucketIt:bucketPointer->getIndexVec()){
-                    if((bucketIt.first >= beginKey)&&(bucketIt.first <= endKey)){
-                        pos = bucketIt.second;
-                        file.open(filename);
-                        file.seekg(pos);
-                        file.read((char *)rawReg, sizeof(Register));
-                        file.close();
-                        ansVec.push_back(*rawReg);
-                    }
-                }
-                bucketPointer = bucketPointer->getNextOverflowBucket();
-            }
-
-        }
-        return ansVec;
-    }
-
-    /**Funcional*/
-    void insert(Register reg){
-        Bucket *bucket = locateBucket(reg.id);
-        keyType key = reg.id;
-        bucket->insert(reg);
-        overflowVerificator(bucket);
-    }
-
-    /**Falta implementar*/
-    void erase(keyType key){
-        Bucket* bucket = locateBucket(key);
-        auto it = bucket->getIndexVec().begin();
-        while(it->first != key){
-            if(it == bucket->getIndexVec().end()){
-                if(bucket->getNextOverflowBucket()!=nullptr){
-                    bucket = bucket->getNextOverflowBucket();
-                    it = bucket->getIndexVec().begin();
-                }
-            }
-            it++;
-        }
-        long pos = it->second;
-        std::fstream file;
-        char blankSpace[sizeof(Register)];
-        file.open(filename);
-        file.seekg(pos);
-        file.write(blankSpace, sizeof(Register));
-        file.close();
-        //Si el bucket queda vacio, liberarlo
-
-
-    }
+    std::string filename;
 
     void overflowVerificator(Bucket *bucket){
         if(bucket->getIndexVec().size() > blockFactor){
@@ -164,9 +63,198 @@ public:
                 value.erase(0,1);
             }
         }
+        value = hashFunction(key);
         auto generatedBucket = new Bucket(value);
         hashIndex.insert(std::pair<std::string,Bucket*>(value,generatedBucket));
         return generatedBucket;
+    }
+
+
+    void fixIndex() {
+        bool issue = false;
+        Bucket *bucketPointer;
+        for(auto hashIt:hashIndex){
+            if(hashIt.second->getIndexVec().empty()){
+                hashIt.second = hashIt.second->getNextOverflowBucket();
+            }else{
+                bucketPointer = hashIt.second;
+                while(bucketPointer!= nullptr){
+                    if(bucketPointer->getNextOverflowBucket()->getIndexVec().empty()){
+                        bucketPointer->setNextOverflowBucket(bucketPointer->getNextOverflowBucket()->getNextOverflowBucket());
+                    }
+                    bucketPointer = bucketPointer->getNextOverflowBucket();
+                }
+            }
+        }
+    }
+
+    Register textToRegisterCSV(std::string text){
+        char c;
+        int state = 0, id = 0, age = 0, hypertension = 0, heartDisease = 0, avgGlucose = 0, stroke = 0;
+        std::string word, gender, everMarried, workType, residenceType, everSmoked, bmi;
+        for(int i = 0; i < text.size(); i++){
+            if(text[i] == '\n'){
+                word.clear();
+                break;
+            }else if(text[i] == ','){
+                if(state == 0) {
+                    id = std::stoi(word);
+                    word.clear();
+                    state++;
+                }else if(state == 1){
+                    gender = word;
+                    word.clear();
+                    state++;
+                }else if(state == 2){
+                    age = std::stoi(word);
+                    word.clear();
+                    state++;
+                }else if(state == 3){
+                    hypertension = std::stoi(word);
+                    word.clear();
+                    state++;
+                }else if(state == 4){
+                    heartDisease = std::stoi(word);
+                    word.clear();
+                    state++;
+                }else if(state == 5){
+                    everMarried = word;
+                    word.clear();
+                    state++;
+                }else if(state == 6){
+                    workType = word;
+                    word.clear();
+                    state++;
+                }else if(state == 7){
+                    residenceType = word;
+                    word.clear();
+                    state++;
+                }else if(state == 8){
+                    avgGlucose = std::stoi(word);
+                    word.clear();
+                    state++;
+                }else if(state == 9){
+                    bmi = word;
+                    word.clear();
+                    state++;
+                }else if(state == 10){
+                    everSmoked = word;
+                    word.clear();
+                    state++;
+                }else{
+                    stroke = std::stoi(word);
+                    word.clear();
+                }
+            }else{
+                word += text[i];
+            }
+        }
+        return Register(id,gender,age,hypertension,heartDisease,everMarried,workType,residenceType,avgGlucose,bmi,everSmoked,stroke);
+    }
+
+    void insertIndex(Register const &reg, long pos){
+        Bucket *bucket = locateBucket(reg.id);
+        bucket->getIndexVec().insert(bucket->getIndexVec().end(),std::pair<keyType,long>(reg.id,pos));
+        overflowVerificator(bucket);
+    }
+
+    /** Toma un valor entero y devuelve los n primero bits binarios en string*/
+    std::string hashFunction(int key){
+        return std::bitset<hashSize>(key%(int)pow(2,hashSize)).to_string();
+    }
+
+    long getRegisterPos(keyType key){
+        Bucket* bucket = locateBucket(key);
+        auto it = bucket->getIndexVec().begin();
+        while(it->first != key){
+            if(it == bucket->getIndexVec().end()){
+                if(bucket->getNextOverflowBucket()!=nullptr){
+                    bucket = bucket->getNextOverflowBucket();
+                    it = bucket->getIndexVec().begin();
+                }
+            }else{
+                it++;
+            }
+        }
+        return it->second;
+    }
+
+public:
+
+    /** Construye 2^hashSize de índices y 2 buckets iniciales*/
+    ExtendedHash(){
+        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("0",new Bucket("0")));
+        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("1",new Bucket("1")));
+    }
+
+    ExtendedHash(std::string const &_filename){
+        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("0",new Bucket("0")));
+        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("1",new Bucket("1")));
+        scanAllCSV(filename);
+    }
+
+    void scanAllCSV(std::string const &_filename){
+        hashIndex.clear();
+        filename = _filename;
+        std::fstream file;
+        std::string ignoreHeader, line;
+        long pos;
+        Register reg;
+        file.open(filename);
+        getline(file,ignoreHeader);
+        pos = file.tellg();
+        while(getline(file,line)){
+            reg = textToRegisterCSV(line);
+            insertIndex(reg, pos);
+            pos = file.tellg();
+        }
+    }
+
+    /**Funcional*/
+    Register find(keyType key){
+        long pos = getRegisterPos(key);
+        std::fstream file;
+        std::string line;
+        file.open(filename);
+        file.seekg(pos);
+        getline(file,line);
+        Register reg = textToRegisterCSV(line);
+        file.close();
+        return reg;
+    }
+
+    /**Funcional, tiene que leer el archivo completo desde memoria secundaria*/
+    std::vector<Register> find(keyType beginKey, keyType endKey){
+        std::vector<Register> ansVec = std::vector<Register>();
+        auto reg =  new Register;
+        std::fstream file;
+        std::string line, headerLine;
+        file.open(filename);
+        getline(file,headerLine);
+        while(getline(file,line)){
+            *reg = textToRegisterCSV(line);
+            if(reg->id >= beginKey && reg->id <= endKey){
+                ansVec.push_back(*reg);
+            }
+        }
+        return ansVec;
+    }
+
+    /**Funcional*/
+    void insert(Register reg){
+        std::fstream file;
+        file.open(filename);
+        file.seekg(0,std::ios::end);
+        long pos = file.tellg();
+        std::string* regText = reg.dataToCSV();
+        file.write((char *)regText,regText->size());
+        file.close();
+        insertIndex(reg,pos);
+    }
+
+    /**Falta implementar*/
+    void erase(keyType key){
+
     }
 
     void print(){
@@ -184,5 +272,4 @@ public:
             std::cout<<"end\n";
         }
     }
-
 };
