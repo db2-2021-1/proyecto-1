@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "parser_def.h"
+#include "tree.h"
 %}
 
 %option caseless

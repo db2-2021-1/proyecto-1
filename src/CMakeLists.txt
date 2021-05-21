@@ -31,8 +31,14 @@ add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
 	PRIVATE
-	${BISON_parser_OUTPUTS}
-	${FLEX_scanner_OUTPUTS}
+		# Generated
+		${BISON_parser_OUTPUTS}
+		${FLEX_scanner_OUTPUTS}
+
+		# C
+		tree.c
+
+		# C++
 		args.cpp
 		completion.cpp
 		main.cpp

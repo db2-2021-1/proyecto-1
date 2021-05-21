@@ -16,15 +16,33 @@
 
 #pragma once
 
-#include "tree.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void parse_init(const char* str);
-sql_statement_tree* parse(const char* str);
-void parse_free(void);
+enum statement_type
+{
+	SQL_INVALID,
+
+	SQL_CREATE,
+	SQL_SELECT,
+	SQL_INSERT,
+	SQL_DELETE
+};
+
+typedef struct _sql_statement_tree
+{
+	int type;
+} sql_statement_tree;
+
+sql_statement_tree* sql_statement_tree_alloc();
+
+sql_statement_tree* sql_create();
+sql_statement_tree* sql_select();
+sql_statement_tree* sql_insert();
+sql_statement_tree* sql_delete();
+
+void sql_statement_tree_free(sql_statement_tree* tree);
 
 #ifdef __cplusplus
 } // extern "C"

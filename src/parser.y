@@ -1,14 +1,23 @@
 %{
 #include <stdio.h>
+
 #include "parser_def.h"
+#include "tree.h"
 
 int yylex();
-void yyerror(const char* s);
+void yyerror(sql_statement_tree** tree, const char* s);
 %}
+
+%code requires {
+#include "tree.h"
+}
+
+%parse-param {sql_statement_tree **tree}
 
 %union {
 	int intval;
 	char *strval;
+	sql_statement_tree *statement;
 }
 
 %left AND
@@ -31,11 +40,21 @@ void yyerror(const char* s);
 %token VARCHAR
 %token WHERE
 
+//%type <statement> create_table
+//%type <statement> select_table
+//%type <statement> insert_into_table
+//%type <statement> delete_from_table
+
+%type create_table
+%type select_table
+%type insert_into_table
+%type delete_from_table
+
 %%
-sql: create_table
-	| select_table
-	| insert_into_table
-	| delete_from_table
+sql: create_table       { *tree = sql_create(); }
+	| select_table      { *tree = sql_select(); }
+	| insert_into_table { *tree = sql_insert(); }
+	| delete_from_table { *tree = sql_delete(); }
 ;
 
 create_table: CREATE TABLE NAME '(' new_colums ')';
@@ -83,16 +102,19 @@ data_list: INTNUM
 delete_from_table: DELETE FROM NAME WHERE expr;
 %%
 
-void parse(const char* str)
+sql_statement_tree* parse(const char* str)
 {
 	parse_init(str);
 
-	printf("%s\n", yyparse() == 0 ? "ok" : "no");
+	sql_statement_tree* tree = NULL;
+	printf("%s\n", yyparse(&tree) == 0 ? "ok" : "no");
 
 	parse_free();
+
+	return tree;
 }
 
-void yyerror(const char* s)
+void yyerror(sql_statement_tree**, const char* s)
 {
 	fprintf(stderr, "%s\n", s);
 }

@@ -37,7 +37,29 @@ int main(int argc, char* argv[])
 		if(strlen(line) > 0)
 		{
 			add_history(line);
-			parse(line);
+			sql_statement_tree* tree = parse(line);
+			if(tree)
+			{
+				switch(tree->type)
+				{
+					case SQL_CREATE:
+						puts("CREATE");
+						break;
+
+					case SQL_DELETE:
+						puts("DELETE");
+						break;
+
+					case SQL_INSERT:
+						puts("INSERT");
+						break;
+
+					case SQL_SELECT:
+						puts("SELECT");
+						break;
+				}
+			}
+			sql_statement_tree_free(tree);
 		}
 
 		free(line);
