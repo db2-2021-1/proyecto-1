@@ -69,7 +69,6 @@ private:
         return generatedBucket;
     }
 
-
     void fixIndex() {
         bool issue = false;
         Bucket *bucketPointer;
@@ -90,8 +89,8 @@ private:
 
     Register textToRegisterCSV(std::string text){
         char c;
-        int state = 0, id = 0, age = 0, hypertension = 0, heartDisease = 0, avgGlucose = 0, stroke = 0;
-        std::string word, gender, everMarried, workType, residenceType, everSmoked, bmi;
+        int state = 0, id = 0, age = 0, hypertension = 0, heartDisease = 0, stroke = 0;
+        std::string word, gender, everMarried, workType, residenceType, everSmoked, bmi, avgGlucose;
         for(int i = 0; i < text.size(); i++){
             if(text[i] == '\n'){
                 word.clear();
@@ -130,7 +129,7 @@ private:
                     word.clear();
                     state++;
                 }else if(state == 8){
-                    avgGlucose = std::stoi(word);
+                    avgGlucose = word;
                     word.clear();
                     state++;
                 }else if(state == 9){
@@ -182,20 +181,14 @@ private:
 public:
 
     /** Construye 2^hashSize de índices y 2 buckets iniciales*/
-    ExtendedHash(){
-        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("0",new Bucket("0")));
-        hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("1",new Bucket("1")));
-    }
-
     ExtendedHash(std::string const &_filename){
         hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("0",new Bucket("0")));
         hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("1",new Bucket("1")));
-        scanAllCSV(filename);
+        filename = _filename;
     }
 
-    void scanAllCSV(std::string const &_filename){
+    void scanAllCSV(){
         hashIndex.clear();
-        filename = _filename;
         std::fstream file;
         std::string ignoreHeader, line;
         long pos;
@@ -223,7 +216,7 @@ public:
         return reg;
     }
 
-    /**Funcional, tiene que leer el archivo completo desde memoria secundaria*/
+    /**Funcional*/
     std::vector<Register> find(keyType beginKey, keyType endKey){
         std::vector<Register> ansVec = std::vector<Register>();
         auto reg =  new Register;
@@ -246,15 +239,32 @@ public:
         file.open(filename);
         file.seekg(0,std::ios::end);
         long pos = file.tellg();
-        std::string* regText = reg.dataToCSV();
-        file.write((char *)regText,regText->size());
+        file<<'\n'<<reg.dataToCSV();
         file.close();
         insertIndex(reg,pos);
     }
 
-    /**Falta implementar*/
+    /**Funcional*/
     void erase(keyType key){
-
+        std::vector<Register> regVec;
+        Register reg;
+        std::fstream file;
+        std::string line, header;
+        file.open(filename);
+        getline(file,header);
+        while(getline(file,line)){
+            reg = textToRegisterCSV(line);
+            if(reg.id != key)
+                regVec.push_back(reg);
+        }
+        file.close();
+        file.open(filename, std::ofstream::out | std::ofstream::trunc);
+        file<<header;
+        for(auto it:regVec){
+            file<<'\n'<<it.dataToCSV();
+        }
+        file.close();
+        scanAllCSV();
     }
 
     void print(){
