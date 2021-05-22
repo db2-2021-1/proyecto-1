@@ -49,7 +49,7 @@ void init_history()
 {
 	using_history();
 
-	if(FILE* file = fopen(history_file.c_str(), "r"))
+	if(FILE* file = fopen(history_file.c_str(), "a"))
 	{
 		fclose(file);
 
