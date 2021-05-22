@@ -19,9 +19,13 @@
 #include <string>
 #include <variant>
 
+#include "tree.h"
+
 namespace db2::statement
 {
 
 using literal = std::variant<int, std::string>;
+
+literal from_union(sql_literal l);
 
 }

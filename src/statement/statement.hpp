@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "tree.h"
@@ -37,10 +38,18 @@ protected:
 	statement(){};
 
 	virtual bool execute() = 0;
+	virtual std::ostream& print(std::ostream&) const = 0;
 public:
 	virtual ~statement(){};
+
+	friend std::ostream& operator<<(std::ostream& os, const statement& i);
 };
 
-std::unique_ptr<statement> from_tree(sql_statement_tree& tree);
+std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
 
+/// Parses a SQL string to an abstract syntax tree. Then from_tree()
+/// is called.
+std::unique_ptr<statement> from_string(std::string_view str);
+
+std::ostream& operator<<(std::ostream& os, const statement& i);
 }

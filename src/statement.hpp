@@ -16,6 +16,6 @@
 
 #pragma once
 
-#include "statement/abstract.hpp"
 #include "statement/insert.hpp"
 #include "statement/literal.hpp"
+#include "statement/statement.hpp"

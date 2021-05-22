@@ -14,38 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
+#include "literal.hpp"
 
-#include <readline/history.h>
-#include <readline/readline.h>
-
-#include "args.hpp"
-#include "completion.hpp"
-#include "statement.hpp"
-
-int main(int argc, char* argv[])
+db2::statement::literal db2::statement::from_union(sql_literal l)
 {
-	db2::args a;
-
-	a.parse(argc, argv);
-
-	init_readline();
-	init_history();
-
-	while(char* line = readline("SQL> "))
+	switch(l.type)
 	{
-		if(strlen(line) > 0)
-		{
-			add_history(line);
+		case SQL_INT:
+			return l.value.number;
 
-			if(auto statement = db2::statement::from_string(line))
-			{
-				std::cout << *statement;
-			}
-		}
+		case SQL_STRING:
+			return l.value.str;
 
-		free(line);
+		default:
+			return {};
 	}
-
-	exit(EXIT_SUCCESS);
 }

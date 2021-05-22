@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 #include "statement.hpp"
 #include "literal.hpp"
@@ -24,17 +25,29 @@
 namespace db2::statement
 {
 
+/// INSERT INTO table_name VALUES
+/// (data),
+/// (data),
+/// (data)
 class insert: public statement
 {
 private:
 	std::vector<std::vector<literal>> data;
 
+	insert(const sql_statement_tree& tree);
+	virtual std::ostream& print(std::ostream& os) const;
 public:
 	insert(std::string table_name, std::vector<std::vector<literal>> data);
 	insert();
 
 	virtual bool execute();
 	virtual ~insert(){};
+
+	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::ostream& operator<<(std::ostream& os, const insert& i);
+	friend class statement;
 };
+
+std::ostream& operator<<(std::ostream& os, const insert& i);
 
 }

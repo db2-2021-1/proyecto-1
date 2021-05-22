@@ -21,9 +21,37 @@ db2::statement::insert::insert(std::string table_name, std::vector<std::vector<l
 	data(std::move(data))
 {};
 
+db2::statement::insert::insert(const sql_statement_tree& tree)
+{
+	table_name = tree.table_name;
+
+	for(auto* row = tree.insert_values; row != nullptr; row = row->next)
+	{
+		std::vector<literal> new_column;
+		for(auto* column = row->data_list; column != nullptr; column = column->next)
+		{
+			new_column.push_back(from_union(column->literal));
+		}
+
+		data.push_back(std::move(new_column));
+	}
+}
+
 db2::statement::insert::insert(){};
 
 bool db2::statement::insert::execute()
 {
 	return false;
+}
+
+std::ostream& db2::statement::insert::print(std::ostream& os) const
+{
+	return os << *this;
+}
+
+std::ostream& db2::statement::operator<<(std::ostream& os, const insert& i)
+{
+	os << "INSERT " << i.table_name << '\n';
+
+	return os;
 }
