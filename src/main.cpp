@@ -23,6 +23,9 @@
 #include "completion.hpp"
 #include "statement.hpp"
 
+#define DEFAULT_PROMPT "\e[1;36mSQL\e[1;33m>\e[0m "
+#define ERROR_PREFIX "\e[1;31m!!!\e[0m "
+
 int main(int argc, char* argv[])
 {
 	db2::args a;
@@ -32,8 +35,16 @@ int main(int argc, char* argv[])
 	init_readline();
 	init_history();
 
-	while(char* line = readline("\e[1;36mSQL\e[1;33m>\e[0m "))
+	int prompt_i = 0;
+	const char* prompts[2] =
 	{
+		DEFAULT_PROMPT,
+		ERROR_PREFIX DEFAULT_PROMPT
+	};
+
+	while(char* line = readline(prompts[prompt_i]))
+	{
+		prompt_i = 0;
 		if(strlen(line) > 0)
 		{
 			add_history(line);
@@ -41,10 +52,10 @@ int main(int argc, char* argv[])
 			if(auto statement = db2::statement::from_string(line))
 			{
 				if(!statement->execute())
-				{
-					std::cout << "\e[1;31m!!!\e[0m ";
-				}
+					prompt_i = 1;
 			}
+			else
+				prompt_i = 1;
 		}
 
 		free(line);
