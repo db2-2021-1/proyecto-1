@@ -19,7 +19,7 @@
 #include <iostream>
 
 #include "args.hpp"
-#include "parser_def.h"
+#include "statement.hpp"
 
 void db2::args::parse(int argc, char* argv[])
 {
@@ -33,7 +33,6 @@ void db2::args::parse(int argc, char* argv[])
 
 	while((c = getopt_long(argc, argv, shortopts, options, nullptr)) != -1)
 	{
-		sql_statement_tree* tree = NULL;
 		switch(c)
 		{
 			case 'h':
@@ -41,9 +40,10 @@ void db2::args::parse(int argc, char* argv[])
 				break;
 
 			case 'c':
-				tree = ::parse(optarg);
-				sql_statement_tree_print(tree, stdout);
-				sql_statement_tree_free(tree);
+				if(auto statement = db2::statement::from_string(optarg))
+				{
+					std::cout << *statement;
+				}
 				exit(EXIT_SUCCESS);
 
 			default:
