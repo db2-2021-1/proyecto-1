@@ -11,18 +11,21 @@
 %%
 AND     { return AND;     }
 BETWEEN { return BETWEEN; }
+CREATE  { return CREATE;  }
 DELETE  { return DELETE;  }
 FROM    { return FROM;    }
+INDEX   { return INDEX;   }
 INSERT  { return INSERT;  }
+INT     { return INT;     }
 INTO    { return INTO;    }
 IS      { return IS;      }
+ON      { return ON;      }
 SELECT  { return SELECT;  }
 TABLE   { return TABLE;   }
+USING   { return USING;   }
 VALUES  { return VALUES;  }
-WHERE   { return WHERE;   }
-INT     { return INT;     }
 VARCHAR { return VARCHAR; }
-CREATE  { return CREATE;  }
+WHERE   { return WHERE;   }
 
 \"(\\.|\"\"|[^"\n])*\" {
 	yylval.strval = strndup(yytext+1, strlen(yytext)-2);

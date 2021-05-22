@@ -23,7 +23,10 @@ std::unique_ptr<db2::statement::statement>
 {
 	switch(tree.type)
 	{
-		case SQL_CREATE:
+		case SQL_CREATE_TABLE:
+			return nullptr;
+
+		case SQL_CREATE_INDEX:
 			return nullptr;
 
 		case SQL_SELECT:
@@ -45,9 +48,12 @@ std::unique_ptr<db2::statement::statement>
 {
 	if(sql_statement_tree* tree = parse(str.data()))
 	{
-		return from_tree(*tree);
+		auto statement = from_tree(*tree);
+
+		sql_statement_tree_print(tree, stdout);
 
 		sql_statement_tree_free(tree);
+		return statement;
 	}
 
 	return nullptr;

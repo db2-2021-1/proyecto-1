@@ -40,16 +40,20 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %token CREATE
 %token DELETE
 %token FROM
+%token INDEX
 %token INSERT
 %token INT
 %token INTO
+%token ON
 %token SELECT
 %token TABLE
+%token USING
 %token VALUES
 %token VARCHAR
 %token WHERE
 
 %type <statement> create_table
+%type <statement> create_index
 %type <statement> select_table
 %type <statement> insert_into_table
 %type <statement> delete_from_table
@@ -64,14 +68,16 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <new_colums> new_colums;
 
 %%
-sql: create_table       { *tree = $1; }
+sql
+	: create_table      { *tree = $1; }
+	| create_index      { *tree = $1; }
 	| select_table      { *tree = $1; }
 	| insert_into_table { *tree = $1; }
 	| delete_from_table { *tree = $1; }
 	;
 
 create_table
-	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create($3, $5); }
+	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create_table($3, $5); }
 	;
 
 new_colums
@@ -88,6 +94,14 @@ TYPE
 	| VARCHAR '(' INTNUM ')' { $$ = sql_type_varchar($3); }
 	;
 
+
+create_index
+	: CREATE INDEX ON NAME '(' column_list ')' { $$ = sql_create_index($4, $6); }
+	| CREATE INDEX ON NAME USING NAME '(' column_list ')' {
+		$$ = sql_create_index_using($4, $6, $8);
+		free($6);
+	}
+	;
 
 select_table
 	: SELECT column_list FROM NAME            { $$ = sql_select($2, $4); }

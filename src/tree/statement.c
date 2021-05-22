@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "statement.h"
 
@@ -23,9 +24,10 @@ sql_statement_tree* sql_statement_tree_alloc()
 	sql_statement_tree* tree =
 		(sql_statement_tree*)malloc(sizeof(sql_statement_tree));
 
-	if(!tree)
+	if(tree)
 	{
 		tree->type          = SQL_INVALID;
+		tree->index_type    = SQL_BPTREE;
 		tree->columns       = NULL;
 		tree->table_name    = NULL;
 		tree->insert_values = NULL;
@@ -36,13 +38,43 @@ sql_statement_tree* sql_statement_tree_alloc()
 	return tree;
 };
 
-sql_statement_tree* sql_create(char* table_name, sql_new_columns* new_columns)
+sql_statement_tree* sql_create_table(char* table_name, sql_new_columns* new_columns)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
-	tree->type        = SQL_CREATE;
-	tree->table_name  = table_name;
-	tree->new_columns = new_columns;
+	if(tree)
+	{
+		tree->type		= SQL_CREATE_TABLE;
+		tree->table_name  = table_name;
+		tree->new_columns = new_columns;
+	}
+
+	return tree;
+}
+
+sql_statement_tree* sql_create_index(char* table_name, sql_columns* columns)
+{
+	sql_statement_tree* tree = sql_statement_tree_alloc();
+
+	if(tree)
+	{
+		tree->type		= SQL_CREATE_INDEX;
+		tree->index_type  = SQL_BPTREE;
+		tree->table_name  = table_name;
+		tree->columns	 = columns;
+	}
+
+	return tree;
+}
+
+sql_statement_tree* sql_create_index_using(char* table_name, const char* index_type, sql_columns* columns)
+{
+	sql_statement_tree* tree = sql_create_index(table_name, columns);
+
+	if(strcmp(index_type, "hash") == 0 && tree)
+	{
+		tree->index_type = SQL_HASH;
+	}
 
 	return tree;
 }
@@ -51,9 +83,12 @@ sql_statement_tree* sql_select(sql_columns* columns, char* table_name)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
-	tree->type       = SQL_SELECT;
-	tree->columns    = columns;
-	tree->table_name = table_name;
+	if(tree)
+	{
+		tree->type	   = SQL_SELECT;
+		tree->columns	= columns;
+		tree->table_name = table_name;
+	}
 
 	return tree;
 }
@@ -62,7 +97,10 @@ sql_statement_tree* sql_select_where(sql_columns* columns, char* table_name, sql
 {
 	sql_statement_tree* tree = sql_select(columns, table_name);
 
-	tree->expr = expr;
+	if(tree)
+	{
+		tree->expr = expr;
+	}
 
 	return tree;
 }
@@ -71,9 +109,12 @@ sql_statement_tree* sql_insert(char* table_name, sql_insert_values* insert_value
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
-	tree->type          = SQL_INSERT;
-	tree->table_name    = table_name;
-	tree->insert_values = insert_values;
+	if(tree)
+	{
+		tree->type		  = SQL_INSERT;
+		tree->table_name	= table_name;
+		tree->insert_values = insert_values;
+	}
 
 	return tree;
 }
@@ -82,9 +123,12 @@ sql_statement_tree* sql_delete(char* table_name, sql_expr* expr)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
-	tree->type       = SQL_DELETE;
-	tree->table_name = table_name;
-	tree->expr       = expr;
+	if(tree)
+	{
+		tree->type	   = SQL_DELETE;
+		tree->table_name = table_name;
+		tree->expr	   = expr;
+	}
 
 	return tree;
 }
@@ -109,9 +153,15 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 	{
 		switch(tree->type)
 		{
-			case SQL_CREATE:
-				fprintf(file, "CREATE %s\n", tree->table_name);
+			case SQL_CREATE_TABLE:
+				fprintf(file, "CREATE TABLE %s\n", tree->table_name);
 				sql_new_columns_print(tree->new_columns, file);
+				break;
+
+			case SQL_CREATE_INDEX:
+				fprintf(file, "CREATE INDEX %s", tree->table_name);
+				fprintf(file, "%s\n", tree->index_type == SQL_HASH ? "USING hash" : "");
+				sql_columns_print(tree->columns, file);
 				break;
 
 			case SQL_DELETE:

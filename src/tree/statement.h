@@ -31,15 +31,23 @@ enum sql_statement_type
 {
 	SQL_INVALID,
 
-	SQL_CREATE,
+	SQL_CREATE_TABLE,
+	SQL_CREATE_INDEX,
 	SQL_SELECT,
 	SQL_INSERT,
 	SQL_DELETE
 };
 
+enum sql_index_type
+{
+	SQL_BPTREE,
+	SQL_HASH
+};
+
 typedef struct _sql_statement_tree
 {
 	int type;
+	int index_type;
 	sql_columns* columns;
 	char* table_name;
 	sql_insert_values* insert_values;
@@ -50,24 +58,22 @@ typedef struct _sql_statement_tree
 sql_statement_tree* sql_statement_tree_alloc();
 
 /// Creates a CREATE TABLE tree.
-/// table_name must be allocated with malloc, and its ownership its
-/// transfered to the tree.
-sql_statement_tree* sql_create(char* table_name, sql_new_columns* new_columns);
+sql_statement_tree* sql_create_table(char* table_name, sql_new_columns* new_columns);
+
+/// Creates a CREATE INDEX tree.
+sql_statement_tree* sql_create_index(char* table_name, sql_columns* columns);
+
+/// Creates a CREATE INDEX tree with a custom index
+sql_statement_tree* sql_create_index_using(char* table_name, const char* index_type, sql_columns* columns);
 
 /// Creates a SELECT tree.
-/// table_name must be allocated with malloc, and its ownership its
-/// transfered to the tree.
 sql_statement_tree* sql_select(sql_columns* columns, char* table_name);
 sql_statement_tree* sql_select_where(sql_columns* columns, char* table_name, sql_expr* expr);
 
 /// Creates a INSERT INTO tree.
-/// table_name must be allocated with malloc, and its ownership its
-/// transfered to the tree.
 sql_statement_tree* sql_insert(char* table_name, sql_insert_values* insert_values);
 
 /// Creates a DELETE FROM tree.
-/// table_name must be allocated with malloc, and its ownership its
-/// transfered to the tree.
 sql_statement_tree* sql_delete(char* table_name, sql_expr* expr);
 
 void sql_statement_tree_free(sql_statement_tree* tree);

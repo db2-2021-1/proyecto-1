@@ -23,6 +23,10 @@ extern "C" {
 #endif
 
 void parse_init(const char* str);
+
+#if __GNUC__ >= 11
+__attribute__ ((malloc (sql_statement_tree_free, 1)))
+#endif
 sql_statement_tree* parse(const char* str);
 void parse_free(void);
 
