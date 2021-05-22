@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "create_index.hpp"
+#include "create_table.hpp"
 #include "delete_from.hpp"
 #include "insert.hpp"
 #include "parser_def.h"
@@ -27,7 +28,7 @@ std::unique_ptr<db2::statement::statement>
 	switch(tree.type)
 	{
 		case SQL_CREATE_TABLE:
-			return nullptr;
+			return std::unique_ptr<statement>(new(std::nothrow) create_table(tree));
 
 		case SQL_CREATE_INDEX:
 			return std::unique_ptr<statement>(new(std::nothrow) create_index(tree));

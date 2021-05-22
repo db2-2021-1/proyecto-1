@@ -16,41 +16,35 @@
 
 #pragma once
 
+#include <vector>
 #include <iostream>
 
-#include "tree.h"
+#include "statement.hpp"
+#include "type.hpp"
 
 namespace db2::statement
 {
 
-struct type
+/// CREATE TABLE name(name type, name type)
+class create_table: public statement
 {
-	enum class _type
-	{
-		INT,
-		VARCHAR
-	};
+private:
+	std::vector<std::pair<std::string, type>> data_types;
 
-	_type t;
-	size_t size;
+	create_table(const sql_statement_tree& tree);
+	virtual std::ostream& print(std::ostream& os) const;
+public:
+	create_table(std::string table_name, std::vector<std::pair<std::string, type>> data_types);
+	create_table();
 
-	type(sql_type sql_t)
-	{
-		switch(sql_t.type)
-		{
-			case SQL_INT:
-				t = _type::INT;
-				break;
+	virtual bool execute();
+	virtual ~create_table(){};
 
-			case SQL_VARCHAR:
-				t = _type::VARCHAR;
-				break;
-		}
-
-		size = sql_t.size;
-	}
+	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::ostream& operator<<(std::ostream& os, const create_table& c);
+	friend class statement;
 };
 
-std::ostream& operator<<(std::ostream& os, const type& t);
+std::ostream& operator<<(std::ostream& os, const create_table& c);
 
 }

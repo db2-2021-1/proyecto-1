@@ -14,14 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "type.hpp"
 
-#include "statement/create_index.hpp"
-#include "statement/create_table.hpp"
-#include "statement/delete_from.hpp"
-#include "statement/expression.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
-#include "statement/select.hpp"
-#include "statement/statement.hpp"
-#include "statement/type.hpp"
+std::ostream& db2::statement::operator<<(std::ostream& os, const type& t)
+{
+	switch(t.t)
+	{
+		case type::_type::INT:
+			os << "INT";
+			break;
+
+		case type::_type::VARCHAR:
+			os << "VARCHAR (" << t.size << ")";
+			break;
+	}
+
+	return os;
+}

@@ -18,10 +18,12 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 		# C++
 		create_index.cpp
+		create_table.cpp
 		delete_from.cpp
 		expression.cpp
 		insert.cpp
 		literal.cpp
 		select.cpp
 		statement.cpp
+		type.cpp
 )
