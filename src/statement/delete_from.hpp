@@ -16,36 +16,36 @@
 
 #pragma once
 
-#include <string>
+#include <iostream>
+#include <optional>
+#include <vector>
 
-#include "literal.hpp"
-#include "tree.h"
+#include "expression.hpp"
+#include "statement.hpp"
 
 namespace db2::statement
 {
 
-struct expression
+/// DELETE FROM name expression
+class delete_from: public statement
 {
-	enum class type
-	{
-		// name IS literal
-		is,
+private:
+	expression expr;
 
-		// name BETWEEN literal AND literal
-		between
-	};
+	delete_from(const sql_statement_tree& tree);
+	virtual std::ostream& print(std::ostream& os) const;
+public:
+	delete_from(std::string table_name, expression expr);
+	delete_from();
 
-	type t;
+	virtual bool execute();
+	virtual ~delete_from(){};
 
-	std::string column;
-	literal value[2];
-
-	expression(std::string column, literal value);
-	expression(std::string column, literal value_ge, literal value_le);
-	expression(const sql_expr& expr);
-	expression();
+	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::ostream& operator<<(std::ostream& os, const delete_from& i);
+	friend class statement;
 };
 
-std::ostream& operator<<(std::ostream& os, const expression& l);
+std::ostream& operator<<(std::ostream& os, const delete_from& s);
 
 }

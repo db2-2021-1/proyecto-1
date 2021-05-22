@@ -125,7 +125,7 @@ sql_statement_tree* sql_delete(char* table_name, sql_expr* expr)
 
 	if(tree)
 	{
-		tree->type       = SQL_DELETE;
+		tree->type       = SQL_DELETE_FROM;
 		tree->table_name = table_name;
 		tree->expr       = expr;
 	}
@@ -164,7 +164,7 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 				sql_columns_print(tree->columns, file);
 				break;
 
-			case SQL_DELETE:
+			case SQL_DELETE_FROM:
 				fprintf(file, "DELETE %s\n", tree->table_name);
 				sql_expr_print(tree->expr, file);
 				break;

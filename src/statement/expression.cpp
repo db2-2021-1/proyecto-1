@@ -52,6 +52,8 @@ db2::statement::expression::expression(const sql_expr& expr)
 	}
 }
 
+db2::statement::expression::expression(){};
+
 std::ostream& db2::statement::operator<<(std::ostream& os, const expression& l)
 {
 	os << l.column << ' ';

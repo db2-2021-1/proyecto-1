@@ -18,6 +18,7 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 		# C++
 		create_index.cpp
+		delete_from.cpp
 		expression.cpp
 		insert.cpp
 		literal.cpp

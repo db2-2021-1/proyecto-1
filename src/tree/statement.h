@@ -35,7 +35,7 @@ enum sql_statement_type
 	SQL_CREATE_INDEX,
 	SQL_SELECT,
 	SQL_INSERT,
-	SQL_DELETE
+	SQL_DELETE_FROM
 };
 
 enum sql_index_type

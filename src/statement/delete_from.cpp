@@ -14,38 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "delete_from.hpp"
 
-#include <string>
+db2::statement::delete_from::delete_from(std::string table_name, expression expr):
+	statement(std::move(table_name)),
+	expr(std::move(expr))
+{};
 
-#include "literal.hpp"
-#include "tree.h"
+db2::statement::delete_from::delete_from(const sql_statement_tree& tree):
+	statement(tree.table_name),
+	expr(*tree.expr)
+{};
 
-namespace db2::statement
+db2::statement::delete_from::delete_from(){};
+
+bool db2::statement::delete_from::execute()
 {
+	// TODO
+	return false;
+}
 
-struct expression
+std::ostream& db2::statement::delete_from::print(std::ostream& os) const
 {
-	enum class type
-	{
-		// name IS literal
-		is,
+	return os << *this;
+}
 
-		// name BETWEEN literal AND literal
-		between
-	};
-
-	type t;
-
-	std::string column;
-	literal value[2];
-
-	expression(std::string column, literal value);
-	expression(std::string column, literal value_ge, literal value_le);
-	expression(const sql_expr& expr);
-	expression();
-};
-
-std::ostream& operator<<(std::ostream& os, const expression& l);
-
+std::ostream& db2::statement::operator<<(std::ostream& os, const delete_from& s)
+{
+	return os
+		<< "DELETE FROM " << s.table_name << '\n'
+		<< s.expr << '\n';
 }
