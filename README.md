@@ -18,3 +18,7 @@ cmake -B build
 
 cmake --build build
 ```
+
+## Ejecución
+
+https://user-images.githubusercontent.com/39320840/119235993-b4a16b00-bafa-11eb-8b16-f86d2266e12c.mp4
