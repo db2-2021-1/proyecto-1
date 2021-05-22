@@ -39,8 +39,15 @@ db2::statement::select::select(){};
 
 bool db2::statement::select::execute()
 {
+	// select{
+	//     columns    // SELECT a,b,c
+	//     table_name // FROM name
+	//     expr?      // [ WHERE expr ]
+	// }
+
 	// TODO
 	std::cout << *this;
+
 	return false;
 }
 

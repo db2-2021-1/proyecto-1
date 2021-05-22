@@ -41,8 +41,14 @@ db2::statement::insert::insert(){};
 
 bool db2::statement::insert::execute()
 {
+	// insert{
+	//     table_name // INSERT INTO name VALUES
+	//     data       // (1,2,"a"), (2,3,"b")
+	// }
+
 	// TODO
 	std::cout << *this;
+
 	return false;
 }
 

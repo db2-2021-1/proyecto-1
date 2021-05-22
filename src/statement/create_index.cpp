@@ -44,8 +44,15 @@ db2::statement::create_index::create_index(){};
 
 bool db2::statement::create_index::execute()
 {
+	// create_index{
+	//     table_name  // CREATE INDEX ON name
+	//     type        // [ USING hash ]
+	//     column_name // (a)
+	// }
+
 	// TODO
 	std::cout << *this;
+
 	return false;
 }
 

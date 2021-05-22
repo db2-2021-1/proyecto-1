@@ -30,8 +30,14 @@ db2::statement::delete_from::delete_from(){};
 
 bool db2::statement::delete_from::execute()
 {
+	// delete_from{
+	//     table_name // DELETE FROM name
+	//     expr       // WHERE expr
+	// }
+
 	// TODO
 	std::cout << *this;
+
 	return false;
 }
 

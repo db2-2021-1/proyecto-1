@@ -35,8 +35,14 @@ db2::statement::create_table::create_table(){};
 
 bool db2::statement::create_table::execute()
 {
+	// create_table{
+	//     table_name  // CREATE TABLE name
+	//     data_types  // (data type, data type(size))
+	// }
+
 	// TODO
 	std::cout << *this;
+
 	return false;
 }
 
