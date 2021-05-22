@@ -16,11 +16,39 @@
 
 #pragma once
 
-#include "statement/create_index.hpp"
-#include "statement/delete_from.hpp"
-#include "statement/expression.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
-#include "statement/select.hpp"
-#include "statement/statement.hpp"
-#include "statement/type.hpp"
+#include <cstdlib>
+
+#include "tree.h"
+
+namespace db2::statement
+{
+
+struct type
+{
+	enum class _type
+	{
+		INT,
+		VARCHAR
+	};
+
+	_type t;
+	size_t size;
+
+	type(sql_type sql_t)
+	{
+		switch(sql_t.type)
+		{
+			case SQL_INT:
+				t = _type::INT;
+				break;
+
+			case SQL_VARCHAR:
+				t = _type::VARCHAR;
+				break;
+		}
+
+		size = sql_t.size;
+	}
+};
+
+}
