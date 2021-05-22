@@ -9,11 +9,12 @@
 * `bison`
 * `cmake`
 * `flex`
+* `rapidjson`
 * `readline`
 
 ## Compilación
 ``` bash
-sudo apt install libreadline-dev bison libfl-dev
+sudo apt install cmake libreadline-dev bison libfl-dev rapidjson-dev
 cmake -B build
 
 cmake --build build

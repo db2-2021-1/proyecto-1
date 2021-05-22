@@ -14,4 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <cstdio>
+
+#include <rapidjson/filereadstream.h>
+#include <rapidjson/filewritestream.h>
+
 #include "table.hpp"
+
+db2::table::table(
+		std::string table_name,
+		std::vector<std::pair<std::string, statement::type>> columns,
+		std::optional<index> table_index
+	):
+	table_name(std::move(table_name)),
+	columns(std::move(columns)),
+	table_index(std::move(table_index))
+{};
+
+bool db2::table::read_metadata()
+{
+	return false;
+}
+
+bool db2::table::write_metadata()
+{
+	return false;
+}

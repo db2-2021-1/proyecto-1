@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdio>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -29,19 +30,26 @@ namespace db2
 /// This class manages the operations on a table.
 class table
 {
+public:
+	struct index
+	{
+		std::string column_name;
+		statement::index_type type;
+	};
 private:
-	std::string name;
-
-	/// Name of the column used as primary key.
-	std::string primary_key;
-
-	statement::index_type type;
+	std::string table_name;
+	std::vector<std::pair<std::string, statement::type>> columns;
+	std::optional<index> table_index;
 
 public:
-	table(std::string name):
-		name(std::move(name))
-	{};
+	table(
+		std::string table_name,
+		std::vector<std::pair<std::string, statement::type>> columns,
+		std::optional<index> table_index = std::nullopt
+	);
 
+	bool read_metadata();
+	bool write_metadata();
 };
 
 };
