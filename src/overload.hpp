@@ -16,18 +16,16 @@
 
 #pragma once
 
-#include <string>
-#include <variant>
-
-#include "tree.h"
-
-namespace db2::statement
+namespace db2
 {
 
-using literal = std::variant<int, std::string>;
+/// https://arne-mertz.de/2018/05/overload-build-a-variant-visitor-on-the-fly/
+template<class ...Fs>
+struct overload : Fs...
+{
+	overload(Fs const&... fs): Fs{fs}...{};
 
-literal from_union(sql_literal l);
+	using Fs::operator()...;
+};
 
-std::ostream& operator<<(std::ostream& os, const literal& l);
-
-}
+};

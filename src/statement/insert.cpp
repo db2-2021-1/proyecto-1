@@ -53,5 +53,15 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const insert& i)
 {
 	os << "INSERT " << i.table_name << '\n';
 
+	for(const auto& row: i.data)
+	{
+		std::cout << "(";
+		for(const auto& data: row)
+		{
+			std::cout << data << ", ";
+		}
+		std::cout << ")\n";
+	}
+
 	return os;
 }

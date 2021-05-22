@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
+
 #include "literal.hpp"
+#include "overload.hpp"
 
 db2::statement::literal db2::statement::from_union(sql_literal l)
 {
@@ -29,4 +32,20 @@ db2::statement::literal db2::statement::from_union(sql_literal l)
 		default:
 			return {};
 	}
+}
+
+std::ostream& db2::statement::operator<<(std::ostream& os, const literal& l)
+{
+	std::visit(overload{
+		[&os](int number)
+		{
+			os << number;
+		},
+		[&os](const std::string& str)
+		{
+			os << str;
+		},
+	}, l);
+
+	return os;
 }
