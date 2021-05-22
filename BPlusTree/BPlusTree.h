@@ -1,11 +1,14 @@
-#include <iostream>
-#include <fstream>
 #include <utility>
 #include <vector>
 
-#include "register.h"
+#include "csv_lector.h"
 
-const std::string filename = "./sample.dat";
+Register notFound()
+{
+  return Register(-1, "NotFound", -1, -1, -1,
+                  "NotFound", "NotFound", "NotFound",
+                  "NotFound", "NotFound", "NotFound", -1);
+}
 
 class BPlusTree
 {
@@ -14,7 +17,7 @@ private:
   keyType firstid;
   void insertInternal(int x, Node *cursor, Node *child, long posicion)
   {
-    std::cout << "insertInternal" << std::endl;
+    //std::cout << "insertInternal" << std::endl;
     if (cursor->size < MAX)
     {
       int i = 0;
@@ -29,9 +32,13 @@ private:
         cursor->ptr[j] = cursor->ptr[j - 1];
       }
       cursor->key[i] = x;
+      if (cursor->IS_LEAF)
+      {
+        std::cout << "cursor->IS_LEAF LINEA 34\n";
+      }
       cursor->values.insert(std::make_pair(x, posicion));
       cursor->size++;
-      cursor->values.insert(std::make_pair(x, posicion));
+      //cursor->values.insert(std::make_pair(x, posicion));
       cursor->ptr[i + 1] = child;
     }
     else
@@ -183,10 +190,12 @@ public:
       {
         if (cursor->key[i] == id)
         {
-          auto posicion_registro = cursor->values.find(id)->second;
+          auto posicion_registro = (cursor->values.find(id))->second;
+          //std::cout << "id: " << id << "\n";
+          //std::cout << "posicion_registro: " << posicion_registro << "\n";
           if (id != firstid && posicion_registro == 0)
           {
-            return Register(-1, "Not found", "Not found", -1);
+            return notFound();
           }
           std::fstream file;
           std::string line;
@@ -198,7 +207,9 @@ public:
           return *ptrReg;
         }
       }
-      return Register(-1, "Not found", "Not found", -1);
+      //std::cout << "posicion_registro: " << posicion_registro << "\n";
+      std::cout << "id: " << id << std::endl;
+      return notFound();
     }
   }
 

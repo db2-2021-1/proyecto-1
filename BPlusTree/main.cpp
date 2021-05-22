@@ -5,12 +5,19 @@ int main()
 {
     BPlusTree bplustree; //UNCLUSTERED B+ TREE
 
+    Lector lector;
+
+    auto registros = lector.scanAllCSV();
+
+    for(auto &item : registros){
+        bplustree.insert(item);
+    }
     //INSERCION DE UN ELEMENTO
-    bplustree.insert(Register(25, "Esteban", "Principe", 20));
-    bplustree.insert(Register(16, "Andres", "Losta", 20));
-    bplustree.insert(Register(1, "Jose", "De Lama", 21));
-    bplustree.insert(Register(4, "Monita", "China", 18));
-    bplustree.insert(Register(9, "Claudia", "Noche", 21));
+    //bplustree.display(bplustree.getRoot());
+    /*auto register_found = bplustree.find(72915);
+    register_found.print();
+    */
+
     /*
     //BUSQUEDA DE UN SOLO VALOR
     auto register_found = bplustree.find(9);
@@ -22,8 +29,8 @@ int main()
     register_found.print();
     */
     //BUSQUEDA POR RANGO
-    auto registros = bplustree.find(6, 7);
-    for (auto &item : registros)
+    auto registros_ = bplustree.find(222, 600);
+    for (auto &item : registros_)
     {
         item.print();
     }

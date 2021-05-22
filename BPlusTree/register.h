@@ -7,55 +7,39 @@ typedef int keyType;
 struct Register
 {
     keyType id;
-    char firstName[16];
-    char lastName[16];
+    std::string gender;
     int age;
+    int hypertension;
+    int heartDisease;
+    std::string everMarried;
+    std::string workType;
+    std::string residenceType;
+    std::string avgGlucose;
+    std::string bmi;
+    std::string everSmoke;
+    int stroke;
 
-    Register() {}
+    Register(){};
 
-    Register(keyType _id, std::string _firstName, std::string _lastName, int _age) : id(_id), age(_age)
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            if (i < _firstName.size())
-            {
-                firstName[i] = _firstName[i];
-            }
-            else
-            {
-                firstName[i] = '\0';
-            }
-        }
-        for (int i = 0; i < 16; i++)
-        {
-            if (i < _lastName.size())
-            {
-                lastName[i] = _lastName[i];
-            }
-            else
-            {
-                lastName[i] = '\0';
-            }
-        }
-    }
+    Register(keyType id, const std::string &gender, int age, int hypertension, int heartDisease,
+             const std::string &everMarried, const std::string &workType, const std::string &residenceType,
+             const std::string avgGlucose, const std::string &bmi, const std::string &everSmoke, int stroke) : id(id), gender(gender),
+                                                                                                               age(age), hypertension(
+                                                                                                                             hypertension),
+                                                                                                               heartDisease(heartDisease), everMarried(everMarried), workType(workType),
+                                                                                                               residenceType(
+                                                                                                                   residenceType),
+                                                                                                               avgGlucose(avgGlucose),
+                                                                                                               bmi(bmi),
+                                                                                                               everSmoke(everSmoke),
+                                                                                                               stroke(stroke){};
 
     void print()
     {
-        std::cout << "\n";
-        std::cout << "id: " << id << "\n";
-        std::cout << "firstName: ";
-        for (int i = 0; i < 16; i++)
-        {
-            std::cout << firstName[i];
-        }
-        std::cout << "\n";
-        std::cout << "lastName: ";
-        for (int i = 0; i < 16; i++)
-        {
-            std::cout << lastName[i];
-        }
-        std::cout << "\n";
-        std::cout << "age: " << age << "\n\n";
+        std::cout << "id: " << id << "\ngender: " << gender << "\nage: " << age << "\nhypertension: " << hypertension
+                  << "\nheart disease: " << heartDisease << "\never married: " << everMarried << "\nwork type: "
+                  << workType << "\nresidence type: " << residenceType << "\navg. glucose: " << avgGlucose
+                  << "\nbody mass index: " << bmi << "\never smoke: " << everSmoke << "\nstroke: " << stroke << "\n\n";
     }
 };
 
