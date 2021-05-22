@@ -16,6 +16,23 @@
 
 #pragma once
 
-#include "statement/abstract.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
+#include <string>
+#include <utility>
+
+namespace db2::statement
+{
+
+class abstract
+{
+protected:
+	std::string table_name;
+
+	abstract(std::string table_name):
+		table_name(std::move(table_name))
+	{};
+
+	virtual bool execute() = 0;
+	virtual ~abstract(){};
+};
+
+}

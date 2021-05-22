@@ -16,6 +16,24 @@
 
 #pragma once
 
-#include "statement/abstract.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
+#include <vector>
+
+#include "abstract.hpp"
+#include "literal.hpp"
+
+namespace db2::statement
+{
+
+class insert: public abstract
+{
+private:
+	std::vector<std::vector<literal>> data;
+
+public:
+	insert(std::string table_name, std::vector<std::vector<literal>> data);
+
+	virtual bool execute();
+	virtual ~insert(){};
+};
+
+}

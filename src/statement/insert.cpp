@@ -14,24 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "insert.hpp"
 
-#include <string>
-#include <utility>
+db2::statement::insert::insert(std::string table_name, std::vector<std::vector<literal>> data):
+	abstract(std::move(table_name)),
+	data(std::move(data))
+{};
 
-namespace db2::statement
+bool db2::statement::insert::execute()
 {
-
-class abstract
-{
-protected:
-	std::string table_name;
-
-	abstract(std::string table_name):
-		table_name(std::move(table_name))
-	{};
-
-	virtual bool execute() = 0;
-};
-
+	return false;
 }

@@ -16,6 +16,12 @@
 
 #pragma once
 
-#include "statement/abstract.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
+#include <string>
+#include <variant>
+
+namespace db2::statement
+{
+
+using literal = std::variant<int, std::string>;
+
+}
