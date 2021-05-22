@@ -53,6 +53,15 @@ sql_statement_tree* sql_select(char* table_name)
 	return tree;
 }
 
+sql_statement_tree* sql_select_where(char* table_name, sql_expr* expr)
+{
+	sql_statement_tree* tree = sql_select(table_name);
+
+	tree->expr = expr;
+
+	return tree;
+}
+
 sql_statement_tree* sql_insert(char* table_name)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
@@ -106,6 +115,7 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 
 			case SQL_SELECT:
 				fprintf(file, "SELECT %s\n", tree->table_name);
+				sql_expr_print(tree->expr, file);
 				break;
 		}
 	}

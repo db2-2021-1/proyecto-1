@@ -52,6 +52,7 @@ sql_statement_tree* sql_create(char* table_name);
 /// table_name must be allocated with malloc, and its ownership its
 /// transfered to the tree.
 sql_statement_tree* sql_select(char* table_name);
+sql_statement_tree* sql_select_where(char* table_name, sql_expr* expr);
 
 /// Creates a INSERT INTO tree.
 /// table_name must be allocated with malloc, and its ownership its

@@ -75,7 +75,7 @@ TYPE
 
 select_table
 	: SELECT column_list FROM NAME            { $$ = sql_select($4); }
-	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select($4); }
+	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select_where($4, $6); }
 	;
 
 column_list: '*' | columns;
