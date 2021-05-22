@@ -19,6 +19,7 @@
 #include <string>
 
 #include "literal.hpp"
+#include "tree.h"
 
 namespace db2::statement
 {
@@ -41,6 +42,7 @@ struct expression
 
 	expression(std::string column, literal value);
 	expression(std::string column, literal value_ge, literal value_le);
+	expression(const sql_expr& expr);
 };
 
 std::ostream& operator<<(std::ostream& os, const expression& l);

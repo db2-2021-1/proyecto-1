@@ -17,6 +17,7 @@
 #include "create_index.hpp"
 #include "insert.hpp"
 #include "parser_def.h"
+#include "select.hpp"
 #include "statement.hpp"
 
 std::unique_ptr<db2::statement::statement>
@@ -31,7 +32,7 @@ std::unique_ptr<db2::statement::statement>
 			return std::unique_ptr<statement>(new(std::nothrow) create_index(tree));
 
 		case SQL_SELECT:
-			return nullptr;
+			return std::unique_ptr<statement>(new(std::nothrow) select(tree));
 
 		case SQL_INSERT:
 			return std::unique_ptr<statement>(new(std::nothrow) insert(tree));

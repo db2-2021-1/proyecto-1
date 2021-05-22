@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
+
 #include "expression.hpp"
 
 db2::statement::expression::expression(std::string column, literal value):
@@ -31,6 +33,25 @@ db2::statement::expression::expression(std::string column, literal value_ge, lit
 	this->value[1] = std::move(value_le);
 }
 
+db2::statement::expression::expression(const sql_expr& expr)
+{
+	column = expr.column_name;
+
+	switch(expr.type)
+	{
+		case SQL_EXPR_IS:
+			t = type::is;
+			value[0] = from_union(expr.literals[0]);
+			break;
+
+		case SQL_EXPR_BETWEEN:
+			t = type::between;
+			value[0] = from_union(expr.literals[0]);
+			value[1] = from_union(expr.literals[1]);
+			break;
+	}
+}
+
 std::ostream& db2::statement::operator<<(std::ostream& os, const expression& l)
 {
 	os << l.column << ' ';
@@ -44,5 +65,5 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const expression& l)
 			os << "BETWEEN " << l.value[0] << " AND " << l.value[1];
 			break;
 	}
-	return os << '\n';
+	return os;
 }
