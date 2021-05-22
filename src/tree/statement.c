@@ -16,7 +16,7 @@
 
 #include <stdlib.h>
 
-#include "tree.h"
+#include "statement.h"
 
 sql_statement_tree* sql_statement_tree_alloc()
 {
@@ -108,127 +108,5 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 				fprintf(file, "SELECT %s\n", tree->table_name);
 				break;
 		}
-	}
-}
-
-sql_expr* sql_expr_alloc()
-{
-	sql_expr* expr = (sql_expr*)malloc(sizeof(sql_expr));
-
-	if(expr)
-	{
-		expr->type        = SQL_EXPR_INVALID;
-		expr->column_name = NULL;
-	}
-
-	return expr;
-}
-
-void sql_expr_free(sql_expr* expr)
-{
-	if(expr)
-	{
-		free(expr->column_name);
-		sql_literal_free(expr->literals[0]);
-		sql_literal_free(expr->literals[1]);
-	}
-
-	free(expr);
-}
-
-sql_expr* sql_expr_is(char* column_name, sql_literal l)
-{
-	sql_expr* expr = sql_expr_alloc();
-
-	if(expr)
-	{
-		expr->type        = SQL_EXPR_IS;
-		expr->column_name = column_name;
-		expr->literals[0] = l;
-	}
-
-	return expr;
-}
-
-sql_expr* sql_expr_between(char* column_name, sql_literal l_l, sql_literal l_r)
-{
-	sql_expr* expr = sql_expr_alloc();
-
-	if(expr)
-	{
-		expr->type        = SQL_EXPR_BETWEEN;
-		expr->column_name = column_name;
-		expr->literals[0] = l_l;
-		expr->literals[1] = l_r;
-	}
-
-	return expr;
-}
-
-void sql_expr_print(sql_expr* expr, FILE* file)
-{
-	if(expr)
-	{
-		switch(expr->type)
-		{
-			case SQL_EXPR_IS:
-				fprintf(file, "%s IS ", expr->column_name);
-				sql_literal_print(expr->literals[0], file);
-				fprintf(file, "%s", "\n");
-				break;
-
-			case SQL_EXPR_BETWEEN:
-				fprintf(file, "%s BETWEEN ", expr->column_name);
-				sql_literal_print(expr->literals[0], file);
-				fprintf(file, "%s", " AND ");
-				sql_literal_print(expr->literals[1], file);
-				fprintf(file, "%s", "\n");
-				break;
-		}
-	}
-}
-
-sql_literal sql_literal_number(int number)
-{
-	sql_literal literal =
-	{
-		.type         = SQL_NUMBER,
-		.value.number = number
-	};
-
-	return literal;
-}
-
-sql_literal sql_literal_string(char* str)
-{
-	sql_literal literal =
-	{
-		.type         = SQL_STRING,
-		.value.str    = str
-	};
-
-	return literal;
-}
-
-void sql_literal_free(sql_literal literal)
-{
-	if(literal.type == SQL_STRING)
-	{
-		free(literal.value.str);
-		literal.value.str = NULL;
-	}
-}
-
-void sql_literal_print(sql_literal literal, FILE* file)
-{
-	switch(literal.type)
-	{
-		case SQL_NUMBER:
-			fprintf(file, "%d", literal.value.number);
-			break;
-
-		case SQL_STRING:
-			fprintf(file, "%s", literal.value.str);
-			break;
 	}
 }
