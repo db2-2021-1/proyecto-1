@@ -161,7 +161,7 @@ sql_statement_tree* parse(const char* str)
 	return tree;
 }
 
-void yyerror(sql_statement_tree**, const char* s)
+void yyerror(__attribute__ ((unused)) sql_statement_tree** tree, const char* s)
 {
 	fprintf(stderr, "%s\n", s);
 }
