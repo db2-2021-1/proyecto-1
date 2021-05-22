@@ -24,9 +24,12 @@ INT     { return INT;     }
 VARCHAR { return VARCHAR; }
 CREATE  { return CREATE;  }
 
-\"(\\.|\"\"|[^"\n])*\" { return STRING; }
-[a-z][a-z0-9_]*        { return NAME;   }
--?[0-9]+               { return INTNUM; }
+\"(\\.|\"\"|[^"\n])*\" {
+	yylval.strval = strndup(yytext+1, strlen(yytext)-2);
+	return STRING;
+}
+[a-z][a-z0-9_]*        { yylval.strval = strdup(yytext); return NAME;   }
+-?[0-9]+               { yylval.intval = atoi(yytext); return INTNUM; }
 
 [*(),;] { return yytext[0]; }
 

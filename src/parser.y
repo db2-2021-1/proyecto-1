@@ -18,6 +18,8 @@ void yyerror(sql_statement_tree** tree, const char* s);
 	int intval;
 	char *strval;
 	sql_statement_tree *statement;
+	sql_expr *expr;
+	sql_literal literal;
 }
 
 %left AND
@@ -44,6 +46,8 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <statement> select_table
 %type <statement> insert_into_table
 %type <statement> delete_from_table
+%type <expr> expr;
+%type <literal> literal;
 
 %%
 sql: create_table       { *tree = $1; }
@@ -53,7 +57,7 @@ sql: create_table       { *tree = $1; }
 	;
 
 create_table
-	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create(); }
+	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create($3); }
 	;
 
 new_colums
@@ -70,8 +74,8 @@ TYPE
 
 
 select_table
-	: SELECT column_list FROM NAME            { $$ = sql_select(); }
-	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select(); }
+	: SELECT column_list FROM NAME            { $$ = sql_select($4); }
+	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select($4); }
 	;
 
 column_list: '*' | columns;
@@ -82,16 +86,17 @@ columns
 	;
 
 expr
-	: NAME
-	| INTNUM
-	| STRING
-	| expr IS expr
-	| expr BETWEEN expr AND expr
+	: NAME IS literal                  { $$ = sql_expr_is($1, $3); }
+	| NAME BETWEEN literal AND literal { $$ = sql_expr_between($1, $3, $5); }
 	;
 
+literal
+	: INTNUM { $$ = sql_literal_number($1); }
+	| STRING { $$ = sql_literal_string($1); }
+	;
 
 insert_into_table
-	: INSERT INTO NAME VALUES insert_values { $$ = sql_insert(); }
+	: INSERT INTO NAME VALUES insert_values { $$ = sql_insert($3); }
 	;
 
 insert_values
@@ -100,15 +105,13 @@ insert_values
 	;
 
 data_list
-	: INTNUM
-	| STRING
-	| data_list ',' INTNUM
-	| data_list ',' STRING
+	: literal
+	| data_list ',' literal
 	;
 
 
 delete_from_table
-	: DELETE FROM NAME WHERE expr { $$ = sql_delete(); }
+	: DELETE FROM NAME WHERE expr { $$ = sql_delete($3, $5); }
 	;
 %%
 
@@ -117,7 +120,8 @@ sql_statement_tree* parse(const char* str)
 	parse_init(str);
 
 	sql_statement_tree* tree = NULL;
-	printf("%s\n", yyparse(&tree) == 0 ? "ok" : "no");
+	if(yyparse(&tree) != 0)
+		fprintf(stderr, "%s\n", "Bad SQL.");
 
 	parse_free();
 
