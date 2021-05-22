@@ -16,8 +16,33 @@
 
 #pragma once
 
-#include "statement/create_index.hpp"
-#include "statement/expression.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
-#include "statement/statement.hpp"
+#include <string>
+
+#include "literal.hpp"
+
+namespace db2::statement
+{
+
+struct expression
+{
+	enum class type
+	{
+		// name IS literal
+		is,
+
+		// name BETWEEN literal AND literal
+		between
+	};
+
+	type t;
+
+	std::string column;
+	literal value[2];
+
+	expression(std::string column, literal value);
+	expression(std::string column, literal value_ge, literal value_le);
+};
+
+std::ostream& operator<<(std::ostream& os, const expression& l);
+
+}
