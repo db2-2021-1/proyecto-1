@@ -7,6 +7,8 @@
 %}
 
 %option caseless
+%option noinput
+%option nounput
 
 %%
 AND     { return AND;     }
