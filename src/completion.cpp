@@ -86,15 +86,18 @@ char* key_word_generator(const char* text, int state)
 		"CREATE",
 		"DELETE",
 		"FROM",
+		"INDEX",
 		"INSERT",
 		"INT",
 		"INTO",
 		"IS",
+		"ON",
 		"SELECT",
 		"TABLE",
 		"VALUES",
 		"VARCHAR",
 		"WHERE",
+		"USING",
 
 		nullptr
 	};
