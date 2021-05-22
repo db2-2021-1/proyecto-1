@@ -18,4 +18,5 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 		# C++
 		insert.cpp
+		statement.cpp
 )

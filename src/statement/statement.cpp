@@ -14,25 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "statement.hpp"
 
-#include <string>
-#include <utility>
-
-namespace db2::statement
+std::unique_ptr<db2::statement::statement>
+	db2::statement::from_tree(sql_statement_tree& tree)
 {
-
-class abstract
-{
-protected:
-	std::string table_name;
-
-	abstract(std::string table_name):
-		table_name(std::move(table_name))
-	{};
-
-	virtual bool execute() = 0;
-	virtual ~abstract(){};
-};
-
+	return nullptr;
 }

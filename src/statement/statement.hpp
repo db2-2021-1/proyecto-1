@@ -14,16 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "insert.hpp"
+#pragma once
 
-db2::statement::insert::insert(std::string table_name, std::vector<std::vector<literal>> data):
-	statement(std::move(table_name)),
-	data(std::move(data))
-{};
+#include <memory>
+#include <string>
+#include <utility>
 
-db2::statement::insert::insert(){};
+#include "tree.h"
 
-bool db2::statement::insert::execute()
+namespace db2::statement
 {
-	return false;
+
+class statement
+{
+protected:
+	std::string table_name;
+
+	statement(std::string table_name):
+		table_name(std::move(table_name))
+	{};
+
+	statement(){};
+
+	virtual bool execute() = 0;
+public:
+	virtual ~statement(){};
+};
+
+std::unique_ptr<statement> from_tree(sql_statement_tree& tree);
+
 }

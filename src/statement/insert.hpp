@@ -18,19 +18,20 @@
 
 #include <vector>
 
-#include "abstract.hpp"
+#include "statement.hpp"
 #include "literal.hpp"
 
 namespace db2::statement
 {
 
-class insert: public abstract
+class insert: public statement
 {
 private:
 	std::vector<std::vector<literal>> data;
 
 public:
 	insert(std::string table_name, std::vector<std::vector<literal>> data);
+	insert();
 
 	virtual bool execute();
 	virtual ~insert(){};
