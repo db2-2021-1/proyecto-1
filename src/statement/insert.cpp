@@ -41,6 +41,7 @@ db2::statement::insert::insert(){};
 
 bool db2::statement::insert::execute()
 {
+	// TODO
 	return false;
 }
 

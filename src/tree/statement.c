@@ -44,7 +44,7 @@ sql_statement_tree* sql_create_table(char* table_name, sql_new_columns* new_colu
 
 	if(tree)
 	{
-		tree->type		= SQL_CREATE_TABLE;
+		tree->type        = SQL_CREATE_TABLE;
 		tree->table_name  = table_name;
 		tree->new_columns = new_columns;
 	}
@@ -58,10 +58,10 @@ sql_statement_tree* sql_create_index(char* table_name, sql_columns* columns)
 
 	if(tree)
 	{
-		tree->type		= SQL_CREATE_INDEX;
-		tree->index_type  = SQL_BPTREE;
-		tree->table_name  = table_name;
-		tree->columns	 = columns;
+		tree->type       = SQL_CREATE_INDEX;
+		tree->index_type = SQL_BPTREE;
+		tree->table_name = table_name;
+		tree->columns    = columns;
 	}
 
 	return tree;
@@ -85,8 +85,8 @@ sql_statement_tree* sql_select(sql_columns* columns, char* table_name)
 
 	if(tree)
 	{
-		tree->type	   = SQL_SELECT;
-		tree->columns	= columns;
+		tree->type       = SQL_SELECT;
+		tree->columns    = columns;
 		tree->table_name = table_name;
 	}
 
@@ -111,8 +111,8 @@ sql_statement_tree* sql_insert(char* table_name, sql_insert_values* insert_value
 
 	if(tree)
 	{
-		tree->type		  = SQL_INSERT;
-		tree->table_name	= table_name;
+		tree->type          = SQL_INSERT;
+		tree->table_name    = table_name;
 		tree->insert_values = insert_values;
 	}
 
@@ -125,9 +125,9 @@ sql_statement_tree* sql_delete(char* table_name, sql_expr* expr)
 
 	if(tree)
 	{
-		tree->type	   = SQL_DELETE;
+		tree->type       = SQL_DELETE;
 		tree->table_name = table_name;
-		tree->expr	   = expr;
+		tree->expr       = expr;
 	}
 
 	return tree;

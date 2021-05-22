@@ -14,9 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "create_index.hpp"
 #include "insert.hpp"
-#include "statement.hpp"
 #include "parser_def.h"
+#include "statement.hpp"
 
 std::unique_ptr<db2::statement::statement>
 	db2::statement::from_tree(const sql_statement_tree& tree)
@@ -27,7 +28,7 @@ std::unique_ptr<db2::statement::statement>
 			return nullptr;
 
 		case SQL_CREATE_INDEX:
-			return nullptr;
+			return std::unique_ptr<statement>(new(std::nothrow) create_index(tree));
 
 		case SQL_SELECT:
 			return nullptr;
@@ -49,8 +50,6 @@ std::unique_ptr<db2::statement::statement>
 	if(sql_statement_tree* tree = parse(str.data()))
 	{
 		auto statement = from_tree(*tree);
-
-		sql_statement_tree_print(tree, stdout);
 
 		sql_statement_tree_free(tree);
 		return statement;

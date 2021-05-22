@@ -16,32 +16,44 @@
 
 #pragma once
 
-#include <cstdio>
-#include <string>
-#include <utility>
+#include <iostream>
 
 #include "statement.hpp"
 
-namespace db2
+namespace db2::statement
 {
 
+enum class index_type
+{
+	/// Extendible hash.
+	e_hash,
 
-/// This class manages the operations on a table.
-class table
+	/// B+ tree.
+	bp_tree
+};
+
+/// CREATE INDEX ON name [ USING index_type ] (name)
+class create_index: public statement
 {
 private:
 	std::string name;
+	index_type type;
+	std::string column_name;
 
-	/// Name of the column used as primary key.
-	std::string primary_key;
-
-	statement::index_type type;
-
+	create_index(const sql_statement_tree& tree);
+	virtual std::ostream& print(std::ostream& os) const;
 public:
-	table(std::string name):
-		name(std::move(name))
-	{};
+	create_index(std::string name, index_type type, std::string column_name);
+	create_index();
 
+	virtual bool execute();
+	virtual ~create_index(){};
+
+	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::ostream& operator<<(std::ostream& os, const create_index& c);
+	friend class statement;
 };
 
-};
+std::ostream& operator<<(std::ostream& os, const create_index& i);
+
+}

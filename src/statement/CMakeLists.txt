@@ -17,6 +17,7 @@
 target_sources(${PROJECT_NAME}
 	PRIVATE
 		# C++
+		create_index.cpp
 		insert.cpp
 		literal.cpp
 		statement.cpp

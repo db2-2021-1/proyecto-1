@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "statement/create_index.hpp"
 #include "statement/insert.hpp"
 #include "statement/literal.hpp"
 #include "statement/statement.hpp"
