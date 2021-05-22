@@ -14,9 +14,38 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <stdlib.h>
 
-#include "tree/columns.h"
-#include "tree/expresion.h"
-#include "tree/literal.h"
-#include "tree/statement.h"
+#include "columns.h"
+
+sql_columns* sql_columns_alloc(char* _name)
+{
+	sql_columns* columns = (sql_columns*)malloc(sizeof(sql_columns));
+
+	if(columns)
+	{
+		columns->name = _name;
+		columns->next = NULL;
+	}
+
+	return columns;
+}
+
+void sql_columns_free(sql_columns* columns)
+{
+	if(columns)
+	{
+		free(columns->name);
+		sql_columns_free(columns->next);
+	}
+	free(columns);
+}
+
+void sql_columns_print(sql_columns* columns, FILE* file)
+{
+	if(columns)
+	{
+		fprintf(file, "%s%s", columns->name, columns->next ? ", " : "\n");
+		sql_columns_print(columns->next, file);
+	}
+}

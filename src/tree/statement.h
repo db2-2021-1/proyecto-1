@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 
+#include "columns.h"
 #include "expresion.h"
 
 #ifdef __cplusplus
@@ -37,6 +38,7 @@ enum sql_statement_type
 typedef struct _sql_statement_tree
 {
 	int type;
+	sql_columns* columns;
 	char* table_name;
 	sql_expr* expr;
 } sql_statement_tree;
@@ -51,8 +53,8 @@ sql_statement_tree* sql_create(char* table_name);
 /// Creates a SELECT tree.
 /// table_name must be allocated with malloc, and its ownership its
 /// transfered to the tree.
-sql_statement_tree* sql_select(char* table_name);
-sql_statement_tree* sql_select_where(char* table_name, sql_expr* expr);
+sql_statement_tree* sql_select(sql_columns* columns, char* table_name);
+sql_statement_tree* sql_select_where(sql_columns* columns, char* table_name, sql_expr* expr);
 
 /// Creates a INSERT INTO tree.
 /// table_name must be allocated with malloc, and its ownership its

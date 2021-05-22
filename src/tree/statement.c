@@ -26,6 +26,7 @@ sql_statement_tree* sql_statement_tree_alloc()
 	if(!tree)
 	{
 		tree->type       = SQL_INVALID;
+		tree->columns    = NULL;
 		tree->table_name = NULL;
 		tree->expr       = NULL;
 	}
@@ -43,19 +44,20 @@ sql_statement_tree* sql_create(char* table_name)
 	return tree;
 }
 
-sql_statement_tree* sql_select(char* table_name)
+sql_statement_tree* sql_select(sql_columns* columns, char* table_name)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
 	tree->type       = SQL_SELECT;
+	tree->columns    = columns;
 	tree->table_name = table_name;
 
 	return tree;
 }
 
-sql_statement_tree* sql_select_where(char* table_name, sql_expr* expr)
+sql_statement_tree* sql_select_where(sql_columns* columns, char* table_name, sql_expr* expr)
 {
-	sql_statement_tree* tree = sql_select(table_name);
+	sql_statement_tree* tree = sql_select(columns, table_name);
 
 	tree->expr = expr;
 
@@ -87,6 +89,7 @@ void sql_statement_tree_free(sql_statement_tree* tree)
 {
 	if(tree)
 	{
+		sql_columns_free(tree->columns);
 		free(tree->table_name);
 		sql_expr_free(tree->expr);
 	}
@@ -115,6 +118,7 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 
 			case SQL_SELECT:
 				fprintf(file, "SELECT %s\n", tree->table_name);
+				sql_columns_print(tree->columns, file);
 				sql_expr_print(tree->expr, file);
 				break;
 		}

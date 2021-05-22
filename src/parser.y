@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <string.h>
 
 #include "parser_def.h"
 #include "tree.h"
@@ -20,6 +21,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 	sql_statement_tree *statement;
 	sql_expr *expr;
 	sql_literal literal;
+	sql_columns* columns;
 }
 
 %left AND
@@ -48,6 +50,8 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <statement> delete_from_table
 %type <expr> expr;
 %type <literal> literal;
+%type <columns> column_list;
+%type <columns> columns;
 
 %%
 sql: create_table       { *tree = $1; }
@@ -62,7 +66,7 @@ create_table
 
 new_colums
 	: name_type
-	| new_colums ',' name_type
+	| name_type ',' new_colums
 	;
 
 name_type: NAME TYPE;
@@ -74,15 +78,18 @@ TYPE
 
 
 select_table
-	: SELECT column_list FROM NAME            { $$ = sql_select($4); }
-	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select_where($4, $6); }
+	: SELECT column_list FROM NAME            { $$ = sql_select($2, $4); }
+	| SELECT column_list FROM NAME WHERE expr { $$ = sql_select_where($2, $4, $6); }
 	;
 
-column_list: '*' | columns;
+column_list
+	: '*'     { $$ = sql_columns_alloc(strdup("*")); }
+	| columns { $$ = $1; }
+	;
 
 columns
-	: NAME
-	| columns ',' NAME
+	: NAME             { $$ = sql_columns_alloc($1); }
+	| NAME ',' columns { $$ = sql_columns_alloc($1); $$->next = $3; }
 	;
 
 expr
@@ -106,7 +113,7 @@ insert_values
 
 data_list
 	: literal
-	| data_list ',' literal
+	| literal ',' data_list
 	;
 
 

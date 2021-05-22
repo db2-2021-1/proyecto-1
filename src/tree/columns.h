@@ -16,7 +16,23 @@
 
 #pragma once
 
-#include "tree/columns.h"
-#include "tree/expresion.h"
-#include "tree/literal.h"
-#include "tree/statement.h"
+#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _sql_columns
+{
+	char* name;
+	struct _sql_columns* next;
+} sql_columns;
+
+sql_columns* sql_columns_alloc(char* _name);
+void sql_columns_free(sql_columns* columns);
+
+void sql_columns_print(sql_columns* columns, FILE* file);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
