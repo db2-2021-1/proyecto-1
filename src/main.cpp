@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	init_readline();
 	init_history();
 
-	while(char* line = readline("SQL> "))
+	while(char* line = readline("\e[1;36mSQL\e[1;33m>\e[0m "))
 	{
 		if(strlen(line) > 0)
 		{
