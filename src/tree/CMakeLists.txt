@@ -22,5 +22,8 @@ target_sources(${PROJECT_NAME}
 		expresion.c
 		insert_values.c
 		literal.c
+		name_type.c
+		new_columns.c
 		statement.c
+		type.c
 )

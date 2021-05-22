@@ -21,6 +21,7 @@
 #include "columns.h"
 #include "expresion.h"
 #include "insert_values.h"
+#include "new_columns.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +44,7 @@ typedef struct _sql_statement_tree
 	char* table_name;
 	sql_insert_values* insert_values;
 	sql_expr* expr;
+	sql_new_columns* new_columns;
 } sql_statement_tree;
 
 sql_statement_tree* sql_statement_tree_alloc();
@@ -50,7 +52,7 @@ sql_statement_tree* sql_statement_tree_alloc();
 /// Creates a CREATE TABLE tree.
 /// table_name must be allocated with malloc, and its ownership its
 /// transfered to the tree.
-sql_statement_tree* sql_create(char* table_name);
+sql_statement_tree* sql_create(char* table_name, sql_new_columns* new_columns);
 
 /// Creates a SELECT tree.
 /// table_name must be allocated with malloc, and its ownership its

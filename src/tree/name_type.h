@@ -16,12 +16,22 @@
 
 #pragma once
 
-#include "tree/columns.h"
-#include "tree/data_list.h"
-#include "tree/expresion.h"
-#include "tree/insert_values.h"
-#include "tree/literal.h"
-#include "tree/name_type.h"
-#include "tree/new_columns.h"
-#include "tree/statement.h"
-#include "tree/type.h"
+#include "type.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _sql_name_type
+{
+	char* name;
+	sql_type type;
+} sql_name_type;
+
+/// Only frees the name pointer not the name_type.
+void sql_name_type_free(sql_name_type name_type);
+void sql_name_type_print(sql_name_type name_type, FILE* file);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

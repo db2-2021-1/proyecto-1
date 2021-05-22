@@ -30,17 +30,19 @@ sql_statement_tree* sql_statement_tree_alloc()
 		tree->table_name    = NULL;
 		tree->insert_values = NULL;
 		tree->expr          = NULL;
+		tree->new_columns   = NULL;
 	}
 
 	return tree;
 };
 
-sql_statement_tree* sql_create(char* table_name)
+sql_statement_tree* sql_create(char* table_name, sql_new_columns* new_columns)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
-	tree->type       = SQL_CREATE;
-	tree->table_name = table_name;
+	tree->type        = SQL_CREATE;
+	tree->table_name  = table_name;
+	tree->new_columns = new_columns;
 
 	return tree;
 }
@@ -95,6 +97,7 @@ void sql_statement_tree_free(sql_statement_tree* tree)
 		free(tree->table_name);
 		sql_insert_values_free(tree->insert_values);
 		sql_expr_free(tree->expr);
+		sql_new_columns_free(tree->new_columns);
 	}
 
 	free(tree);
@@ -108,6 +111,7 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 		{
 			case SQL_CREATE:
 				fprintf(file, "CREATE %s\n", tree->table_name);
+				sql_new_columns_print(tree->new_columns, file);
 				break;
 
 			case SQL_DELETE:

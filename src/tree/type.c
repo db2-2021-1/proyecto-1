@@ -14,14 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <stdlib.h>
 
-#include "tree/columns.h"
-#include "tree/data_list.h"
-#include "tree/expresion.h"
-#include "tree/insert_values.h"
-#include "tree/literal.h"
-#include "tree/name_type.h"
-#include "tree/new_columns.h"
-#include "tree/statement.h"
-#include "tree/type.h"
+#include "type.h"
+
+sql_type sql_type_int()
+{
+	sql_type type =
+	{
+		.type = SQL_INT,
+		.size = sizeof(int)
+	};
+
+	return type;
+}
+
+sql_type sql_type_varchar(size_t size)
+{
+	sql_type type =
+	{
+		.type = SQL_VARCHAR,
+		.size = size
+	};
+
+	return type;
+}
+
+void sql_type_print(sql_type type, FILE* file)
+{
+	switch(type.type)
+	{
+		case SQL_INT:
+			fprintf(file, "%s", "INT");
+			break;
+
+		case SQL_VARCHAR:
+			fprintf(file, "%s(%ld)", "VARCHAR", type.size);
+			break;
+	}
+}

@@ -24,6 +24,9 @@ void yyerror(sql_statement_tree** tree, const char* s);
 	sql_columns* columns;
 	sql_data_list* data_list;
 	sql_insert_values* insert_values;
+	sql_type type;
+	sql_name_type name_type;
+	sql_new_columns* new_colums;
 }
 
 %left AND
@@ -56,6 +59,9 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <columns> columns;
 %type <data_list> data_list;
 %type <insert_values> insert_values;
+%type <type> TYPE;
+%type <name_type> name_type;
+%type <new_colums> new_colums;
 
 %%
 sql: create_table       { *tree = $1; }
@@ -65,19 +71,21 @@ sql: create_table       { *tree = $1; }
 	;
 
 create_table
-	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create($3); }
+	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create($3, $5); }
 	;
 
 new_colums
-	: name_type
-	| name_type ',' new_colums
+	: name_type                { $$ = sql_new_columns_alloc($1); }
+	| name_type ',' new_colums { $$ = sql_new_columns_alloc($1); $$->next = $3; }
 	;
 
-name_type: NAME TYPE;
+name_type
+	: NAME TYPE { $$.name = $1; $$.type = $2; }
+	;
 
 TYPE
-	: INT
-	| VARCHAR '(' INTNUM ')'
+	: INT                    { $$ = sql_type_int(); }
+	| VARCHAR '(' INTNUM ')' { $$ = sql_type_varchar($3); }
 	;
 
 

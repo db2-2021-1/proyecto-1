@@ -16,12 +16,29 @@
 
 #pragma once
 
-#include "tree/columns.h"
-#include "tree/data_list.h"
-#include "tree/expresion.h"
-#include "tree/insert_values.h"
-#include "tree/literal.h"
-#include "tree/name_type.h"
-#include "tree/new_columns.h"
-#include "tree/statement.h"
-#include "tree/type.h"
+#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum sql_type_type
+{
+	SQL_INT,
+	SQL_VARCHAR
+};
+
+typedef struct _sql_type
+{
+	int type;
+	size_t size;
+} sql_type;
+
+sql_type sql_type_int();
+sql_type sql_type_varchar(size_t size);
+
+void sql_type_print(sql_type type, FILE* file);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

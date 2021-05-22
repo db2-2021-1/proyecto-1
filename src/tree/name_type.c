@@ -14,14 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <stdlib.h>
 
-#include "tree/columns.h"
-#include "tree/data_list.h"
-#include "tree/expresion.h"
-#include "tree/insert_values.h"
-#include "tree/literal.h"
-#include "tree/name_type.h"
-#include "tree/new_columns.h"
-#include "tree/statement.h"
-#include "tree/type.h"
+#include "name_type.h"
+
+void sql_name_type_free(sql_name_type name_type)
+{
+	free(name_type.name);
+}
+
+void sql_name_type_print(sql_name_type name_type, FILE* file)
+{
+	fprintf(file, "%s ", name_type.name);
+	sql_type_print(name_type.type, file);
+}
