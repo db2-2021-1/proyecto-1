@@ -26,7 +26,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 	sql_insert_values* insert_values;
 	sql_type type;
 	sql_name_type name_type;
-	sql_new_columns* new_colums;
+	sql_new_columns* new_columns;
 }
 
 %left AND
@@ -65,7 +65,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <insert_values> insert_values;
 %type <type> TYPE;
 %type <name_type> name_type;
-%type <new_colums> new_colums;
+%type <new_columns> new_columns;
 
 %%
 sql
@@ -77,12 +77,12 @@ sql
 	;
 
 create_table
-	: CREATE TABLE NAME '(' new_colums ')' { $$ = sql_create_table($3, $5); }
+	: CREATE TABLE NAME '(' new_columns ')' { $$ = sql_create_table($3, $5); }
 	;
 
-new_colums
+new_columns
 	: name_type                { $$ = sql_new_columns_alloc($1); }
-	| name_type ',' new_colums { $$ = sql_new_columns_alloc($1); $$->next = $3; }
+	| name_type ',' new_columns { $$ = sql_new_columns_alloc($1); $$->next = $3; }
 	;
 
 name_type
