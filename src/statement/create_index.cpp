@@ -45,6 +45,7 @@ db2::statement::create_index::create_index(){};
 bool db2::statement::create_index::execute()
 {
 	// TODO
+	std::cout << *this;
 	return false;
 }
 

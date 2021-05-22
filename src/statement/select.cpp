@@ -40,6 +40,7 @@ db2::statement::select::select(){};
 bool db2::statement::select::execute()
 {
 	// TODO
+	std::cout << *this;
 	return false;
 }
 

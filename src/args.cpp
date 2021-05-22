@@ -42,9 +42,10 @@ void db2::args::parse(int argc, char* argv[])
 			case 'c':
 				if(auto statement = db2::statement::from_string(optarg))
 				{
-					std::cout << *statement;
+					if(!statement->execute())
+						exit(EXIT_FAILURE);
 				}
-				exit(EXIT_SUCCESS);
+				exit(EXIT_FAILURE);
 
 			default:
 				exit(EXIT_FAILURE);

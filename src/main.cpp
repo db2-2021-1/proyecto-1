@@ -40,7 +40,10 @@ int main(int argc, char* argv[])
 
 			if(auto statement = db2::statement::from_string(line))
 			{
-				std::cout << *statement;
+				if(!statement->execute())
+				{
+					std::cout << "\e[1;31m!!!\e[0m ";
+				}
 			}
 		}
 

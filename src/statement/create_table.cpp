@@ -36,6 +36,7 @@ db2::statement::create_table::create_table(){};
 bool db2::statement::create_table::execute()
 {
 	// TODO
+	std::cout << *this;
 	return false;
 }
 

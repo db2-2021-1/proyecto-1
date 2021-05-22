@@ -37,9 +37,9 @@ protected:
 
 	statement(){};
 
-	virtual bool execute() = 0;
 	virtual std::ostream& print(std::ostream&) const = 0;
 public:
+	virtual bool execute() = 0;
 	virtual ~statement(){};
 
 	friend std::ostream& operator<<(std::ostream& os, const statement& i);

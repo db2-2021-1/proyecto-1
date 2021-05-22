@@ -31,6 +31,7 @@ db2::statement::delete_from::delete_from(){};
 bool db2::statement::delete_from::execute()
 {
 	// TODO
+	std::cout << *this;
 	return false;
 }
 
