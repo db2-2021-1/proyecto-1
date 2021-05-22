@@ -22,6 +22,8 @@
 #include <string>
 #include <utility>
 
+#include <rapidjson/reader.h>
+
 #include "statement.hpp"
 
 namespace db2
@@ -44,10 +46,52 @@ private:
 	bool check_and_create_directory() const;
 	std::filesystem::path metadata_path() const;
 
+	class json_handler:
+		public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, json_handler>
+	{
+	private:
+		enum class state
+		{
+			before_table,
+			in_table,
+			after_columns,
+			before_column,
+			in_column,
+			after_column_name,
+			after_column_type,
+			in_column_type,
+			after_column_type_name,
+			after_column_type_size,
+			after_index,
+			in_index,
+			after_index_column,
+			after_index_type,
+			after_table
+		};
+
+		table& t;
+		state s;
+	public:
+		json_handler(table& t):
+			t(t),
+			s(state::before_table)
+		{};
+
+		bool StartObject();
+		bool EndObject(rapidjson::SizeType);
+		bool StartArray();
+		bool EndArray(rapidjson::SizeType);
+		bool Key(const char* str, rapidjson::SizeType, bool);
+		bool String(const char* str, rapidjson::SizeType, bool);
+		bool Uint64(uint64_t n);
+
+		bool Default();
+	};
+
 public:
 	table(
 		std::string table_name,
-		std::vector<std::pair<std::string, statement::type>> columns,
+		std::vector<std::pair<std::string, statement::type>> columns = {},
 		std::optional<index> table_index = std::nullopt
 	);
 
@@ -55,6 +99,8 @@ public:
 
 	bool read_metadata();
 	bool write_metadata() const;
+
+	void set_index(index i);
 };
 
 };

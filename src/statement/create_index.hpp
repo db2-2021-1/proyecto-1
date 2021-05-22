@@ -17,6 +17,7 @@
 #pragma once
 
 #include <iostream>
+#include <string_view>
 
 #include "statement.hpp"
 
@@ -33,6 +34,7 @@ enum class index_type
 };
 
 std::string index_type2str(index_type type);
+index_type str2index_type(std::string_view str);
 
 /// CREATE INDEX ON name [ USING index_type ] (name)
 class create_index: public statement

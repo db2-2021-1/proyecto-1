@@ -17,6 +17,7 @@
 #pragma once
 
 #include <iostream>
+#include <string_view>
 
 #include "tree.h"
 
@@ -27,6 +28,8 @@ struct type
 {
 	enum class _type
 	{
+		NONE,
+
 		INT,
 		VARCHAR
 	};
@@ -35,7 +38,9 @@ struct type
 	size_t size;
 
 	type(sql_type sql_t);
+	type();
 	static std::string type2str(_type t);
+	static _type str2type(std::string_view str);
 };
 
 std::ostream& operator<<(std::ostream& os, const type& t);

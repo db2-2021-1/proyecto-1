@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "create_index.hpp"
+#include "table.hpp"
 
 std::string db2::statement::index_type2str(index_type type)
 {
@@ -29,6 +30,16 @@ std::string db2::statement::index_type2str(index_type type)
 		default:
 			return "";
 	}
+}
+
+db2::statement::index_type db2::statement::str2index_type(std::string_view str)
+{
+	// Add a map if there are more than two index types.
+
+	if(str == "e_hash")
+		return index_type::e_hash;
+	else
+		return index_type::bp_tree;
 }
 
 db2::statement::create_index::create_index(std::string name, index_type type, std::string column_name):
@@ -65,10 +76,14 @@ bool db2::statement::create_index::execute()
 	//     column_name // (a)
 	// }
 
-	// TODO
-	std::cout << *this;
+	table t(table_name);
 
-	return false;
+	if(!t.read_metadata())
+		return false;
+
+	t.set_index({column_name, type});
+
+	return t.write_metadata();
 }
 
 std::ostream& db2::statement::create_index::print(std::ostream& os) const

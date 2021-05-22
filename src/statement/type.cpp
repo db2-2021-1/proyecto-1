@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <unordered_map>
+
 #include "type.hpp"
 
 db2::statement::type::type(sql_type sql_t)
@@ -27,10 +29,19 @@ db2::statement::type::type(sql_type sql_t)
 		case SQL_VARCHAR:
 			t = _type::VARCHAR;
 			break;
+
+		default:
+			t = _type::NONE;
+			break;
 	}
 
 	size = sql_t.size;
 }
+
+db2::statement::type::type():
+	t(_type::NONE),
+	size(0)
+{};
 
 std::string db2::statement::type::type2str(_type t)
 {
@@ -47,6 +58,26 @@ std::string db2::statement::type::type2str(_type t)
 	}
 }
 
+db2::statement::type::_type db2::statement::type::str2type(std::string_view str)
+{
+	static const std::unordered_map<std::string_view, _type> str2type_map
+	{
+		{"INT",     _type::INT},
+		{"VARCHAR", _type::VARCHAR},
+	};
+
+	auto it = str2type_map.find(str);
+
+	if(it == str2type_map.end())
+	{
+		return _type::NONE;
+	}
+	else
+	{
+		return it->second;
+	}
+}
+
 std::ostream& db2::statement::operator<<(std::ostream& os, const type& t)
 {
 	switch(t.t)
@@ -57,6 +88,9 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const type& t)
 
 		case type::_type::VARCHAR:
 			os << "VARCHAR (" << t.size << ")";
+			break;
+
+		default:
 			break;
 	}
 

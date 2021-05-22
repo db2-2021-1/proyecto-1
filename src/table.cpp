@@ -17,17 +17,165 @@
 #include <climits>
 #include <cstdio>
 #include <system_error>
+#include <map>
 
 #ifndef PIPE_BUF
 #define PIPE_BUF 1
 #endif
 
+#include <rapidjson/error/en.h>
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/reader.h>
 #include <rapidjson/writer.h>
 
 #include "table.hpp"
+
+bool db2::table::json_handler::StartObject()
+{
+	switch(s)
+	{
+		case state::before_table:
+			s = state::in_table;
+			return true;
+
+		case state::before_column:
+			t.columns.emplace_back();
+			s = state::in_column;
+			return true;
+
+		case state::after_column_type:
+			s = state::in_column_type;
+			return true;
+
+		case state::after_index:
+			t.table_index.emplace();
+			s = state::in_index;
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+bool db2::table::json_handler::EndObject(rapidjson::SizeType)
+{
+	switch(s)
+	{
+		case state::in_table:
+			s = state::after_table;
+			return true;
+
+		case state::in_column:
+			s = state::before_column;
+			return true;
+
+		case state::in_column_type:
+			s = state::in_column;
+			return true;
+
+		case state::in_index:
+			s = state::in_table;
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+bool db2::table::json_handler::StartArray()
+{
+	switch(s)
+	{
+		case state::after_columns:
+			s = state::before_column;
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+bool db2::table::json_handler::EndArray(rapidjson::SizeType)
+{
+	switch(s)
+	{
+		case state::before_column:
+			s = state::in_table;
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+bool db2::table::json_handler::Key(const char* str, rapidjson::SizeType, bool)
+{
+	std::map<std::pair<state, std::string_view>, state> key_map
+	{
+		{{state::in_table, "columns"}, state::after_columns},
+		{{state::in_column, "name"}, state::after_column_name},
+		{{state::in_column, "type"}, state::after_column_type},
+		{{state::in_column_type, "name"}, state::after_column_type_name},
+		{{state::in_column_type, "size"}, state::after_column_type_size},
+		{{state::in_table, "index"}, state::after_index},
+		{{state::in_index, "column"}, state::after_index_column},
+		{{state::in_index, "type"}, state::after_index_type},
+	};
+
+	auto it = key_map.find({s, str});
+
+	if(it == key_map.end())
+		return false;
+
+	s = it->second;
+	return true;
+}
+
+bool db2::table::json_handler::String(const char* str, rapidjson::SizeType, bool)
+{
+	switch(s)
+	{
+		case state::after_column_name:
+			t.columns.back().first = str;
+			s = state::in_column;
+			return true;
+
+		case state::after_column_type_name:
+			t.columns.back().second.t = statement::type::str2type(str);
+			s = state::in_column_type;
+			return true;
+
+		case state::after_column_type_size:
+			t.columns.back().second.size = std::stoul(str);
+			s = state::in_column_type;
+			return true;
+
+		case state::after_index_column:
+			if(!t.table_index.has_value())
+				return false;
+
+			t.table_index->column_name = str;
+			s = state::in_index;
+			return true;
+
+		case state::after_index_type:
+			if(!t.table_index.has_value())
+				return false;
+
+			t.table_index->type = statement::str2index_type(str);
+			s = state::in_index;
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+bool db2::table::json_handler::Default()
+{
+	return false;
+}
 
 db2::table::table(
 		std::string table_name,
@@ -76,7 +224,17 @@ bool db2::table::read_metadata()
 
 	char buffer[PIPE_BUF];
 
-	//TODO
+	json_handler handler(*this);
+	rapidjson::Reader reader;
+	rapidjson::FileReadStream frs(file, buffer, sizeof(buffer));
+
+	bool return_value = true;
+	if(!reader.Parse<rapidjson::ParseFlag::kParseNumbersAsStringsFlag>(frs, handler))
+	{
+		rapidjson::ParseErrorCode e = reader.GetParseErrorCode();
+		fprintf(stderr, "%s\n", rapidjson::GetParseError_En(e));
+		return_value = false;
+	}
 
 	if(fclose(file) != 0)
 	{
@@ -84,7 +242,7 @@ bool db2::table::read_metadata()
 		return false;
 	}
 
-	return true;
+	return return_value;
 }
 
 bool db2::table::write_metadata() const
@@ -159,4 +317,9 @@ bool db2::table::write_metadata() const
 	}
 
 	return true;
+}
+
+void db2::table::set_index(index i)
+{
+	table_index.emplace(std::move(i));
 }
