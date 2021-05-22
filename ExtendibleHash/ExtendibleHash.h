@@ -7,7 +7,7 @@
 #include "Register.h"
 
 
-class ExtendedHash {
+class ExtendibleHash {
 private:
     std::map<std::string,Bucket*> hashIndex;
     std::string filename;
@@ -69,31 +69,12 @@ private:
         return generatedBucket;
     }
 
-    void fixIndex() {
-        bool issue = false;
-        Bucket *bucketPointer;
-        for(auto hashIt:hashIndex){
-            if(hashIt.second->getIndexVec().empty()){
-                hashIt.second = hashIt.second->getNextOverflowBucket();
-            }else{
-                bucketPointer = hashIt.second;
-                while(bucketPointer!= nullptr){
-                    if(bucketPointer->getNextOverflowBucket()->getIndexVec().empty()){
-                        bucketPointer->setNextOverflowBucket(bucketPointer->getNextOverflowBucket()->getNextOverflowBucket());
-                    }
-                    bucketPointer = bucketPointer->getNextOverflowBucket();
-                }
-            }
-        }
-    }
-
     Register textToRegisterCSV(std::string text){
         char c;
-        int state = 0, id = 0, age = 0, hypertension = 0, heartDisease = 0, stroke = 0;
-        std::string word, gender, everMarried, workType, residenceType, everSmoked, bmi, avgGlucose;
+        int state = 0, id = 0, hypertension = 0, heartDisease = 0, stroke = 0;
+        std::string word, gender, age, everMarried, workType, residenceType, everSmoked, bmi, avgGlucose;
         for(int i = 0; i < text.size(); i++){
             if(text[i] == '\n'){
-                word.clear();
                 break;
             }else if(text[i] == ','){
                 if(state == 0) {
@@ -105,7 +86,7 @@ private:
                     word.clear();
                     state++;
                 }else if(state == 2){
-                    age = std::stoi(word);
+                    age = word;
                     word.clear();
                     state++;
                 }else if(state == 3){
@@ -140,14 +121,12 @@ private:
                     everSmoked = word;
                     word.clear();
                     state++;
-                }else{
-                    stroke = std::stoi(word);
-                    word.clear();
                 }
             }else{
                 word += text[i];
             }
         }
+        stroke = std::stoi(word);
         return Register(id,gender,age,hypertension,heartDisease,everMarried,workType,residenceType,avgGlucose,bmi,everSmoked,stroke);
     }
 
@@ -181,7 +160,7 @@ private:
 public:
 
     /** Construye 2^hashSize de índices y 2 buckets iniciales*/
-    ExtendedHash(std::string const &_filename){
+    ExtendibleHash(std::string const &_filename){
         hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("0",new Bucket("0")));
         hashIndex.insert(hashIndex.end(),std::pair<std::string,Bucket*>("1",new Bucket("1")));
         filename = _filename;
@@ -219,17 +198,25 @@ public:
     /**Funcional*/
     std::vector<Register> find(keyType beginKey, keyType endKey){
         std::vector<Register> ansVec = std::vector<Register>();
-        auto reg =  new Register;
+        long pos;
+        Bucket* bucketIt;
         std::fstream file;
-        std::string line, headerLine;
+        std::string line;
         file.open(filename);
-        getline(file,headerLine);
-        while(getline(file,line)){
-            *reg = textToRegisterCSV(line);
-            if(reg->id >= beginKey && reg->id <= endKey){
-                ansVec.push_back(*reg);
+        for(auto indexIt:hashIndex){
+            bucketIt = indexIt.second;
+            while(bucketIt!= nullptr){
+                for(auto registerIt:bucketIt->getIndexVec()){
+                    if(registerIt.first >= beginKey && registerIt.first <= endKey){
+                        file.seekg(registerIt.second);
+                        getline(file,line);
+                        ansVec.push_back(textToRegisterCSV(line));
+                    }
+                }
+                bucketIt = bucketIt->getNextOverflowBucket();
             }
         }
+        file.close();
         return ansVec;
     }
 
@@ -238,32 +225,32 @@ public:
         std::fstream file;
         file.open(filename);
         file.seekg(0,std::ios::end);
+        file<<'\n';
         long pos = file.tellg();
-        file<<'\n'<<reg.dataToCSV();
+        file<<reg.dataToCSV();
         file.close();
-        insertIndex(reg,pos);
+        insertIndex(reg,pos+1);
     }
 
     /**Funcional*/
     void erase(keyType key){
-        std::vector<Register> regVec;
         Register reg;
-        std::fstream file;
+        std::fstream file, auxfile;
         std::string line, header;
         file.open(filename);
+        auxfile.open("auxfile.csv");
         getline(file,header);
+        auxfile<<header;
         while(getline(file,line)){
             reg = textToRegisterCSV(line);
             if(reg.id != key)
-                regVec.push_back(reg);
+                auxfile<<'\n'<<line;
         }
+        auxfile.close();
         file.close();
-        file.open(filename, std::ofstream::out | std::ofstream::trunc);
-        file<<header;
-        for(auto it:regVec){
-            file<<'\n'<<it.dataToCSV();
-        }
-        file.close();
+        std::remove(filename.c_str());
+        std::rename("auxfile.csv",filename.c_str());
+        hashIndex.clear();
         scanAllCSV();
     }
 

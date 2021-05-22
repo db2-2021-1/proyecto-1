@@ -7,7 +7,7 @@ typedef long long keyType;
 struct Register{
     keyType id;
     std::string gender;
-    int age;
+    std::string age;
     int hypertension;
     int heartDisease;
     std::string everMarried;
@@ -20,7 +20,7 @@ struct Register{
 
     Register(){};
 
-    Register(keyType id, const std::string &gender, int age, int hypertension, int heartDisease,
+    Register(keyType id, const std::string &gender, const std::string &age, int hypertension, int heartDisease,
              const std::string &everMarried, const std::string &workType, const std::string &residenceType,
              const std::string avgGlucose, const std::string &bmi, const std::string &everSmoke, int stroke) : id(id), gender(gender),
                                                                                                  age(age), hypertension(
@@ -39,7 +39,7 @@ struct Register{
     }
 
     std::string dataToCSV(){
-        return std::to_string(id)+","+gender+","+std::to_string(age)+","+std::to_string(hypertension)+","+
+        return std::to_string(id)+","+gender+","+age+","+std::to_string(hypertension)+","+
                                std::to_string(heartDisease)+","+everMarried+","+workType+","+residenceType+","+avgGlucose+
                                ","+bmi+","+everSmoke+","+std::to_string(stroke);
     }
