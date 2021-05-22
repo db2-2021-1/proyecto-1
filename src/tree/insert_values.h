@@ -16,9 +16,25 @@
 
 #pragma once
 
-#include "tree/columns.h"
-#include "tree/data_list.h"
-#include "tree/expresion.h"
-#include "tree/insert_values.h"
-#include "tree/literal.h"
-#include "tree/statement.h"
+#include <stdio.h>
+
+#include "data_list.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _sql_insert_values
+{
+	sql_data_list* data_list;
+	struct _sql_insert_values* next;
+} sql_insert_values;
+
+sql_insert_values* sql_insert_values_alloc(sql_data_list* data_list);
+void sql_insert_values_free(sql_insert_values* insert_values);
+
+void sql_insert_values_print(sql_insert_values* insert_values, FILE* file);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

@@ -18,7 +18,9 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 		# C
 		columns.c
+		data_list.c
 		expresion.c
+		insert_values.c
 		literal.c
 		statement.c
 )

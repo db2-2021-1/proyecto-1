@@ -22,6 +22,8 @@ void yyerror(sql_statement_tree** tree, const char* s);
 	sql_expr *expr;
 	sql_literal literal;
 	sql_columns* columns;
+	sql_data_list* data_list;
+	sql_insert_values* insert_values;
 }
 
 %left AND
@@ -52,6 +54,8 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <literal> literal;
 %type <columns> column_list;
 %type <columns> columns;
+%type <data_list> data_list;
+%type <insert_values> insert_values;
 
 %%
 sql: create_table       { *tree = $1; }
@@ -103,17 +107,17 @@ literal
 	;
 
 insert_into_table
-	: INSERT INTO NAME VALUES insert_values { $$ = sql_insert($3); }
+	: INSERT INTO NAME VALUES insert_values { $$ = sql_insert($3, $5); }
 	;
 
 insert_values
-	: '(' data_list ')'
-	| insert_values ',' '(' data_list ')'
+	: '(' data_list ')'                   { $$ = sql_insert_values_alloc($2); }
+	| '(' data_list ')' ',' insert_values { $$ = sql_insert_values_alloc($2); $$->next = $5; }
 	;
 
 data_list
-	: literal
-	| literal ',' data_list
+	: literal               { $$ = sql_data_list_alloc($1); }
+	| literal ',' data_list { $$ = sql_data_list_alloc($1); $$->next = $3; }
 	;
 
 

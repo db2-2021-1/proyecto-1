@@ -25,10 +25,11 @@ sql_statement_tree* sql_statement_tree_alloc()
 
 	if(!tree)
 	{
-		tree->type       = SQL_INVALID;
-		tree->columns    = NULL;
-		tree->table_name = NULL;
-		tree->expr       = NULL;
+		tree->type          = SQL_INVALID;
+		tree->columns       = NULL;
+		tree->table_name    = NULL;
+		tree->insert_values = NULL;
+		tree->expr          = NULL;
 	}
 
 	return tree;
@@ -64,12 +65,13 @@ sql_statement_tree* sql_select_where(sql_columns* columns, char* table_name, sql
 	return tree;
 }
 
-sql_statement_tree* sql_insert(char* table_name)
+sql_statement_tree* sql_insert(char* table_name, sql_insert_values* insert_values)
 {
 	sql_statement_tree* tree = sql_statement_tree_alloc();
 
-	tree->type       = SQL_INSERT;
-	tree->table_name = table_name;
+	tree->type          = SQL_INSERT;
+	tree->table_name    = table_name;
+	tree->insert_values = insert_values;
 
 	return tree;
 }
@@ -91,6 +93,7 @@ void sql_statement_tree_free(sql_statement_tree* tree)
 	{
 		sql_columns_free(tree->columns);
 		free(tree->table_name);
+		sql_insert_values_free(tree->insert_values);
 		sql_expr_free(tree->expr);
 	}
 
@@ -114,6 +117,7 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 
 			case SQL_INSERT:
 				fprintf(file, "INSERT %s\n", tree->table_name);
+				sql_insert_values_print(tree->insert_values, file);
 				break;
 
 			case SQL_SELECT:

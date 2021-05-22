@@ -20,6 +20,7 @@
 
 #include "columns.h"
 #include "expresion.h"
+#include "insert_values.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +41,7 @@ typedef struct _sql_statement_tree
 	int type;
 	sql_columns* columns;
 	char* table_name;
+	sql_insert_values* insert_values;
 	sql_expr* expr;
 } sql_statement_tree;
 
@@ -59,7 +61,7 @@ sql_statement_tree* sql_select_where(sql_columns* columns, char* table_name, sql
 /// Creates a INSERT INTO tree.
 /// table_name must be allocated with malloc, and its ownership its
 /// transfered to the tree.
-sql_statement_tree* sql_insert(char* table_name);
+sql_statement_tree* sql_insert(char* table_name, sql_insert_values* insert_values);
 
 /// Creates a DELETE FROM tree.
 /// table_name must be allocated with malloc, and its ownership its
