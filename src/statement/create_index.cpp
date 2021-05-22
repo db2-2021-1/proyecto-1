@@ -16,6 +16,21 @@
 
 #include "create_index.hpp"
 
+std::string db2::statement::index_type2str(index_type type)
+{
+	switch(type)
+	{
+		case index_type::bp_tree:
+			return "bp_tree";
+
+		case index_type::e_hash:
+			return "e_hash";
+
+		default:
+			return "";
+	}
+}
+
 db2::statement::create_index::create_index(std::string name, index_type type, std::string column_name):
 	statement(std::move(name)),
 	type(type),

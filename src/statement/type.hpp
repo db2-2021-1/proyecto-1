@@ -34,21 +34,8 @@ struct type
 	_type t;
 	size_t size;
 
-	type(sql_type sql_t)
-	{
-		switch(sql_t.type)
-		{
-			case SQL_INT:
-				t = _type::INT;
-				break;
-
-			case SQL_VARCHAR:
-				t = _type::VARCHAR;
-				break;
-		}
-
-		size = sql_t.size;
-	}
+	type(sql_type sql_t);
+	static std::string type2str(_type t);
 };
 
 std::ostream& operator<<(std::ostream& os, const type& t);

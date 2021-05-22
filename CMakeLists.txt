@@ -74,6 +74,11 @@ target_link_libraries(${PROJECT_NAME}
 		PkgConfig::header_only
 )
 
+target_compile_definitions(${PROJECT_NAME}
+	PRIVATE
+		RAPIDJSON_HAS_STDSTRING
+)
+
 # Install target
 install(TARGETS ${PROJECT_NAME}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}

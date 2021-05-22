@@ -16,6 +16,37 @@
 
 #include "type.hpp"
 
+db2::statement::type::type(sql_type sql_t)
+{
+	switch(sql_t.type)
+	{
+		case SQL_INT:
+			t = _type::INT;
+			break;
+
+		case SQL_VARCHAR:
+			t = _type::VARCHAR;
+			break;
+	}
+
+	size = sql_t.size;
+}
+
+std::string db2::statement::type::type2str(_type t)
+{
+	switch(t)
+	{
+		case _type::INT:
+			return "INT";
+
+		case _type::VARCHAR:
+			return "VARCHAR";
+
+		default:
+			return "";
+	}
+}
+
 std::ostream& db2::statement::operator<<(std::ostream& os, const type& t)
 {
 	switch(t.t)

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdio>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <utility>
@@ -25,7 +26,6 @@
 
 namespace db2
 {
-
 
 /// This class manages the operations on a table.
 class table
@@ -41,6 +41,9 @@ private:
 	std::vector<std::pair<std::string, statement::type>> columns;
 	std::optional<index> table_index;
 
+	bool check_and_create_directory() const;
+	std::filesystem::path metadata_path() const;
+
 public:
 	table(
 		std::string table_name,
@@ -48,8 +51,10 @@ public:
 		std::optional<index> table_index = std::nullopt
 	);
 
+	table();
+
 	bool read_metadata();
-	bool write_metadata();
+	bool write_metadata() const;
 };
 
 };

@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "create_table.hpp"
+#include "table.hpp"
 
 db2::statement::create_table::create_table(std::string table_name, std::vector<std::pair<std::string, type>> data_types):
 	statement(std::move(table_name)),
@@ -40,10 +41,9 @@ bool db2::statement::create_table::execute()
 	//     data_types  // (data type, data type(size))
 	// }
 
-	// TODO
-	std::cout << *this;
+	table t(table_name, data_types);
 
-	return false;
+	return t.write_metadata();
 }
 
 std::ostream& db2::statement::create_table::print(std::ostream& os) const

@@ -32,6 +32,8 @@ enum class index_type
 	bp_tree
 };
 
+std::string index_type2str(index_type type);
+
 /// CREATE INDEX ON name [ USING index_type ] (name)
 class create_index: public statement
 {
