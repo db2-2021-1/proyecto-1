@@ -1,4 +1,5 @@
 %{
+#include <stdlib.h>
 #include <string.h>
 
 #include "parser.h"
@@ -30,7 +31,13 @@ VARCHAR { return VARCHAR; }
 WHERE   { return WHERE;   }
 
 \"(\\.|\"\"|[^"\n])*\" {
-	yylval.strval = strndup(yytext+1, strlen(yytext)-2);
+#if _POSIX_C_SOURCE >= 200809L
+	yylval.strval = strndup(yytext+1, yyleng-2);
+#else
+	yylval.strval = malloc(yyleng - 1);
+	memcpy(yylval.strval, yytext + 1, yyleng - 2);
+	yylval.strval[yyleng - 2] = '\0';
+#endif
 	return STRING;
 }
 [a-z][a-z0-9_]*        { yylval.strval = strdup(yytext); return NAME;   }
