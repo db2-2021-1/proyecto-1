@@ -102,6 +102,7 @@ jobs:
         update: true
         install: base-devel
           mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-ntldd-git
           mingw-w64-x86_64-rapidjson
           mingw-w64-x86_64-readline
           mingw-w64-x86_64-toolchain
@@ -127,8 +128,8 @@ jobs:
       shell: msys2 {0}
       working-directory: ./build
       run: |
-          ldd *.exe |
-          grep '\/mingw.*\.dll' -o |
+          ntldd  *.exe |
+          awk '{print $3}' |
           xargs -I{} cp "{}" .
 
     - uses: actions/upload-artifact@v2
