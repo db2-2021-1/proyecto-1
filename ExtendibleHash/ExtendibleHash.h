@@ -4,7 +4,7 @@
 #include <cmath>
 #include <bitset>
 #include <string>
-#include "Register.h"
+#include "register.h"
 
 
 class ExtendibleHash {
@@ -237,8 +237,8 @@ public:
         Register reg;
         std::fstream file, auxfile;
         std::string line, header;
-        file.open(filename);
-        auxfile.open("auxfile.csv");
+        file.open(filename,std::ios::in);
+        auxfile.open("auxfile.csv",std::ios::out);
         getline(file,header);
         auxfile<<header;
         while(getline(file,line)){
