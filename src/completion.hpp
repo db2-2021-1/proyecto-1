@@ -18,8 +18,6 @@
 
 #include <string>
 
-extern const std::string history_file;
-
 void init_readline();
 void init_history();
 

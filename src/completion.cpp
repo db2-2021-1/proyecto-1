@@ -26,7 +26,7 @@
 
 // https://thoughtbot.com/blog/tab-completion-in-gnu-readline
 
-const std::string history_file =
+const auto history_file =
 	std::filesystem::path(getenv("HOME")) / ".proyecto-1_history";
 
 void init_readline()
