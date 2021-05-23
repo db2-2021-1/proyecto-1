@@ -128,8 +128,10 @@ jobs:
       shell: msys2 {0}
       working-directory: ./build
       run: |
-          ntldd  *.exe |
-          awk '{print $3}' |
+          ntldd -R *exe |
+          grep -i mingw |
+          cut -d">" -f2 |
+          cut -d" " -f2 |
           xargs -I{} cp "{}" .
 
     - uses: actions/upload-artifact@v2
