@@ -132,7 +132,7 @@ jobs:
           grep -i mingw |
           cut -d">" -f2 |
           cut -d" " -f2 |
-          cygpath -u |
+          xargs cygpath -u |
           xargs -I{} cp "{}" .
 
     - uses: actions/upload-artifact@v2
