@@ -77,6 +77,7 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE
 		RAPIDJSON_HAS_STDSTRING
+		_GNU_SOURCE
 )
 
 # Install target
