@@ -123,7 +123,17 @@ jobs:
           export MAKEFLAGS=-j$(nproc)
           cmake.exe --build build
 
+    - name: Copy dlls
+      shell: msys2 {0}
+      working-directory: ./build
+      run: |
+          ldd *.exe |
+          grep '\/mingw.*\.dll' -o |
+          xargs -I{} cp "{}" .
+
     - uses: actions/upload-artifact@v2
       with:
         name: windows_package
-        path: build/*.exe
+        path: |
+            build/*.exe
+            build/*.dll
