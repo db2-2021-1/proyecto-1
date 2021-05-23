@@ -17,7 +17,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <wordexp.h>
+#include <filesystem>
 
 #include <readline/history.h>
 #include <readline/readline.h>
@@ -26,18 +26,8 @@
 
 // https://thoughtbot.com/blog/tab-completion-in-gnu-readline
 
-const std::string history_file = []()
-{
-	wordexp_t p;
-
-	wordexp("~/.proyecto-1_history", &p, 0);
-
-	std::string str(p.we_wordv[0]);
-
-	wordfree(&p);
-
-	return str;
-}();
+const std::string history_file =
+	std::filesystem::path(getenv("HOME")) / ".proyecto-1_history";
 
 void init_readline()
 {
