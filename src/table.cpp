@@ -209,12 +209,7 @@ std::filesystem::path db2::table::metadata_path() const
 
 bool db2::table::read_metadata()
 {
-	FILE* file =
-#ifdef _MSC_VER
-		fopen(metadata_path().c_str(), L"r");
-#else
-		fopen(metadata_path().c_str(), "r");
-#endif
+	FILE* file = fopen(metadata_path().string().c_str(), "r");
 
 	if(!file)
 	{
@@ -238,7 +233,7 @@ bool db2::table::read_metadata()
 
 	if(fclose(file) != 0)
 	{
-		perror(metadata_path().c_str());
+		perror(metadata_path().string().c_str());
 		return false;
 	}
 
@@ -250,12 +245,7 @@ bool db2::table::write_metadata() const
 	if(!check_and_create_directory())
 		return false;
 
-	FILE* file =
-#ifdef _MSC_VER
-		fopen(metadata_path().c_str(), L"w");
-#else
-		fopen(metadata_path().c_str(), "w");
-#endif
+	FILE* file = fopen(metadata_path().string().c_str(), "w");
 
 	if(!file)
 	{
@@ -312,7 +302,7 @@ bool db2::table::write_metadata() const
 
 	if(fclose(file) != 0)
 	{
-		perror(metadata_path().c_str());
+		perror(metadata_path().string().c_str());
 		return false;
 	}
 

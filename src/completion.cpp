@@ -39,26 +39,26 @@ void init_history()
 {
 	using_history();
 
-	if(FILE* file = fopen(history_file.c_str(), "a"))
+	if(FILE* file = fopen(history_file.string().c_str(), "a"))
 	{
 		fclose(file);
 
-		if(read_history(history_file.c_str()) != 0)
-			perror(history_file.c_str());
+		if(read_history(history_file.string().c_str()) != 0)
+			perror(history_file.string().c_str());
 
 		if(atexit(end_history) != 0)
 			exit(EXIT_FAILURE);
 	}
 	else
 	{
-		perror(history_file.c_str());
+		perror(history_file.string().c_str());
 	}
 }
 
 void end_history()
 {
-	if(write_history(history_file.c_str()) != 0)
-		perror(history_file.c_str());
+	if(write_history(history_file.string().c_str()) != 0)
+		perror(history_file.string().c_str());
 }
 
 char** sql_completion(const char* text, int, int)
