@@ -1,7 +1,7 @@
 # Maintainer: Otreblan <otreblain@gmail.com>
 
 pkgname=proyecto-1-git
-pkgver=0.2.0.r8.ge430557
+pkgver=0.2.1.r1.gfa59780
 pkgrel=1
 epoch=
 pkgdesc="Proyecto 1"
@@ -9,8 +9,8 @@ arch=('x86_64')
 url="https://github.com/db2-2021-1/proyecto-1"
 license=('GPL3')
 groups=()
-depends=('gcc-libs' 'readline' 'flex')
-makedepends=('git' 'cmake' 'bison' 'rapidjson')
+depends=('gcc-libs' 'readline')
+makedepends=('git' 'cmake' 'bison' 'rapidjson' 'flex')
 checkdepends=()
 optdepends=()
 provides=(${pkgname%-git})
