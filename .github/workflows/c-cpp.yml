@@ -112,9 +112,8 @@ jobs:
       shell: msys2 {0}
       run: echo "$PATH" && cmake.exe
         -G 'MSYS Makefiles'
-        -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-        -DCMAKE_CXX_FLAGS="-Wall -Wextra -O2"
-        -DCMAKE_C_FLAGS="-Wall -Wextra -O2"
+        -DCMAKE_CXX_FLAGS="-Wall -Wextra -g"
+        -DCMAKE_C_FLAGS="-Wall -Wextra -g"
         -B build
 
     - name: build

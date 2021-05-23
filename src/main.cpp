@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	a.parse(argc, argv);
 
 	init_readline();
-	//init_history();
+	init_history();
 
 	int prompt_i = 0;
 	const char* prompts[2] =
