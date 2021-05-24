@@ -16,13 +16,36 @@
 
 #pragma once
 
-#include "statement/copy.hpp"
-#include "statement/create_index.hpp"
-#include "statement/create_table.hpp"
-#include "statement/delete_from.hpp"
-#include "statement/expression.hpp"
-#include "statement/insert.hpp"
-#include "statement/literal.hpp"
-#include "statement/select.hpp"
-#include "statement/statement.hpp"
-#include "statement/type.hpp"
+#include <iostream>
+#include <optional>
+#include <vector>
+
+#include "expression.hpp"
+#include "statement.hpp"
+
+namespace db2::statement
+{
+
+/// COPY name FROM csv_name CSV HEADER
+class copy: public statement
+{
+private:
+	std::string csv_name;
+
+	copy(const sql_statement_tree& tree);
+	virtual std::ostream& print(std::ostream& os) const;
+public:
+	copy(std::string table_name, std::string csv_name);
+	copy();
+
+	virtual bool execute();
+	virtual ~copy(){};
+
+	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::ostream& operator<<(std::ostream& os, const copy& c);
+	friend class statement;
+};
+
+std::ostream& operator<<(std::ostream& os, const copy& c);
+
+}

@@ -21,6 +21,7 @@
 #include "parser_def.h"
 #include "select.hpp"
 #include "statement.hpp"
+#include "copy.hpp"
 
 std::unique_ptr<db2::statement::statement>
 	db2::statement::from_tree(const sql_statement_tree& tree)
@@ -41,6 +42,9 @@ std::unique_ptr<db2::statement::statement>
 
 		case SQL_DELETE_FROM:
 			return std::unique_ptr<statement>(new(std::nothrow) delete_from(tree));
+
+		case SQL_COPY:
+			return std::unique_ptr<statement>(new(std::nothrow) copy(tree));
 
 		default:
 			return nullptr;
