@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "copy.hpp"
+#include "table.hpp"
 
 db2::statement::copy::copy(std::string table_name, std::string csv_name):
 	statement(std::move(table_name)),
@@ -36,10 +37,12 @@ bool db2::statement::copy::execute()
 	//     csv_name   // FROM csv_name CSV HEADER
 	// }
 
-	// TODO
-	std::cout << *this;
+	table t(table_name);
 
-	return false;
+	if(!t.read_metadata())
+		return false;
+
+	return t.write_csv(csv_name);
 }
 
 std::ostream& db2::statement::copy::print(std::ostream& os) const

@@ -101,6 +101,9 @@ public:
 	bool write_metadata() const;
 
 	void set_index(index i);
+
+	/// Copy data from csv.
+	bool write_csv(std::string_view csv_name);
 };
 
 };
