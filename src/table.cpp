@@ -507,3 +507,53 @@ size_t db2::table::tuple_size() const
 
 	return size;
 }
+
+void db2::table::write(std::ostream& os, const statement::row& r) const
+{
+	size_t i = 0;
+	for(const auto& cell: r)
+	{
+		size_t size = columns[i].second.size;
+
+		std::visit(overload{
+			[&os](int i)
+			{
+				os.write((char*)&i, sizeof(i));
+			},
+			[&os, size](const std::string& str)
+			{
+				os.write(str.c_str(), str.size());
+				for(size_t i = str.size(); i < size+1; i++)
+				{
+					os << '\0';
+				}
+			},
+		}, cell);
+	}
+}
+
+db2::statement::row db2::table::read(std::istream& is, char* buffer) const
+{
+	statement::row new_row;
+
+	for(const auto& [name, type]: columns)
+	{
+		is.read(buffer, type.size);
+
+		switch(type.t)
+		{
+			case statement::type::_type::INT:
+				new_row.push_back(*(int*)buffer);
+				break;
+
+			case statement::type::_type::VARCHAR:
+				new_row.push_back(std::string(buffer));
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	return new_row;
+}

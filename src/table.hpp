@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <iostream>
 #include <optional>
 #include <string>
 #include <utility>
@@ -87,6 +88,11 @@ private:
 
 		bool Default();
 	};
+
+	void write(std::ostream& os, const statement::row& r) const;
+
+	// The buffer must be big enough to hold the biggest value.
+	statement::row read(std::istream& is, char* buffer) const;
 
 public:
 	table(
