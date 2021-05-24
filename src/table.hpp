@@ -106,10 +106,10 @@ public:
 	bool read_csv(std::string_view csv_name);
 
 	/// Write data to the table.
-	bool write_data(std::vector<std::vector<statement::literal>>& data);
+	bool write_data(std::vector<statement::row>& data);
 
 	/// Check and trim data.
-	bool check_data(std::vector<std::vector<statement::literal>>& data);
+	bool check_data(std::vector<statement::row>& data);
 
 	/// The number of bytes in any row of the table.
 	size_t tuple_size() const;

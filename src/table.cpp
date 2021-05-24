@@ -354,7 +354,7 @@ bool db2::table::read_csv(std::string_view csv_name)
 	};
 
 	auto push_token = [&](
-		std::vector<statement::literal>& row,
+		statement::row& row,
 		size_t column,
 		const char* str
 		) -> bool
@@ -407,11 +407,11 @@ bool db2::table::read_csv(std::string_view csv_name)
 		return false;
 	}
 
-	std::vector<std::vector<statement::literal>> new_rows;
+	std::vector<statement::row> new_rows;
 
 	while(get_csv_line())
 	{
-		std::vector<statement::literal> new_row;
+		statement::row new_row;
 
 		for(size_t column = 0; get_token(); column++)
 		{
@@ -435,7 +435,7 @@ bool db2::table::read_csv(std::string_view csv_name)
 	return clean();
 }
 
-bool db2::table::write_data(std::vector<std::vector<statement::literal>>& data)
+bool db2::table::write_data(std::vector<statement::row>& data)
 {
 	using namespace db2::statement;
 
@@ -457,7 +457,7 @@ bool db2::table::write_data(std::vector<std::vector<statement::literal>>& data)
 	return false;
 }
 
-bool db2::table::check_data(std::vector<std::vector<statement::literal>>& data)
+bool db2::table::check_data(std::vector<statement::row>& data)
 {
 	for(auto& row: data)
 	{

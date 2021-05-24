@@ -15,9 +15,10 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "insert.hpp"
+#include "row.hpp"
 #include "table.hpp"
 
-db2::statement::insert::insert(std::string table_name, std::vector<std::vector<literal>> data):
+db2::statement::insert::insert(std::string table_name, std::vector<row> data):
 	statement(std::move(table_name)),
 	data(std::move(data))
 {};
@@ -26,15 +27,15 @@ db2::statement::insert::insert(const sql_statement_tree& tree)
 {
 	table_name = tree.table_name;
 
-	for(auto* row = tree.insert_values; row != nullptr; row = row->next)
+	for(auto* old_row = tree.insert_values; old_row != nullptr; old_row = old_row->next)
 	{
-		std::vector<literal> new_column;
-		for(auto* column = row->data_list; column != nullptr; column = column->next)
+		row new_row;
+		for(auto* column = old_row->data_list; column != nullptr; column = column->next)
 		{
-			new_column.push_back(from_union(column->literal));
+			new_row.push_back(from_union(column->literal));
 		}
 
-		data.push_back(std::move(new_column));
+		data.push_back(std::move(new_row));
 	}
 }
 

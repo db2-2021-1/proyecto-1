@@ -24,6 +24,7 @@ target_sources(${PROJECT_NAME}
 		expression.cpp
 		insert.cpp
 		literal.cpp
+		row.cpp
 		select.cpp
 		statement.cpp
 		type.cpp
