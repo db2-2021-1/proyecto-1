@@ -1,7 +1,10 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
-#include "csv_lector.h"
+
+#pragma once
+
+//#include "csv_lector.h"
 
 Register notFound()
 {
