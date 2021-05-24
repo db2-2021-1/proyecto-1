@@ -26,13 +26,17 @@ sql_statement_tree* sql_statement_tree_alloc()
 
 	if(tree)
 	{
-		tree->type          = SQL_INVALID;
-		tree->index_type    = SQL_BPTREE;
-		tree->columns       = NULL;
-		tree->table_name    = NULL;
-		tree->insert_values = NULL;
-		tree->expr          = NULL;
-		tree->new_columns   = NULL;
+		*tree = (sql_statement_tree)
+		{
+			.type          = SQL_INVALID,
+			.index_type    = SQL_BPTREE,
+			.columns       = NULL,
+			.table_name    = NULL,
+			.insert_values = NULL,
+			.expr          = NULL,
+			.new_columns   = NULL,
+			.csv_name      = NULL
+		};
 	}
 
 	return tree;
@@ -133,6 +137,20 @@ sql_statement_tree* sql_delete(char* table_name, sql_expr* expr)
 	return tree;
 }
 
+sql_statement_tree* sql_copy(char* table_name, char* csv_name)
+{
+	sql_statement_tree* tree = sql_statement_tree_alloc();
+
+	if(tree)
+	{
+		tree->type       = SQL_COPY;
+		tree->table_name = table_name;
+		tree->csv_name   = csv_name;
+	}
+
+	return tree;
+}
+
 void sql_statement_tree_free(sql_statement_tree* tree)
 {
 	if(tree)
@@ -142,6 +160,7 @@ void sql_statement_tree_free(sql_statement_tree* tree)
 		sql_insert_values_free(tree->insert_values);
 		sql_expr_free(tree->expr);
 		sql_new_columns_free(tree->new_columns);
+		free(tree->csv_name);
 	}
 
 	free(tree);
@@ -178,6 +197,10 @@ void sql_statement_tree_print(sql_statement_tree* tree, FILE* file)
 				fprintf(file, "SELECT %s\n", tree->table_name);
 				sql_columns_print(tree->columns, file);
 				sql_expr_print(tree->expr, file);
+				break;
+
+			case SQL_COPY:
+				fprintf(file, "COPY %s FROM %s\n", tree->table_name, tree->csv_name);
 				break;
 		}
 	}

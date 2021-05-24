@@ -35,7 +35,8 @@ enum sql_statement_type
 	SQL_CREATE_INDEX,
 	SQL_SELECT,
 	SQL_INSERT,
-	SQL_DELETE_FROM
+	SQL_DELETE_FROM,
+	SQL_COPY
 };
 
 enum sql_index_type
@@ -53,6 +54,7 @@ typedef struct _sql_statement_tree
 	sql_insert_values* insert_values;
 	sql_expr* expr;
 	sql_new_columns* new_columns;
+	char* csv_name;
 } sql_statement_tree;
 
 sql_statement_tree* sql_statement_tree_alloc();
@@ -75,6 +77,9 @@ sql_statement_tree* sql_insert(char* table_name, sql_insert_values* insert_value
 
 /// Creates a DELETE FROM tree.
 sql_statement_tree* sql_delete(char* table_name, sql_expr* expr);
+
+/// Creates a COPY tree.
+sql_statement_tree* sql_copy(char* table_name, char* csv_name);
 
 void sql_statement_tree_free(sql_statement_tree* tree);
 

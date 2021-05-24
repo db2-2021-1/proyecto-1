@@ -154,7 +154,7 @@ delete_from_table
 
 
 copy
-	: COPY NAME FROM STRING CSV HEADER { $$ = NULL; }
+	: COPY NAME FROM STRING CSV HEADER { $$ = sql_copy($2, $4); }
 %%
 
 sql_statement_tree* parse(const char* str)
