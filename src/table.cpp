@@ -369,7 +369,9 @@ bool db2::table::read_csv(std::string_view csv_name)
 				break;
 
 			case statement::type::_type::VARCHAR:
-				row.emplace_back(std::string(str));
+				row.emplace_back(std::string(str,
+					std::min(columns[column].second.size, strlen(str))
+				));
 				break;
 
 			default:
@@ -433,11 +435,12 @@ bool db2::table::read_csv(std::string_view csv_name)
 	return clean();
 }
 
-bool db2::table::write_data(const std::vector<std::vector<statement::literal>>& data)
+bool db2::table::write_data(std::vector<std::vector<statement::literal>>& data)
 {
 	using namespace db2::statement;
 
-	// TODO check types and size.
+	if(!check_data(data))
+		return false;
 
 	printf("Rows: %lu\n", data.size());
 	for(const auto& row: data)
@@ -449,5 +452,46 @@ bool db2::table::write_data(const std::vector<std::vector<statement::literal>>& 
 		std::cout << '\n';
 	}
 
+	// TODO
+
 	return false;
+}
+
+bool db2::table::check_data(std::vector<std::vector<statement::literal>>& data)
+{
+	for(auto& row: data)
+	{
+		// Check size
+		if(row.size() != columns.size())
+			return false;
+
+		// Check types and size
+		for(size_t i = 0; i < columns.size(); i++)
+		{
+			switch(columns[i].second.t)
+			{
+				case statement::type::_type::INT:
+					if(!std::holds_alternative<int>(row[i]))
+						return false;
+					break;
+
+				case statement::type::_type::VARCHAR:
+					if(!std::holds_alternative<std::string>(row[i]))
+						return false;
+					else
+					{
+						std::string& str = std::get<std::string>(row[i]);
+
+						if(str.size() > columns[i].second.size)
+							str = std::string(str.c_str(), columns[i].second.size);
+					}
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
+
+	return true;
 }
