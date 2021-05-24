@@ -4,8 +4,8 @@
 #include <cmath>
 #include <bitset>
 #include <string>
-#include "register.h"
 
+#pragma once
 
 class ExtendibleHash {
 private:

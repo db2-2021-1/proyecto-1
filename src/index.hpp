@@ -17,3 +17,4 @@
 #pragma once
 
 #include "index/bptree.hpp"
+#include "index/extendible_hash.hpp"
