@@ -14,9 +14,12 @@
 %%
 AND     { return AND;     }
 BETWEEN { return BETWEEN; }
+COPY    { return COPY;    }
 CREATE  { return CREATE;  }
+CSV     { return CSV;     }
 DELETE  { return DELETE;  }
 FROM    { return FROM;    }
+HEADER  { return HEADER;  }
 INDEX   { return INDEX;   }
 INSERT  { return INSERT;  }
 INT     { return INT;     }

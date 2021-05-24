@@ -73,9 +73,12 @@ char* key_word_generator(const char* text, int state)
 	{
 		"AND",
 		"BETWEEN",
+		"COPY",
 		"CREATE",
+		"CSV",
 		"DELETE",
 		"FROM",
+		"HEADER",
 		"INDEX",
 		"INSERT",
 		"INT",
@@ -84,10 +87,10 @@ char* key_word_generator(const char* text, int state)
 		"ON",
 		"SELECT",
 		"TABLE",
+		"USING",
 		"VALUES",
 		"VARCHAR",
 		"WHERE",
-		"USING",
 
 		nullptr
 	};

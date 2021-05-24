@@ -37,9 +37,12 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %token <strval> NAME;
 %token <strval> STRING
 
+%token COPY
 %token CREATE
+%token CSV
 %token DELETE
 %token FROM
+%token HEADER
 %token INDEX
 %token INSERT
 %token INT
@@ -57,6 +60,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <statement> select_table
 %type <statement> insert_into_table
 %type <statement> delete_from_table
+%type <statement> copy
 %type <expr> expr;
 %type <literal> literal;
 %type <columns> column_list;
@@ -74,6 +78,7 @@ sql
 	| select_table      { *tree = $1; }
 	| insert_into_table { *tree = $1; }
 	| delete_from_table { *tree = $1; }
+	| copy              { *tree = $1; }
 	;
 
 create_table
@@ -146,6 +151,10 @@ data_list
 delete_from_table
 	: DELETE FROM NAME WHERE expr { $$ = sql_delete($3, $5); }
 	;
+
+
+copy
+	: COPY NAME FROM STRING CSV HEADER { $$ = NULL; }
 %%
 
 sql_statement_tree* parse(const char* str)
