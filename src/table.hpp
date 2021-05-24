@@ -104,6 +104,9 @@ public:
 
 	/// Copy data from csv.
 	bool read_csv(std::string_view csv_name);
+
+	// Write data to the table.
+	bool write_data(const std::vector<std::vector<statement::literal>>& data);
 };
 
 };

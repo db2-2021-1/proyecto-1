@@ -31,5 +31,4 @@ using literal = std::variant<int, std::string>;
 literal from_union(sql_literal l);
 
 std::ostream& operator<<(std::ostream& os, const literal& l);
-
 }

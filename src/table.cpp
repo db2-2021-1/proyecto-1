@@ -353,32 +353,100 @@ bool db2::table::read_csv(std::string_view csv_name)
 		return (token = strsep(&buffer, ",")) != nullptr;
 	};
 
+	auto push_token = [&](
+		std::vector<statement::literal>& row,
+		size_t column,
+		const char* str
+		) -> bool
+	{
+		if(column >= columns.size())
+			return false;
+
+		switch(columns[column].second.t)
+		{
+			case statement::type::_type::INT:
+				row.emplace_back(atoi(str));
+				break;
+
+			case statement::type::_type::VARCHAR:
+				row.emplace_back(std::string(str));
+				break;
+
+			default:
+				return false;
+		}
+
+		return true;
+	};
+
+	auto clean = [&]() -> bool
+	{
+		free(buffer);
+		return fclose(csv_file);
+	};
+
 	if(!get_csv_line())
 	{
 		// No header
-		fclose(csv_file);
+		clean();
 		return false;
 	}
 
-	while(get_token())
+	for(size_t column = 0; get_token(); column++)
 	{
-		printf("Header: %s\n", token);
+		if(column >= columns.size())
+			fprintf(stderr, "Extra columns.\n");
+		else if(columns[column].first != token)
+			fprintf(stderr, "\"%s\" column out of order.\n", token);
+		else
+			continue;
+
+		clean();
+		return false;
 	}
 
-	puts("");
+	std::vector<std::vector<statement::literal>> new_rows;
 
 	while(get_csv_line())
 	{
-		while(get_token())
+		std::vector<statement::literal> new_row;
+
+		for(size_t column = 0; get_token(); column++)
 		{
-			printf("token: %s\n", token);
+			if(!push_token(new_row, column, token))
+			{
+				clean();
+				fprintf(stderr, "Extra columns.\n");
+				return false;
+			}
 		}
-		puts("");
+
+		new_rows.push_back(std::move(new_row));
 	}
 
+	if(!write_data(new_rows))
+	{
+		clean();
+		return false;
+	}
+
+	return clean();
+}
+
+bool db2::table::write_data(const std::vector<std::vector<statement::literal>>& data)
+{
+	using namespace db2::statement;
+
 	// TODO
+	printf("Rows: %lu\n", data.size());
+	for(const auto& row: data)
+	{
+		for(const auto& cell: row)
+		{
+			std::cout << cell << ' ';
+		}
+		std::cout << '\n';
+	}
 
-	free(buffer);
-
-	return fclose(csv_file) == 0;
+	return false;
 }
