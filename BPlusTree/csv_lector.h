@@ -11,7 +11,8 @@ class Lector
 public:
     Lector(){}
     Register CsvtoRegister(std::string line)
-    {        char c;
+    {        
+        char c;
         int state = 0, id = 0, age = 0, hypertension = 0, heartDisease = 0, stroke = 0;
         std::string word, gender, everMarried, workType, residenceType, everSmoked, bmi, avgGlucose;
         for(int i = 0; i < line.size(); i++){

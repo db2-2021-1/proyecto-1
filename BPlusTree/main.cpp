@@ -3,18 +3,22 @@
 using namespace std;
 int main()
 {
+    int basekey = 10000;
+    int topkey = 20000;
     BPlusTree bplustree; //UNCLUSTERED B+ TREE
 
     Lector lector;
 
     auto registros = lector.scanAllCSV();
 
-    for(auto &item : registros){
+    for (auto &item : registros)
+    {
         bplustree.insert(item);
     }
+    /*
     //INSERCION DE UN ELEMENTO
     //bplustree.display(bplustree.getRoot());
-    /*auto register_found = bplustree.find(72915);
+    auto register_found = bplustree.find(72915);
     register_found.print();
     */
 
@@ -27,12 +31,14 @@ int main()
     //bplustree.remove(9);
     register_found = bplustree.find(9);
     register_found.print();
-    */
+*/
     //BUSQUEDA POR RANGO
-    auto registros_ = bplustree.find(222, 600);
+    std::cout << "\n\n\n\n\n\n";
+    auto registros_ = bplustree.find(basekey, topkey);
     for (auto &item : registros_)
     {
-        item.print();
+        std::cout<<"item.id: "<<item.id<<"\n";
+        //item.print();
     }
 
     //bplustree.print_leaf(bplustree.getRoot());
