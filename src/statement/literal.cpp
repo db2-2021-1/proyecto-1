@@ -17,7 +17,6 @@
 #include <iostream>
 
 #include "literal.hpp"
-#include "overload.hpp"
 
 db2::statement::literal db2::statement::from_union(sql_literal l)
 {

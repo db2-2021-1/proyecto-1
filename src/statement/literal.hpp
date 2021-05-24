@@ -18,7 +18,9 @@
 
 #include <string>
 #include <variant>
+#include <functional>
 
+#include "overload.hpp"
 #include "tree.h"
 
 namespace db2::statement
@@ -29,5 +31,31 @@ using literal = std::variant<int, std::string>;
 literal from_union(sql_literal l);
 
 std::ostream& operator<<(std::ostream& os, const literal& l);
+
+}
+
+namespace std
+{
+
+template<> struct hash<db2::statement::literal>
+{
+	size_t operator()(const db2::statement::literal& l)
+	{
+		size_t h;
+
+		std::visit(db2::overload{
+			[&h](int number)
+			{
+				h = std::hash<int>{}(number);
+			},
+			[&h](const std::string& str)
+			{
+				h = std::hash<std::string>{}(str);
+			},
+		}, l);
+
+		return h;
+	}
+};
 
 }
