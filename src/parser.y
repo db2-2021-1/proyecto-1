@@ -72,7 +72,9 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <new_columns> new_columns;
 
 %%
-sql
+sql: sql_statement ';'
+
+sql_statement
 	: create_table      { *tree = $1; }
 	| create_index      { *tree = $1; }
 	| select_table      { *tree = $1; }
