@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <vector>
+
 #include "select.hpp"
+#include "table.hpp"
 
 db2::statement::select::select(std::string table_name, std::vector<std::string> columns, std::optional<expression> expr):
 	statement(std::move(table_name)),
@@ -46,7 +49,41 @@ bool db2::statement::select::execute()
 	// }
 
 	// TODO
-	std::cout << *this;
+	table t(table_name);
+
+	if(!t.read_metadata())
+		return false;
+
+	// Only punctual and range search are supported
+	if(!expr.has_value())
+		return false;
+
+	// Only * is supported, by now.
+	print_columns(std::cout);
+
+	auto get_data = [&]() -> std::vector<row>
+	{
+		switch(expr->t)
+		{
+			case expression::type::between:
+				return t.select_range(expr->value[0], expr->value[1]);
+
+			case expression::type::is:
+				return t.select_equals(expr->value[0]);
+
+			default:
+				return {};
+		}
+	};
+
+	for(const auto& r: get_data())
+	{
+		for(const auto& cell: r)
+		{
+			std::cout << cell << ',';
+		}
+		std::cout << '\n';
+	}
 
 	return false;
 }
@@ -70,4 +107,14 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const select& s)
 		os << s.expr.value() << '\n';
 
 	return os;
+}
+
+void db2::statement::select::print_columns(std::ostream& os) const
+{
+	for(size_t i = 0; i < columns.size(); i++)
+	{
+		// TODO better csv printing
+		os << columns[i] << ',';
+	}
+	os << '\n';
 }

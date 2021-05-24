@@ -107,6 +107,7 @@ public:
 	bool write_metadata() const;
 
 	void set_index(index i);
+	bool has_index() const;
 
 	/// Copy data from csv.
 	bool read_csv(std::string_view csv_name);
@@ -119,6 +120,9 @@ public:
 
 	/// The number of bytes in any row of the table.
 	size_t tuple_size() const;
+
+	std::vector<statement::row> select_equals(const statement::literal& key);
+	std::vector<statement::row> select_range(const statement::literal& ge, const statement::literal& le);
 };
 
 };

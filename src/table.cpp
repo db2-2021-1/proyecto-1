@@ -314,6 +314,11 @@ void db2::table::set_index(index i)
 	table_index.emplace(std::move(i));
 }
 
+bool db2::table::has_index() const
+{
+	return table_index.has_value();
+}
+
 bool db2::table::read_csv(std::string_view csv_name)
 {
 	if(columns.empty() || !table_index.has_value())
@@ -556,4 +561,37 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 	}
 
 	return new_row;
+}
+
+std::vector<db2::statement::row> db2::table::select_equals(const statement::literal& key)
+{
+	std::vector<statement::row> rows;
+
+	switch(table_index->type)
+	{
+		case statement::index_type::bp_tree:
+			// TODO B+ tree
+			break;
+
+		case statement::index_type::e_hash:
+			// TODO E hash
+			break;
+	}
+	return rows;
+}
+
+std::vector<db2::statement::row> db2::table::select_range(const statement::literal& ge, const statement::literal& le)
+{
+	std::vector<statement::row> rows;
+
+	switch(table_index->type)
+	{
+		case statement::index_type::bp_tree:
+			// TODO B+ tree
+			break;
+
+		case statement::index_type::e_hash:
+			break;
+	}
+	return rows;
 }
