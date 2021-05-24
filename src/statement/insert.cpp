@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "insert.hpp"
+#include "table.hpp"
 
 db2::statement::insert::insert(std::string table_name, std::vector<std::vector<literal>> data):
 	statement(std::move(table_name)),
@@ -46,10 +47,12 @@ bool db2::statement::insert::execute()
 	//     data       // (1,2,"a"), (2,3,"b")
 	// }
 
-	// TODO
-	std::cout << *this;
+	table t(table_name);
 
-	return false;
+	if(!t.read_metadata())
+		return false;
+
+	return t.write_data(data);
 }
 
 std::ostream& db2::statement::insert::print(std::ostream& os) const

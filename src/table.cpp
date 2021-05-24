@@ -437,7 +437,8 @@ bool db2::table::write_data(const std::vector<std::vector<statement::literal>>& 
 {
 	using namespace db2::statement;
 
-	// TODO
+	// TODO check types and size.
+
 	printf("Rows: %lu\n", data.size());
 	for(const auto& row: data)
 	{
