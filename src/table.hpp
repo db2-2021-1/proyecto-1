@@ -103,7 +103,7 @@ public:
 	void set_index(index i);
 
 	/// Copy data from csv.
-	bool write_csv(std::string_view csv_name);
+	bool read_csv(std::string_view csv_name);
 };
 
 };

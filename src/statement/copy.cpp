@@ -42,7 +42,7 @@ bool db2::statement::copy::execute()
 	if(!t.read_metadata())
 		return false;
 
-	return t.write_csv(csv_name);
+	return t.read_csv(csv_name);
 }
 
 std::ostream& db2::statement::copy::print(std::ostream& os) const

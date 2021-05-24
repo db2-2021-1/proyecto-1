@@ -314,7 +314,7 @@ void db2::table::set_index(index i)
 	table_index.emplace(std::move(i));
 }
 
-bool db2::table::write_csv(std::string_view csv_name)
+bool db2::table::read_csv(std::string_view csv_name)
 {
 	if(columns.empty() || !table_index.has_value())
 		return false;
