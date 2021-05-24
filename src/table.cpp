@@ -319,7 +319,66 @@ bool db2::table::write_csv(std::string_view csv_name)
 	if(columns.empty() || !table_index.has_value())
 		return false;
 
+	FILE* csv_file = fopen(csv_name.data(), "r");
+
+	if(!csv_file)
+	{
+		perror(csv_name.data());
+		return false;
+	}
+
+	char* buffer = nullptr;
+	size_t buffer_size = 0;
+	ssize_t line_size;
+
+	char* token;
+
+	/// Get line and trim the new line character.
+	auto get_csv_line = [&]() -> bool
+	{
+		line_size = getline(&buffer, &buffer_size, csv_file);
+
+		if(line_size == -1)
+			return false;
+
+		if(line_size > 0)
+			buffer[line_size-- - 1] = '\0';
+
+		return true;
+	};
+
+	// Get a token from the csv line
+	auto get_token = [&]() -> bool
+	{
+		return (token = strsep(&buffer, ",")) != nullptr;
+	};
+
+	if(!get_csv_line())
+	{
+		// No header
+		fclose(csv_file);
+		return false;
+	}
+
+	while(get_token())
+	{
+		printf("Header: %s\n", token);
+	}
+
+	puts("");
+
+	while(get_csv_line())
+	{
+		while(get_token())
+		{
+			printf("token: %s\n", token);
+		}
+		puts("");
+	}
+
 	// TODO
 
-	return false;
+	free(buffer);
+
+	return fclose(csv_file) == 0;
 }
