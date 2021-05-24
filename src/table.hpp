@@ -110,6 +110,9 @@ public:
 
 	/// Check and trim data.
 	bool check_data(std::vector<std::vector<statement::literal>>& data);
+
+	/// The number of bytes in any row of the table.
+	size_t tuple_size() const;
 };
 
 };

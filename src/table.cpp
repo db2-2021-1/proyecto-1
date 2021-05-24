@@ -495,3 +495,15 @@ bool db2::table::check_data(std::vector<std::vector<statement::literal>>& data)
 
 	return true;
 }
+
+size_t db2::table::tuple_size() const
+{
+	size_t size = 0;
+
+	for(const auto& [str, type]: columns)
+	{
+		size += type.size;
+	}
+
+	return size;
+}
