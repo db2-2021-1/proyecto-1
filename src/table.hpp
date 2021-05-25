@@ -115,6 +115,15 @@ private:
 		const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
 	);
 
+	/// Must be called when the table has an index.
+	std::vector<statement::row> select_equals(const statement::literal& key);
+
+	/// Must be called when the table has an index.
+	std::vector<statement::row> select_range(const statement::literal& ge, const statement::literal& le);
+
+	std::vector<statement::row> select_all(
+		std::optional<statement::expression> expr = std::nullopt);
+
 public:
 	table(
 		std::string table_name,
@@ -145,14 +154,10 @@ public:
 	/// The number of bytes in any row of the table plus the valid flag.
 	size_t tuple_size() const;
 
-	/// Must be called when the table has an index.
-	std::vector<statement::row> select_equals(const statement::literal& key);
-
-	/// Must be called when the table has an index.
-	std::vector<statement::row> select_range(const statement::literal& ge, const statement::literal& le);
-
-	std::vector<statement::row> select_all(
-		std::optional<statement::expression> expr = std::nullopt);
+	/// Get data.
+	std::vector<statement::row> get_data(
+		const std::optional<statement::expression>& expr
+	);
 
 	void print_columns(std::ostream& os) const;
 

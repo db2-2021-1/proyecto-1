@@ -56,28 +56,7 @@ bool db2::statement::select::execute()
 	// Only * is supported, by now.
 	t.print_columns(std::cout);
 
-	auto get_data = [&]() -> std::vector<row>
-	{
-		if(!expr.has_value() || expr->column != t.get_table_index_name())
-			return t.select_all(expr);
-
-
-		switch(expr->t)
-		{
-			case expression::type::between:
-				if(t.get_index_type() == index_type::e_hash)
-					return t.select_all(expr);
-				return t.select_range(expr->value[0], expr->value[1]);
-
-			case expression::type::is:
-				return t.select_equals(expr->value[0]);
-
-			default:
-				return {};
-		}
-	};
-
-	for(const auto& r: get_data())
+	for(const auto& r: t.get_data(expr))
 	{
 		for(const auto& cell: r.values)
 		{

@@ -837,6 +837,28 @@ std::vector<db2::statement::row> db2::table::select_all(
 	return rows;
 }
 
+std::vector<db2::statement::row> db2::table::get_data(
+	const std::optional<statement::expression>& expr
+	)
+{
+	if(!expr.has_value() || expr->column != get_table_index_name())
+		return select_all(expr);
+
+	switch(expr->t)
+	{
+		case statement::expression::type::between:
+			if(get_index_type() == statement::index_type::e_hash)
+				return select_all(expr);
+			return select_range(expr->value[0], expr->value[1]);
+
+		case statement::expression::type::is:
+			return select_equals(expr->value[0]);
+
+		default:
+			return {};
+	}
+}
+
 void db2::table::print_columns(std::ostream& os) const
 {
 	for(const auto& [name, type]: columns)
