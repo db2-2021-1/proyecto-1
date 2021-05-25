@@ -327,7 +327,7 @@ bool db2::table::has_index() const
 
 bool db2::table::read_csv(std::string_view csv_name)
 {
-	if(columns.empty() || !table_index.has_value())
+	if(columns.empty())
 		return false;
 
 	FILE* csv_file = fopen(csv_name.data(), "r");
@@ -386,6 +386,7 @@ bool db2::table::read_csv(std::string_view csv_name)
 				break;
 
 			default:
+				fprintf(stderr, "Type not supported\n");
 				return false;
 		}
 
@@ -395,13 +396,13 @@ bool db2::table::read_csv(std::string_view csv_name)
 	auto clean = [&]() -> bool
 	{
 		free(buffer);
-		return fclose(csv_file);
+		return fclose(csv_file) == 0;
 	};
 
 	if(!get_csv_line())
 	{
-		// No header
 		clean();
+		fprintf(stderr, "No header\n");
 		return false;
 	}
 
@@ -440,6 +441,7 @@ bool db2::table::read_csv(std::string_view csv_name)
 	if(!write_data(new_rows))
 	{
 		clean();
+		fprintf(stderr, "Can't write data\n");
 		return false;
 	}
 
@@ -468,6 +470,7 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 
 	// TODO Update index
 
+	ofs.close();
 	return true;
 }
 
@@ -527,11 +530,10 @@ size_t db2::table::tuple_size() const
 void db2::table::write(std::ostream& os, const statement::row& r) const
 {
 	size_t i = 0;
-	bool valid_row = true;
 
 	for(const auto& cell: r.values)
 	{
-		size_t size = columns[i].second.size;
+		size_t size = columns[i++].second.size;
 
 		std::visit(overload{
 			[&os](int i)
@@ -549,7 +551,7 @@ void db2::table::write(std::ostream& os, const statement::row& r) const
 		}, cell);
 	}
 
-	os.write((char*)&valid_row, sizeof(valid_row));
+	os.write((char*)&r.valid, sizeof(r.valid));
 }
 
 db2::statement::row db2::table::read(std::istream& is, char* buffer) const
