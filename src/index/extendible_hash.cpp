@@ -297,6 +297,47 @@ void db2::index::extendible_hash::add_pair(bucket_p pos, key_position kp)
 
 bool db2::index::extendible_hash::delete_from(size_t key_hash, size_t position)
 {
-	// TODO
+	for(
+		bucket_p bucket_pos = get_bucket(key_hash);
+		bucket_pos != 0;
+		bucket_pos = get_pointer(bucket_pos)
+	)
+	{
+		bucket_header bh = get_bucket_header(bucket_pos);
+
+		key_position kp;
+		for(size_t i = 0; i < bh.size; i++)
+		{
+			index_file.read((char*)&kp, sizeof(kp));
+			if(kp.key == key_hash && kp.position == position)
+			{
+
+				if(i+1 < bh.size)
+				{
+					// Shift the remainder pairs to the left.
+					size_t buffer_size = sizeof(kp)*(bh.size-(i+1));
+					char* buffer = (char*)malloc(buffer_size);
+
+					index_file.read(buffer, buffer_size);
+
+					index_file.seekp(
+						bucket_pos +
+						sizeof(bucket_header) +
+						sizeof(kp)*i
+					);
+
+					index_file.write(buffer, buffer_size);
+
+					free(buffer);
+				}
+
+				bh.size--;
+				set_bucket_header(bucket_pos, bh);
+
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
