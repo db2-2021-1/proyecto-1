@@ -42,6 +42,7 @@ bool db2::statement::copy::execute()
 	if(!t.read_metadata())
 		return false;
 
+	// read_csv() updates the index.
 	return t.read_csv(csv_name);
 }
 

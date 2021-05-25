@@ -162,6 +162,9 @@ public:
 	std::string get_table_index_name() const;
 
 	statement::index_type get_index_type() const;
+
+	/// Inserts valid rows and deletes otherwise.
+	bool update_index(std::vector<statement::row>& data);
 };
 
 };

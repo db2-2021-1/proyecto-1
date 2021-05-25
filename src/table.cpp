@@ -481,7 +481,10 @@ bool db2::table::read_csv(std::string_view csv_name)
 		return false;
 	}
 
-	return clean();
+	if(!clean())
+		return false;
+
+	return update_index(new_rows);
 }
 
 bool db2::table::append_data(std::vector<statement::row>& data)
@@ -502,24 +505,6 @@ bool db2::table::append_data(std::vector<statement::row>& data)
 	for(auto& r: data)
 	{
 		write(ofs, r);
-	}
-
-	// TODO Update index
-	if(table_index.has_value())
-	{
-		switch(table_index->type)
-		{
-			case index_type::e_hash:
-				return update_hash_index(data);
-				break;
-
-			case index_type::bp_tree:
-				//TODO
-				break;
-
-			default:
-				break;
-		}
 	}
 
 	return true;
@@ -570,8 +555,18 @@ bool db2::table::update_hash_index(const std::vector<statement::row>& data)
 	auto hash = std::hash<statement::literal>{};
 	for(const auto& r: data)
 	{
-		if(!hash_index.insert(hash(r.values[column_index]), r.pos))
-			return false;
+		size_t h = hash(r.values[column_index]);
+
+		if(r.valid)
+		{
+			if(!hash_index.insert(h, r.pos))
+				return false;
+		}
+		else
+		{
+			if(!hash_index.delete_from(h, r.pos))
+				return false;
+		}
 	}
 
 	return true;
@@ -874,4 +869,27 @@ db2::statement::index_type db2::table::get_index_type() const
 	if(table_index.has_value())
 		return table_index->type;
 	return statement::index_type::none;
+}
+
+bool db2::table::update_index(std::vector<statement::row>& data)
+{
+	if(table_index.has_value())
+	{
+		switch(table_index->type)
+		{
+			case statement::index_type::e_hash:
+				return update_hash_index(data);
+				break;
+
+			case statement::index_type::bp_tree:
+				//TODO
+				return false;
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	return true;
 }

@@ -49,9 +49,7 @@ bool db2::statement::delete_from::execute()
 	if(!t.write_data(rows))
 		return false;
 
-	// TODO Update index
-
-	return true;
+	return t.update_index(rows);
 }
 
 std::ostream& db2::statement::delete_from::print(std::ostream& os) const
