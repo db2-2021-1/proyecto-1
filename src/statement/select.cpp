@@ -48,7 +48,6 @@ bool db2::statement::select::execute()
 	//     expr?      // [ WHERE expr ]
 	// }
 
-	// TODO
 	table t(table_name);
 
 	if(!t.read_metadata())

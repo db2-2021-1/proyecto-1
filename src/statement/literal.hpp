@@ -31,4 +31,55 @@ using literal = std::variant<int, std::string>;
 literal from_union(sql_literal l);
 
 std::ostream& operator<<(std::ostream& os, const literal& l);
+
+}
+
+inline bool operator<(const db2::statement::literal& l, int i)
+{
+	return l < db2::statement::literal(i);
+}
+
+inline bool operator<(const db2::statement::literal& l, const std::string& str)
+{
+	return l < db2::statement::literal(str);
+}
+
+inline bool operator>(const db2::statement::literal& l, int i)
+{
+	return l > db2::statement::literal(i);
+}
+
+inline bool operator>(const db2::statement::literal& l, const std::string& str)
+{
+	return l > db2::statement::literal(str);
+}
+
+inline bool operator>=(const db2::statement::literal& l, int i)
+{
+	return !(l < i);
+}
+
+inline bool operator>=(const db2::statement::literal& l, const std::string& str)
+{
+	return !(l < str);
+}
+
+inline bool operator<=(const db2::statement::literal& l, int i)
+{
+	return !(l > i);
+}
+
+inline bool operator<=(const db2::statement::literal& l, const std::string& str)
+{
+	return !(l > str);
+}
+
+inline bool operator==(const db2::statement::literal& l, const std::string& str)
+{
+	return l == db2::statement::literal(str);
+}
+
+inline bool operator!=(const db2::statement::literal& l, const std::string& str)
+{
+	return !(l == str);
 }
