@@ -17,5 +17,6 @@
 target_sources(${PROJECT_NAME}
 	PRIVATE
 		# C++
+		bptree.cpp
 		extendible_hash.cpp
 )

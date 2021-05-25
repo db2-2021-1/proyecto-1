@@ -14,7 +14,7 @@ namespace db2::index
 
 /// Index file specficication:
 /// [header]
-/// [bucket_pointer]*2^D
+/// [bucket_pointer]*2^D Directorio
 /// [bucket_header [key_position]*bucket_max_elements bucket_pointer]...
 class extendible_hash
 {
