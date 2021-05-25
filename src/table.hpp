@@ -114,10 +114,10 @@ private:
 	);
 
 	/// Must be called when the table has an index.
-	std::vector<statement::row> select_equals(const statement::literal& key);
+	std::vector<size_t> select_equals(const statement::literal& key);
 
 	/// Must be called when the table has an index.
-	std::vector<statement::row> select_range(const statement::literal& ge, const statement::literal& le);
+	std::vector<size_t> select_range(const statement::literal& ge, const statement::literal& le);
 
 	std::vector<statement::row> select_all(
 		std::optional<statement::expression> expr = std::nullopt);

@@ -707,72 +707,48 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 	return new_row;
 }
 
-std::vector<db2::statement::row> db2::table::select_equals(const statement::literal& key)
+std::vector<size_t> db2::table::select_equals(const statement::literal& key)
 {
-	std::vector<statement::row> rows;
-
 	switch(table_index->type)
 	{
 		case statement::index_type::bp_tree:
 			// TODO B+ tree
-			break;
+			return {};
 
 		case statement::index_type::e_hash:
 		{
 			db2::index::extendible_hash eh(index_path());
 			if(!eh.is_open())
-				return rows;
+				return {};
 
 			std::ifstream ifs(data_path());
 
-			if(!ifs.is_open())
-			{
-				perror(data_path().c_str());
-				return rows;
-			}
-
-			char* buffer = (char*)malloc(tuple_size());
-
-			for(size_t pos: eh.get_positions(std::hash<statement::literal>{}(key)))
-			{
-				ifs.seekg(pos);
-				auto row = read(ifs, buffer);
-				if(row.valid)
-					rows.push_back(std::move(row));
-			}
-
-			free(buffer);
-
-			break;
+			return eh.get_positions(std::hash<statement::literal>{}(key));
 		}
 		default:
 			assert(false);
-			break;
+			return {};
 	}
-	return rows;
 }
 
-std::vector<db2::statement::row> db2::table::select_range(
+std::vector<size_t> db2::table::select_range(
 	const statement::literal& ge,
 	const statement::literal& le
 	)
 {
-	std::vector<statement::row> rows;
-
 	switch(table_index->type)
 	{
 		case statement::index_type::bp_tree:
 			// TODO B+ tree
-			break;
+			return {};
 
 		case statement::index_type::e_hash:
-			break;
+			return {};
 
 		default:
 			assert(false);
 			break;
 	}
-	return rows;
 }
 
 std::vector<db2::statement::row> db2::table::select_all(
@@ -834,15 +810,42 @@ std::vector<db2::statement::row> db2::table::get_data(
 	if(!expr.has_value() || expr->column != get_table_index_name())
 		return select_all(expr);
 
+	auto read_positions = [this](const std::vector<size_t>& positions)
+	{
+		std::vector<statement::row> rows;
+
+		std::ifstream ifs(data_path());
+
+		if(!ifs.is_open())
+		{
+			perror(data_path().c_str());
+			return rows;
+		}
+
+		char* buffer = (char*)malloc(tuple_size());
+
+		for(size_t pos: positions)
+		{
+			ifs.seekg(pos);
+			auto row = read(ifs, buffer);
+			if(row.valid)
+				rows.push_back(std::move(row));
+		}
+
+		free(buffer);
+
+		return rows;
+	};
+
 	switch(expr->t)
 	{
 		case statement::expression::type::between:
 			if(get_index_type() == statement::index_type::e_hash)
 				return select_all(expr);
-			return select_range(expr->value[0], expr->value[1]);
+			return read_positions(select_range(expr->value[0], expr->value[1]));
 
 		case statement::expression::type::is:
-			return select_equals(expr->value[0]);
+			return read_positions(select_equals(expr->value[0]));
 
 		default:
 			return {};
