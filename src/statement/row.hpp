@@ -23,6 +23,13 @@
 namespace db2::statement
 {
 
-using row = std::vector<literal>;
+struct row
+{
+	// False when the row was deleted.
+	bool valid = true;
+
+	// The data itself.
+	std::vector<literal> values;
+};
 
 }

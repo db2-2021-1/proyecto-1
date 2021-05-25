@@ -78,7 +78,7 @@ bool db2::statement::select::execute()
 
 	for(const auto& r: get_data())
 	{
-		for(const auto& cell: r)
+		for(const auto& cell: r.values)
 		{
 			std::cout << cell << ',';
 		}

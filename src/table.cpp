@@ -16,8 +16,9 @@
 
 #include <climits>
 #include <cstdio>
-#include <system_error>
+#include <fstream>
 #include <map>
+#include <system_error>
 
 #ifndef PIPE_BUF
 #define PIPE_BUF 1
@@ -370,11 +371,11 @@ bool db2::table::read_csv(std::string_view csv_name)
 		switch(columns[column].second.t)
 		{
 			case statement::type::_type::INT:
-				row.emplace_back(atoi(str));
+				row.values.emplace_back(atoi(str));
 				break;
 
 			case statement::type::_type::VARCHAR:
-				row.emplace_back(std::string(str,
+				row.values.emplace_back(std::string(str,
 					std::min(columns[column].second.size, strlen(str))
 				));
 				break;
@@ -447,19 +448,25 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 	if(!check_data(data))
 		return false;
 
-	printf("Rows: %lu\n", data.size());
-	for(const auto& row: data)
+	std::filesystem::path data_file = table_name;
+	data_file /= "data.dat";
+
+	std::ofstream ofs(data_file, std::ios::app);
+
+	if(!ofs.is_open())
 	{
-		for(const auto& cell: row)
-		{
-			std::cout << cell << ' ';
-		}
-		std::cout << '\n';
+		perror(data_file.c_str());
+		return false;
 	}
 
-	// TODO
+	for(const auto& r: data)
+	{
+		write(ofs, r);
+	}
 
-	return false;
+	// TODO Update index
+
+	return true;
 }
 
 bool db2::table::check_data(std::vector<statement::row>& data)
@@ -467,7 +474,7 @@ bool db2::table::check_data(std::vector<statement::row>& data)
 	for(auto& row: data)
 	{
 		// Check size
-		if(row.size() != columns.size())
+		if(row.values.size() != columns.size())
 			return false;
 
 		// Check types and size
@@ -476,16 +483,16 @@ bool db2::table::check_data(std::vector<statement::row>& data)
 			switch(columns[i].second.t)
 			{
 				case statement::type::_type::INT:
-					if(!std::holds_alternative<int>(row[i]))
+					if(!std::holds_alternative<int>(row.values[i]))
 						return false;
 					break;
 
 				case statement::type::_type::VARCHAR:
-					if(!std::holds_alternative<std::string>(row[i]))
+					if(!std::holds_alternative<std::string>(row.values[i]))
 						return false;
 					else
 					{
-						std::string& str = std::get<std::string>(row[i]);
+						std::string& str = std::get<std::string>(row.values[i]);
 
 						if(str.size() > columns[i].second.size)
 							str = std::string(str.c_str(), columns[i].second.size);
@@ -510,13 +517,15 @@ size_t db2::table::tuple_size() const
 		size += type.size;
 	}
 
-	return size;
+	return size + sizeof(bool);
 }
 
 void db2::table::write(std::ostream& os, const statement::row& r) const
 {
 	size_t i = 0;
-	for(const auto& cell: r)
+	bool valid_row = true;
+
+	for(const auto& cell: r.values)
 	{
 		size_t size = columns[i].second.size;
 
@@ -535,6 +544,8 @@ void db2::table::write(std::ostream& os, const statement::row& r) const
 			},
 		}, cell);
 	}
+
+	os.write((char*)&valid_row, sizeof(valid_row));
 }
 
 db2::statement::row db2::table::read(std::istream& is, char* buffer) const
@@ -548,17 +559,19 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 		switch(type.t)
 		{
 			case statement::type::_type::INT:
-				new_row.push_back(*(int*)buffer);
+				new_row.values.push_back(*(int*)buffer);
 				break;
 
 			case statement::type::_type::VARCHAR:
-				new_row.push_back(std::string(buffer));
+				new_row.values.push_back(std::string(buffer));
 				break;
 
 			default:
 				break;
 		}
 	}
+
+	is.read((char*)&new_row.valid, sizeof(new_row.valid));
 
 	return new_row;
 }

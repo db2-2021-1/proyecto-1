@@ -32,7 +32,7 @@ db2::statement::insert::insert(const sql_statement_tree& tree)
 		row new_row;
 		for(auto* column = old_row->data_list; column != nullptr; column = column->next)
 		{
-			new_row.push_back(from_union(column->literal));
+			new_row.values.push_back(from_union(column->literal));
 		}
 
 		data.push_back(std::move(new_row));
@@ -68,7 +68,7 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const insert& i)
 	for(const auto& row: i.data)
 	{
 		std::cout << "(";
-		for(const auto& data: row)
+		for(const auto& data: row.values)
 		{
 			std::cout << data << ", ";
 		}

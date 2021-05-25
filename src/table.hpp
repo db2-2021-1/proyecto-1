@@ -118,7 +118,7 @@ public:
 	/// Check and trim data.
 	bool check_data(std::vector<statement::row>& data);
 
-	/// The number of bytes in any row of the table.
+	/// The number of bytes in any row of the table plus the valid flag.
 	size_t tuple_size() const;
 
 	std::vector<statement::row> select_equals(const statement::literal& key);
