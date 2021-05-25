@@ -527,11 +527,8 @@ bool db2::table::append_data(std::vector<statement::row>& data)
 	return true;
 }
 
-bool db2::table::write_data(std::vector<size_t>& positions, std::vector<statement::row>& data)
+bool db2::table::write_data(std::vector<statement::row>& data)
 {
-	if(positions.size() != data.size())
-		return false;
-
 	if(!check_data(data))
 		return false;
 
@@ -543,34 +540,9 @@ bool db2::table::write_data(std::vector<size_t>& positions, std::vector<statemen
 		return false;
 	}
 
-	ssize_t key_i = key_index();
-	std::vector<std::pair<statement::literal, size_t>> deleted_key_pos;
-
-	size_t i = 0;
-	for(size_t pos : positions)
+	for(const auto& row: data)
 	{
-		write(ofs, data[i]);
-		if(key_i != -1 && !data[i].valid)
-			deleted_key_pos.emplace_back(data[i].values[key_i], pos);
-
-		i++;
-	}
-
-	if(table_index.has_value())
-	{
-		switch(table_index->type)
-		{
-			case statement::index_type::bp_tree:
-				// TODO
-				break;
-
-			case statement::index_type::e_hash:
-				delete_from_hash_index(deleted_key_pos);
-				break;
-
-			default:
-				break;
-		}
+		write(ofs, row);
 	}
 
 	return true;
@@ -686,6 +658,8 @@ size_t db2::table::tuple_size() const
 void db2::table::write(std::ostream& os, const statement::row& r) const
 {
 	size_t i = 0;
+	if(r.pos != -1)
+		os.seekp(r.pos);
 
 	for(const auto& cell: r.values)
 	{

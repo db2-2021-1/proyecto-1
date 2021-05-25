@@ -137,7 +137,7 @@ public:
 	bool append_data(std::vector<statement::row>& data);
 
 	/// Write data to the table
-	bool write_data(std::vector<size_t>& positions, std::vector<statement::row>& data);
+	bool write_data(std::vector<statement::row>& data);
 
 	/// Check and trim data.
 	bool check_data(std::vector<statement::row>& data);
