@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "extendible_hash.hpp"
 
 db2::index::extendible_hash::extendible_hash(const std::filesystem::path& index_path):
@@ -91,6 +93,13 @@ size_t db2::index::extendible_hash::D_bit(size_t key_hash) const
 	return d_bit(h.D, key_hash);
 }
 
+std::pair<size_t, size_t>
+	db2::index::extendible_hash::get_new_d_bits(size_t d, size_t key_hash) const
+{
+	size_t old_d_bit = d_bit(d, key_hash);
+	return {old_d_bit, old_d_bit + (1LU << d)};
+}
+
 size_t db2::index::extendible_hash::get_directory(size_t key_hash) const
 {
 	return sizeof(header) + sizeof(bucket_p)*D_bit(key_hash);
@@ -176,8 +185,52 @@ bool db2::index::extendible_hash::insert(size_t key_hash, size_t position)
 	}
 	else if(bh.d < h.D) // Split bucket
 	{
-		// TODO
-		return false;
+		// Read new pair and old pairs
+		// The old bucket will be 0bit
+		bucket_p _0bit_pos = bucket_pos;
+		std::vector<key_position> bucket_content = {kp};
+		bucket_content.reserve(1+bh.size);
+		for(size_t i = 0; i < bh.size; i++)
+		{
+			index_file.read((char*)&kp, sizeof(kp));
+			bucket_content.push_back(kp);
+		}
+		// Reset the old bucket.
+		index_file.seekg(_0bit_pos);
+		write_empty_bucket(bh.d+1);
+
+		// Create a new bucket at the end with d+1.
+		// It will be 1bit
+		index_file.seekp(0, std::ios::end);
+		bucket_p _1bit_pos = index_file.tellp();
+		write_empty_bucket(bh.d+1);
+
+		auto [_0bit, _1bit] = get_new_d_bits(bh.d, key_hash);
+		index_file.seekg(get_directory(0));
+
+		// Change directory to point to the new buckets.
+		for(size_t i = 0; i < (1LU<<h.D); i++)
+		{
+			size_t bit = d_bit(bh.d+1, i);
+			if(bit == _0bit)
+			{
+				index_file.write((char*)&_0bit_pos, sizeof(_0bit_pos));
+			}
+			else if(bit == _1bit)
+			{
+				index_file.write((char*)&_1bit_pos, sizeof(_1bit_pos));
+			}
+			else
+			{
+				index_file.seekp(sizeof(bucket_p), std::ios::cur);
+			}
+		}
+
+		for(const auto& content: bucket_content)
+		{
+			if(!insert(content.key, content.position))
+				return false;
+		}
 	}
 	else // Overflow bucket
 	{

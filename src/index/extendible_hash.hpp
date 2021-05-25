@@ -65,6 +65,9 @@ private:
 	/// Get the D least significant bits from the hash.
 	size_t D_bit(size_t key_hash) const;
 
+	/// Returns 0(d_bit(d,key)) 1(d_bit(d,key))
+	std::pair<size_t, size_t> get_new_d_bits(size_t d, size_t key_hash) const;
+
 	/// Get the position of the directory of a hash.
 	size_t get_directory(size_t key_hash) const;
 

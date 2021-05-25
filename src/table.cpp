@@ -545,7 +545,8 @@ bool db2::table::update_hash_index(
 	auto hash = std::hash<statement::literal>{};
 	for(const auto& r: data)
 	{
-		hash_index.insert(hash(r.values[column_index]), write_start);
+		if(!hash_index.insert(hash(r.values[column_index]), write_start))
+			return false;
 
 		write_start += tuple_size();
 	}
