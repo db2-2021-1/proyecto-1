@@ -23,8 +23,13 @@
 #include "completion.hpp"
 #include "statement.hpp"
 
-#define DEFAULT_PROMPT "\e[1;36mSQL\e[1;33m>\e[0m "
-#define ERROR_PREFIX "\e[1;31m!!!\e[0m "
+#define C_LBLUE  "\001\e[1;36m\002"
+#define C_YELLOW "\001\e[1;33m\002"
+#define C_RED    "\001\e[1;31m\002"
+#define C_RESET  "\001\e[0m\002"
+
+#define DEFAULT_PROMPT C_LBLUE "SQL" C_YELLOW ">" C_RESET " "
+#define ERROR_PREFIX C_RED "!!!" C_RESET " "
 
 int main(int argc, char* argv[])
 {
