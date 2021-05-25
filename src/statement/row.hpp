@@ -28,6 +28,9 @@ struct row
 	// False when the row was deleted.
 	bool valid = true;
 
+	// Position in the file. It will be appended if this values is -1.
+	ssize_t pos = -1;
+
 	// The data itself.
 	std::vector<literal> values;
 };

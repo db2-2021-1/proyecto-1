@@ -714,12 +714,14 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 {
 	statement::row new_row;
 
+	new_row.pos = is.tellg();
+
 	for(const auto& [name, type]: columns)
 	{
 		// Add one byte for the VARCHAR's '\0'
 		is.read(buffer, type.size + (type.t == statement::type::_type::VARCHAR? 1 : 0));
 		if(is.eof())
-			return statement::row{false,{}};
+			return statement::row{false,-1,{}};
 
 		switch(type.t)
 		{
