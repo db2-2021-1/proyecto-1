@@ -67,7 +67,7 @@ public:
 
 	bool is_open() const;
 
-	~extendible_hash();
+	std::vector<size_t> get_positions(size_t key_hash);
 };
 
 };
