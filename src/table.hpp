@@ -22,6 +22,7 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <optional>
 
 #include <rapidjson/reader.h>
 
@@ -48,6 +49,9 @@ private:
 	std::filesystem::path metadata_path() const;
 	std::filesystem::path data_path() const;
 	std::filesystem::path index_path() const;
+
+	/// Get the index of a column by it's name.
+	ssize_t name2index(std::string_view column_name) const;
 
 	/// Get the index of the index key in the row. Returns -1 if no found.
 	ssize_t key_index() const;
@@ -133,11 +137,20 @@ public:
 	/// The number of bytes in any row of the table plus the valid flag.
 	size_t tuple_size() const;
 
+	/// Must be called when the table has an index.
 	std::vector<statement::row> select_equals(const statement::literal& key);
+
+	/// Must be called when the table has an index.
 	std::vector<statement::row> select_range(const statement::literal& ge, const statement::literal& le);
-	std::vector<statement::row> select_all();
+
+	std::vector<statement::row> select_all(
+		std::optional<statement::expression> expr = std::nullopt);
 
 	void print_columns(std::ostream& os) const;
+
+	std::string get_table_index_name() const;
+
+	statement::index_type get_index_type() const;
 };
 
 };

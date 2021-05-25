@@ -26,6 +26,8 @@ namespace db2::statement
 
 enum class index_type
 {
+	none,
+
 	/// Extendible hash.
 	e_hash,
 

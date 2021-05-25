@@ -58,12 +58,15 @@ bool db2::statement::select::execute()
 
 	auto get_data = [&]() -> std::vector<row>
 	{
-		if(!expr.has_value())
-			return t.select_all();
+		if(!expr.has_value() || expr->column != t.get_table_index_name())
+			return t.select_all(expr);
+
 
 		switch(expr->t)
 		{
 			case expression::type::between:
+				if(t.get_index_type() == index_type::e_hash)
+					return t.select_all(expr);
 				return t.select_range(expr->value[0], expr->value[1]);
 
 			case expression::type::is:

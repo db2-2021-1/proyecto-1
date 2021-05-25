@@ -103,6 +103,10 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const create_index& c
 		case index_type::e_hash:
 			os << "Hash";
 			break;
+
+		case index_type::none:
+			os << "None";
+			break;
 	}
 
 	os << '(' << c.column_name << ")\n";

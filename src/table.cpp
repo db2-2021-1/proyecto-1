@@ -219,16 +219,13 @@ std::filesystem::path db2::table::index_path() const
 	return std::filesystem::path(table_name) / "index.dat";
 }
 
-ssize_t db2::table::key_index() const
+ssize_t db2::table::name2index(std::string_view column_name) const
 {
-	if(!table_index.has_value())
-		return -1;
-
 	size_t column_index = 0;
 	bool column_found = false;
 	for(const auto& [name, type]: columns)
 	{
-		if(name == table_index->column_name)
+		if(name == column_name)
 		{
 			column_found = true;
 			break;
@@ -239,8 +236,17 @@ ssize_t db2::table::key_index() const
 	if(!column_found)
 	{
 		fprintf(stderr, "Bad index\n");
+		return -1;
 	}
 	return column_index;
+}
+
+ssize_t db2::table::key_index() const
+{
+	if(!table_index.has_value())
+		return -1;
+
+	return name2index(table_index->column_name);
 }
 
 bool db2::table::read_metadata()
@@ -512,6 +518,9 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 			case index_type::bp_tree:
 				//TODO
 				break;
+
+			default:
+				break;
 		}
 	}
 
@@ -703,11 +712,17 @@ std::vector<db2::statement::row> db2::table::select_equals(const statement::lite
 
 			break;
 		}
+		default:
+			assert(false);
+			break;
 	}
 	return rows;
 }
 
-std::vector<db2::statement::row> db2::table::select_range(const statement::literal& ge, const statement::literal& le)
+std::vector<db2::statement::row> db2::table::select_range(
+	const statement::literal& ge,
+	const statement::literal& le
+	)
 {
 	std::vector<statement::row> rows;
 
@@ -719,15 +734,46 @@ std::vector<db2::statement::row> db2::table::select_range(const statement::liter
 
 		case statement::index_type::e_hash:
 			break;
+
+		default:
+			assert(false);
+			break;
 	}
 	return rows;
 }
 
-std::vector<db2::statement::row> db2::table::select_all()
+std::vector<db2::statement::row> db2::table::select_all(
+	std::optional<statement::expression> expr)
 {
+	ssize_t expr_index = expr.has_value() ? name2index(expr->column) : -1;
+	auto valid = [&](const statement::row& r) -> bool
+	{
+		if(!r.valid)
+			return false;
+
+		if(!expr.has_value())
+			return true;
+
+		assert(expr_index != -1);
+
+		switch(expr->t)
+		{
+			case statement::expression::type::between:
+				return expr->value[0] <= r.values[expr_index] &&
+					r.values[expr_index] <= expr->value[1]
+					;
+
+			case statement::expression::type::is:
+				return r.values[expr_index] == expr->value[0];
+		}
+
+		return false;
+	};
+
 	std::vector<statement::row> rows;
 
 	std::ifstream ifs(data_path());
+
 
 	if(!ifs.is_open())
 	{
@@ -740,7 +786,7 @@ std::vector<db2::statement::row> db2::table::select_all()
 	while(!ifs.eof())
 	{
 		auto row = read(ifs, buffer);
-		if(row.valid)
+		if(valid(row))
 			rows.push_back(std::move(row));
 	}
 
@@ -754,4 +800,18 @@ void db2::table::print_columns(std::ostream& os) const
 	{
 		os << name << (name == columns.rbegin()->first? '\n' : ',');
 	}
+}
+
+std::string db2::table::get_table_index_name() const
+{
+	if(table_index.has_value())
+		return table_index->column_name;
+	return "";
+}
+
+db2::statement::index_type db2::table::get_index_type() const
+{
+	if(table_index.has_value())
+		return table_index->type;
+	return statement::index_type::none;
 }
