@@ -15,6 +15,7 @@
 // along with proyecto-1.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "delete_from.hpp"
+#include "table.hpp"
 
 db2::statement::delete_from::delete_from(std::string table_name, expression expr):
 	statement(std::move(table_name)),
@@ -35,10 +36,22 @@ bool db2::statement::delete_from::execute()
 	//     expr       // WHERE expr
 	// }
 
-	// TODO
-	std::cout << *this;
+	table t(table_name);
 
-	return false;
+	if(!t.read_metadata())
+		return false;
+
+	auto rows = t.get_data(expr);
+
+	for(auto& r: rows)
+		r.valid = false;
+
+	if(!t.write_data(rows))
+		return false;
+
+	// TODO Update index
+
+	return true;
 }
 
 std::ostream& db2::statement::delete_from::print(std::ostream& os) const

@@ -98,17 +98,15 @@ private:
 		bool Default();
 	};
 
-	void write(std::ostream& os, const statement::row& r) const;
+	/// Writes data to the file. It sets the row's pos if it doesn't have one.
+	void write(std::ostream& os, statement::row& r) const;
 
 	// The buffer must be big enough to hold the biggest value.
 	statement::row read(std::istream& is, char* buffer) const;
 
 	/// Updates the hash index. It assumes that all the data was written after
 	/// write_start and that all rows are valid.
-	bool update_hash_index(
-		size_t write_start,
-		const std::vector<statement::row>& data
-	);
+	bool update_hash_index(const std::vector<statement::row>& data);
 
 	/// Delete hashes and
 	bool delete_from_hash_index(

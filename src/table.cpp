@@ -499,9 +499,7 @@ bool db2::table::append_data(std::vector<statement::row>& data)
 		return false;
 	}
 
-	size_t write_start = ofs.tellp();
-
-	for(const auto& r: data)
+	for(auto& r: data)
 	{
 		write(ofs, r);
 	}
@@ -512,7 +510,7 @@ bool db2::table::append_data(std::vector<statement::row>& data)
 		switch(table_index->type)
 		{
 			case index_type::e_hash:
-				return update_hash_index(write_start, data);
+				return update_hash_index(data);
 				break;
 
 			case index_type::bp_tree:
@@ -540,7 +538,7 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 		return false;
 	}
 
-	for(const auto& row: data)
+	for(auto& row: data)
 	{
 		write(ofs, row);
 	}
@@ -548,10 +546,7 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 	return true;
 }
 
-bool db2::table::update_hash_index(
-		size_t write_start,
-		const std::vector<statement::row>& data
-	)
+bool db2::table::update_hash_index(const std::vector<statement::row>& data)
 {
 	static const size_t default_D = 2;
 	static const size_t default_max_bucket_size = 4;
@@ -575,10 +570,8 @@ bool db2::table::update_hash_index(
 	auto hash = std::hash<statement::literal>{};
 	for(const auto& r: data)
 	{
-		if(!hash_index.insert(hash(r.values[column_index]), write_start))
+		if(!hash_index.insert(hash(r.values[column_index]), r.pos))
 			return false;
-
-		write_start += tuple_size();
 	}
 
 	return true;
@@ -655,11 +648,13 @@ size_t db2::table::tuple_size() const
 	return size + sizeof(bool);
 }
 
-void db2::table::write(std::ostream& os, const statement::row& r) const
+void db2::table::write(std::ostream& os, statement::row& r) const
 {
 	size_t i = 0;
 	if(r.pos != -1)
 		os.seekp(r.pos);
+	else
+		r.pos = os.tellp();
 
 	for(const auto& cell: r.values)
 	{
