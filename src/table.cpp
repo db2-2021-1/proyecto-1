@@ -30,8 +30,8 @@
 #include <rapidjson/reader.h>
 #include <rapidjson/writer.h>
 
+#include "index.hpp"
 #include "table.hpp"
-#include "index/extendible_hash.hpp"
 
 bool db2::table::json_handler::StartObject()
 {
@@ -572,6 +572,31 @@ bool db2::table::update_hash_index(const std::vector<statement::row>& data)
 	return true;
 }
 
+bool db2::table::update_bptree_index(const std::vector<statement::row>& data)
+{
+	b_plus_tree bp_tree(index_path(), columns[key_index()].second);
+
+	ssize_t column_index = key_index();
+
+	for(const auto& r: data)
+	{
+		const statement::literal& key = r.values[column_index];
+
+		if(r.valid)
+		{
+			if(!bp_tree.insert(key, r.pos))
+				return false;
+		}
+		else
+		{
+			if(!bp_tree.delete_from(key, r.pos))
+				return false;
+		}
+	}
+
+	return true;
+}
+
 bool db2::table::delete_from_hash_index(
 	const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
 )
@@ -709,19 +734,22 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 
 std::vector<size_t> db2::table::select_equals(const statement::literal& key)
 {
+	assert(table_index.has_value());
+
 	switch(table_index->type)
 	{
 		case statement::index_type::bp_tree:
-			// TODO B+ tree
-			return {};
+		{
+			b_plus_tree bp_tree(index_path(), columns[key_index()].second);
+
+			return bp_tree.get_positions(key);
+		}
 
 		case statement::index_type::e_hash:
 		{
 			db2::index::extendible_hash eh(index_path());
 			if(!eh.is_open())
 				return {};
-
-			std::ifstream ifs(data_path());
 
 			return eh.get_positions(std::hash<statement::literal>{}(key));
 		}
@@ -739,8 +767,11 @@ std::vector<size_t> db2::table::select_range(
 	switch(table_index->type)
 	{
 		case statement::index_type::bp_tree:
-			// TODO B+ tree
-			return {};
+		{
+			b_plus_tree bp_tree(index_path(), columns[key_index()].second);
+
+			return bp_tree.get_positions(ge, le);
+		}
 
 		case statement::index_type::e_hash:
 			return {};
@@ -882,12 +913,9 @@ bool db2::table::update_index(std::vector<statement::row>& data)
 		{
 			case statement::index_type::e_hash:
 				return update_hash_index(data);
-				break;
 
 			case statement::index_type::bp_tree:
-				//TODO
-				return false;
-				break;
+				return update_bptree_index(data);
 
 			default:
 				break;

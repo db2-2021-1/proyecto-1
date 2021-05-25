@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <map>
 
+#include "statement.hpp"
+
 #pragma once
 
 const int MAX = 3;
@@ -34,12 +36,15 @@ private:
   Node *root;
   keyType firstid;
 
+  // Type and size of the key.
+  db2::statement::type key_type;
+
   void insert_internal(int x, Node *cursor, Node *child, long posicion, bool flag);
   Node *find_parent(Node *cursor, Node *child);
 
 public:
-  b_plus_tree(std::string filename);
-  
+  b_plus_tree(std::string filename, db2::statement::type key_type);
+
   Node *find_node(int id);
   size_t find(int id);
   void insert(size_t reg);
@@ -49,4 +54,20 @@ public:
   void remove(keyType key);
   std::vector<size_t> find(keyType beginKey, keyType endKey);
 
+  /// ... WHEN name IS key
+  std::vector<size_t> get_positions(
+    const db2::statement::literal& key
+  );
+
+  /// ... WHEN name IS BETWEEN ge AND le
+  std::vector<size_t> get_positions(
+    const db2::statement::literal& key_ge,
+    const db2::statement::literal& key_le
+  );
+
+  /// INSERT
+  bool insert(const db2::statement::literal& key, size_t position);
+
+  /// DELETE FROM
+  bool delete_from(const db2::statement::literal& key, size_t position);
 };

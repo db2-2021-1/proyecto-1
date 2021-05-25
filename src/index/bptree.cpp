@@ -507,9 +507,38 @@ std::vector<size_t> b_plus_tree::find(keyType beginKey, keyType endKey)
     return registros;
 }
 
-b_plus_tree::b_plus_tree(std::string filename)
+b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type):
+	key_type(key_type)
 {
     std::fstream file;
     file.open(filename, std::ofstream::out | std::ofstream::trunc);
     root = NULL;
+}
+
+std::vector<size_t> b_plus_tree::get_positions(const db2::statement::literal& key)
+{
+  // El tipo y tamaño del key están en key_type
+  //TODO
+  return {};
+}
+
+std::vector<size_t> b_plus_tree::get_positions(
+    const db2::statement::literal& key_ge,
+    const db2::statement::literal& key_le
+  )
+{
+  //TODO
+  return {};
+}
+
+bool b_plus_tree::insert(const db2::statement::literal& key, size_t position)
+{
+  //TODO
+  return false;
+}
+
+bool b_plus_tree::delete_from(const db2::statement::literal& key, size_t position)
+{
+  //TODO
+  return false;
 }

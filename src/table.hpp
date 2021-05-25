@@ -108,6 +108,8 @@ private:
 	/// write_start and that all rows are valid.
 	bool update_hash_index(const std::vector<statement::row>& data);
 
+	bool update_bptree_index(const std::vector<statement::row>& data);
+
 	/// Delete hashes and
 	bool delete_from_hash_index(
 		const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
