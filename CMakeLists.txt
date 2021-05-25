@@ -17,7 +17,7 @@
 cmake_minimum_required(VERSION 3.13.0)
 
 project(proyecto-1
-	VERSION 0.2.3
+	VERSION 0.2.4
 	DESCRIPTION "Proyecto 1"
 	HOMEPAGE_URL "https://github.com/db2-2021-1/proyecto-1"
 )
