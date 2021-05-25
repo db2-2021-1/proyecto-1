@@ -53,7 +53,7 @@ bool db2::statement::insert::execute()
 	if(!t.read_metadata())
 		return false;
 
-	return t.write_data(data);
+	return t.append_data(data);
 }
 
 std::ostream& db2::statement::insert::print(std::ostream& os) const

@@ -474,7 +474,7 @@ bool db2::table::read_csv(std::string_view csv_name)
 		new_rows.push_back(std::move(new_row));
 	}
 
-	if(!write_data(new_rows))
+	if(!append_data(new_rows))
 	{
 		clean();
 		fprintf(stderr, "Can't write data\n");
@@ -484,14 +484,14 @@ bool db2::table::read_csv(std::string_view csv_name)
 	return clean();
 }
 
-bool db2::table::write_data(std::vector<statement::row>& data)
+bool db2::table::append_data(std::vector<statement::row>& data)
 {
 	using namespace db2::statement;
 
 	if(!check_data(data))
 		return false;
 
-	std::ofstream ofs(data_path(), std::ios::app);
+	std::ofstream ofs(data_path(), std::ios::app | std::ios::binary);
 
 	if(!ofs.is_open())
 	{
@@ -517,6 +517,55 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 
 			case index_type::bp_tree:
 				//TODO
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	return true;
+}
+
+bool db2::table::write_data(std::vector<size_t>& positions, std::vector<statement::row>& data)
+{
+	if(positions.size() != data.size())
+		return false;
+
+	if(!check_data(data))
+		return false;
+
+	std::fstream ofs(data_path(), std::ios::in | std::ios::out | std::ios::binary);
+
+	if(!ofs.is_open())
+	{
+		perror(data_path().c_str());
+		return false;
+	}
+
+	ssize_t key_i = key_index();
+	std::vector<std::pair<statement::literal, size_t>> deleted_key_pos;
+
+	size_t i = 0;
+	for(size_t pos : positions)
+	{
+		write(ofs, data[i]);
+		if(key_i != -1 && !data[i].valid)
+			deleted_key_pos.emplace_back(data[i].values[key_i], pos);
+
+		i++;
+	}
+
+	if(table_index.has_value())
+	{
+		switch(table_index->type)
+		{
+			case statement::index_type::bp_tree:
+				// TODO
+				break;
+
+			case statement::index_type::e_hash:
+				delete_from_hash_index(deleted_key_pos);
 				break;
 
 			default:
@@ -558,6 +607,24 @@ bool db2::table::update_hash_index(
 			return false;
 
 		write_start += tuple_size();
+	}
+
+	return true;
+}
+
+bool db2::table::delete_from_hash_index(
+	const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
+)
+{
+	db2::index::extendible_hash hash_index(index_path());
+
+	if(!hash_index.is_open())
+		return false;
+
+	auto hash = std::hash<statement::literal>{};
+	for(const auto& [key, pos]: deleted_key_pos)
+	{
+		hash_index.delete_from(hash(key), pos);
 	}
 
 	return true;

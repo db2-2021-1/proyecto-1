@@ -107,6 +107,7 @@ public:
 
 	std::vector<size_t> get_positions(size_t key_hash);
 	bool insert(size_t key_hash, size_t position);
+	bool delete_from(size_t key_hash, size_t position);
 };
 
 };

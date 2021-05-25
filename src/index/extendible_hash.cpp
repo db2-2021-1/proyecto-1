@@ -294,3 +294,9 @@ void db2::index::extendible_hash::add_pair(bucket_p pos, key_position kp)
 
 	set_bucket_header(pos, bh);
 }
+
+bool db2::index::extendible_hash::delete_from(size_t key_hash, size_t position)
+{
+	// TODO
+	return false;
+}

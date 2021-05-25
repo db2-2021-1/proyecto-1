@@ -110,6 +110,11 @@ private:
 		const std::vector<statement::row>& data
 	);
 
+	/// Delete hashes and
+	bool delete_from_hash_index(
+		const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
+	);
+
 public:
 	table(
 		std::string table_name,
@@ -128,8 +133,11 @@ public:
 	/// Copy data from csv.
 	bool read_csv(std::string_view csv_name);
 
-	/// Write data to the table.
-	bool write_data(std::vector<statement::row>& data);
+	/// Write data to the end of the table.
+	bool append_data(std::vector<statement::row>& data);
+
+	/// Write data to the table
+	bool write_data(std::vector<size_t>& positions, std::vector<statement::row>& data);
 
 	/// Check and trim data.
 	bool check_data(std::vector<statement::row>& data);
