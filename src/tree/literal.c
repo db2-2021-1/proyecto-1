@@ -54,11 +54,11 @@ void sql_literal_print(sql_literal literal, FILE* file)
 	switch(literal.type)
 	{
 		case SQL_NUMBER:
-			fprintf(file, "%d", literal.value.number);
+			fprintf(file, "NUM: %d", literal.value.number);
 			break;
 
 		case SQL_STRING:
-			fprintf(file, "%s", literal.value.str);
+			fprintf(file, "STR: %s", literal.value.str);
 			break;
 	}
 }

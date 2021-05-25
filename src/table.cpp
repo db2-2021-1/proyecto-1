@@ -219,6 +219,30 @@ std::filesystem::path db2::table::index_path() const
 	return std::filesystem::path(table_name) / "index.dat";
 }
 
+ssize_t db2::table::key_index() const
+{
+	if(!table_index.has_value())
+		return -1;
+
+	size_t column_index = 0;
+	bool column_found = false;
+	for(const auto& [name, type]: columns)
+	{
+		if(name == table_index->column_name)
+		{
+			column_found = true;
+			break;
+		}
+		column_index++;
+	}
+
+	if(!column_found)
+	{
+		fprintf(stderr, "Bad index\n");
+	}
+	return column_index;
+}
+
 bool db2::table::read_metadata()
 {
 	FILE* file = fopen(metadata_path().string().c_str(), "r");
@@ -482,7 +506,7 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 		switch(table_index->type)
 		{
 			case index_type::e_hash:
-				return update_hash_index(table_index->column_name, write_start, data);
+				return update_hash_index(write_start, data);
 				break;
 
 			case index_type::bp_tree:
@@ -495,7 +519,6 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 }
 
 bool db2::table::update_hash_index(
-		std::string_view key,
 		size_t write_start,
 		const std::vector<statement::row>& data
 	)
@@ -511,23 +534,13 @@ bool db2::table::update_hash_index(
 	if(!hash_index.is_open())
 		return false;
 
-	size_t column_index = 0;
-	bool column_found = false;
-	for(const auto& [name, type]: columns)
-	{
-		if(name == key)
-		{
-			column_found = true;
-			break;
-		}
-		column_index++;
-	}
+	assert(table_index.has_value());
+	assert(table_index->type == statement::index_type::e_hash);
 
-	if(!column_found)
-	{
-		fprintf(stderr, "Bad index\n");
+	ssize_t column_index = key_index();
+
+	if(column_index == -1)
 		return false;
-	}
 
 	auto hash = std::hash<statement::literal>{};
 	for(const auto& r: data)
@@ -662,8 +675,33 @@ std::vector<db2::statement::row> db2::table::select_equals(const statement::lite
 			break;
 
 		case statement::index_type::e_hash:
-			// TODO E hash
+		{
+			db2::index::extendible_hash eh(index_path());
+			if(!eh.is_open())
+				return rows;
+
+			std::ifstream ifs(data_path());
+
+			if(!ifs.is_open())
+			{
+				perror(data_path().c_str());
+				return rows;
+			}
+
+			char* buffer = (char*)malloc(tuple_size());
+
+			for(size_t pos: eh.get_positions(std::hash<statement::literal>{}(key)))
+			{
+				ifs.seekg(pos);
+				auto row = read(ifs, buffer);
+				if(row.valid)
+					rows.push_back(std::move(row));
+			}
+
+			free(buffer);
+
 			break;
+		}
 	}
 	return rows;
 }

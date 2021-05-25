@@ -49,6 +49,9 @@ private:
 	std::filesystem::path data_path() const;
 	std::filesystem::path index_path() const;
 
+	/// Get the index of the index key in the row. Returns -1 if no found.
+	ssize_t key_index() const;
+
 	class json_handler:
 		public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, json_handler>
 	{
@@ -99,7 +102,6 @@ private:
 	/// Updates the hash index. It assumes that all the data was written after
 	/// write_start and that all rows are valid.
 	bool update_hash_index(
-		std::string_view key,
 		size_t write_start,
 		const std::vector<statement::row>& data
 	);

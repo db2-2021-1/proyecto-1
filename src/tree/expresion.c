@@ -37,7 +37,8 @@ void sql_expr_free(sql_expr* expr)
 	{
 		free(expr->column_name);
 		sql_literal_free(expr->literals[0]);
-		sql_literal_free(expr->literals[1]);
+		if(expr->type == SQL_EXPR_BETWEEN)
+			sql_literal_free(expr->literals[1]);
 	}
 
 	free(expr);
