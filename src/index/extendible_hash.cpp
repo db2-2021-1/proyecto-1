@@ -129,15 +129,11 @@ std::vector<size_t> db2::index::extendible_hash::get_positions(size_t key_hash)
 	for(
 		bucket_p bucket_pos = get_bucket(key_hash);
 		bucket_pos != 0;
-		index_file.read((char*)&bucket_pos, sizeof(bucket_pos))
+		bucket_pos = get_pointer(bucket_pos)
 	)
 	{
-		// Go to the bucket.
-		index_file.seekg(bucket_pos);
-
 		// Read the bucket metadata.
-		bucket_header bh;
-		index_file.read((char*)&bh, sizeof(bh));
+		bucket_header bh = get_bucket_header(bucket_pos);
 
 		key_position kp;
 		for(size_t i = 0; i < bh.size; i++)
@@ -146,12 +142,6 @@ std::vector<size_t> db2::index::extendible_hash::get_positions(size_t key_hash)
 			if(kp.key == key_hash)
 				positions.push_back(kp.position);
 		}
-
-		// Go to the overflow bucket pointer
-		index_file.seekg(
-			(h.bucket_max_elements-bh.size)*sizeof(key_position),
-			std::ios::cur
-		);
 	}
 
 	return positions;
@@ -169,19 +159,11 @@ bool db2::index::extendible_hash::insert(size_t key_hash, size_t position)
 		return false;
 	}
 
-	bucket_header bh;
-	index_file.seekg(bucket_pos);
-	index_file.read((char*)&bh, sizeof(bh));
+	bucket_header bh = get_bucket_header(bucket_pos);
 
 	if(bh.size < h.bucket_max_elements) // Bucket with enough space
 	{
-		bh.size++;
-
-		index_file.seekp(bucket_pos);
-		index_file.write((char*)&bh, sizeof(bh));
-
-		index_file.seekp(sizeof(key_position)*(bh.size-1), std::ios::cur);
-		index_file.write((char*)&kp, sizeof(kp));
+		add_pair(bucket_pos, kp);
 	}
 	else if(bh.d < h.D) // Split bucket
 	{
@@ -234,9 +216,81 @@ bool db2::index::extendible_hash::insert(size_t key_hash, size_t position)
 	}
 	else // Overflow bucket
 	{
-		// TODO
-		return false;
+		for(bucket_p next_b = bucket_pos; next_b != 0;)
+		{
+			bucket_p old_b = next_b;
+
+			next_b = get_pointer(next_b);
+			bucket_header bh = get_bucket_header(old_b);
+
+			if(bh.size >= h.bucket_max_elements && next_b == 0) // New bucket
+			{
+				index_file.seekp(0, std::ios::end);
+				bucket_p new_pos = index_file.tellp();
+				write_empty_bucket(bh.d);
+				set_pointer(old_b, new_pos);
+				add_pair(new_pos, kp);
+				break;
+			}
+			else if(bh.size < h.bucket_max_elements)// Insert into existing bucket
+			{
+				add_pair(old_b, kp);
+				break;
+			}
+		}
 	}
 
 	return true;
+}
+
+void db2::index::extendible_hash::set_bucket_header(bucket_p pos, bucket_header h)
+{
+	index_file.seekp(pos);
+	index_file.write((char*)&h, sizeof(h));
+}
+
+void db2::index::extendible_hash::set_pointer(bucket_p pos, bucket_p b_p)
+{
+	index_file.seekp(
+		pos +
+		sizeof(bucket_header) +
+		(h.bucket_max_elements)*sizeof(key_position)
+	);
+	index_file.write((char*)&b_p, sizeof(b_p));
+}
+
+db2::index::extendible_hash::bucket_header
+	db2::index::extendible_hash::get_bucket_header(bucket_p pos)
+{
+	bucket_header h;
+	index_file.seekg(pos);
+	index_file.read((char*)&h, sizeof(h));
+	return h;
+}
+
+db2::index::extendible_hash::bucket_p
+	db2::index::extendible_hash::get_pointer(bucket_p pos)
+{
+	bucket_p pointer;
+	index_file.seekg(
+		pos +
+		sizeof(bucket_header) +
+		(h.bucket_max_elements)*sizeof(key_position)
+	);
+	index_file.read((char*)&pointer, sizeof(pointer));
+	return pointer;
+}
+
+void db2::index::extendible_hash::add_pair(bucket_p pos, key_position kp)
+{
+	bucket_header bh = get_bucket_header(pos);
+
+	assert(bh.size < h.bucket_max_elements);
+
+	index_file.seekp(sizeof(key_position)*(bh.size), std::ios::cur);
+	index_file.write((char*)&kp, sizeof(kp));
+
+	bh.size++;
+
+	set_bucket_header(pos, bh);
 }

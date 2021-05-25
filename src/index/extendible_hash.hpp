@@ -77,6 +77,21 @@ private:
 	/// Get the pointer of a bucket from a hash.
 	bucket_p get_bucket(size_t key_hash);
 
+	/// Updates the header.
+	void set_bucket_header(bucket_p pos, bucket_header h);
+
+	/// Updates the header's pointer
+	void set_pointer(bucket_p pos, bucket_p b_p);
+
+	/// Gets a header from a bucket.
+	bucket_header get_bucket_header(bucket_p pos);
+
+	/// Gets a pointer from a bucket.
+	bucket_p get_pointer(bucket_p pos);
+
+	/// Add a pair to a bucket with enough space.
+	void add_pair(bucket_p pos, key_position kp);
+
 public:
 	/// Use existing index.
 	extendible_hash(const std::filesystem::path& index_path);
