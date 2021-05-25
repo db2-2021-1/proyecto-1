@@ -31,6 +31,7 @@
 #include <rapidjson/writer.h>
 
 #include "table.hpp"
+#include "index/extendible_hash.hpp"
 
 bool db2::table::json_handler::StartObject()
 {
@@ -211,6 +212,11 @@ std::filesystem::path db2::table::metadata_path() const
 std::filesystem::path db2::table::data_path() const
 {
 	return std::filesystem::path(table_name) / "data.dat";
+}
+
+std::filesystem::path db2::table::index_path() const
+{
+	return std::filesystem::path(table_name) / "index.dat";
 }
 
 bool db2::table::read_metadata()
@@ -463,14 +469,74 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 		return false;
 	}
 
+	size_t write_start = ofs.tellp();
+
 	for(const auto& r: data)
 	{
 		write(ofs, r);
 	}
 
 	// TODO Update index
+	if(table_index.has_value())
+	{
+		switch(table_index->type)
+		{
+			case index_type::e_hash:
+				return update_hash_index(table_index->column_name, write_start, data);
+				break;
 
-	ofs.close();
+			case index_type::bp_tree:
+				//TODO
+				break;
+		}
+	}
+
+	return true;
+}
+
+bool db2::table::update_hash_index(
+		std::string_view key,
+		size_t write_start,
+		const std::vector<statement::row>& data
+	)
+{
+	static const size_t default_D = 2;
+	static const size_t default_max_bucket_size = 4;
+
+	auto hash_index = std::filesystem::exists(index_path())?
+		db2::index::extendible_hash(index_path()):
+		db2::index::extendible_hash(index_path(), default_D, default_max_bucket_size)
+	;
+
+	if(!hash_index.is_open())
+		return false;
+
+	size_t column_index = 0;
+	bool column_found = false;
+	for(const auto& [name, type]: columns)
+	{
+		if(name == key)
+		{
+			column_found = true;
+			break;
+		}
+		column_index++;
+	}
+
+	if(!column_found)
+	{
+		fprintf(stderr, "Bad index\n");
+		return false;
+	}
+
+	auto hash = std::hash<statement::literal>{};
+	for(const auto& r: data)
+	{
+		hash_index.insert(hash(r.values[column_index]), write_start);
+
+		write_start += tuple_size();
+	}
+
 	return true;
 }
 

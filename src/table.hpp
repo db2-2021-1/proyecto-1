@@ -47,6 +47,7 @@ private:
 	bool check_and_create_directory() const;
 	std::filesystem::path metadata_path() const;
 	std::filesystem::path data_path() const;
+	std::filesystem::path index_path() const;
 
 	class json_handler:
 		public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, json_handler>
@@ -94,6 +95,14 @@ private:
 
 	// The buffer must be big enough to hold the biggest value.
 	statement::row read(std::istream& is, char* buffer) const;
+
+	/// Updates the hash index. It assumes that all the data was written after
+	/// write_start and that all rows are valid.
+	bool update_hash_index(
+		std::string_view key,
+		size_t write_start,
+		const std::vector<statement::row>& data
+	);
 
 public:
 	table(

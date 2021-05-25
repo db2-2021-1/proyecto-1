@@ -1,7 +1,11 @@
 #include "extendible_hash.hpp"
 
 db2::index::extendible_hash::extendible_hash(const std::filesystem::path& index_path):
-	index_file(index_path, std::ios::binary | std::ios::in | std::ios::out)
+	index_file(index_path,
+		std::ios::binary |
+		std::ios::in |
+		std::ios::out
+	)
 {
 	if(!index_file.is_open())
 	{
@@ -16,7 +20,10 @@ db2::index::extendible_hash::extendible_hash(
 	const std::filesystem::path& index_path,
 	size_t D,
 	size_t bucket_max_elements):
-	index_file(index_path, std::ios::binary | std::ios::in | std::ios::out)
+	index_file(index_path,
+		std::ios::binary |
+		std::ios::out
+	)
 {
 	if(!index_file.is_open())
 	{
@@ -41,6 +48,9 @@ db2::index::extendible_hash::extendible_hash(
 
 	write_empty_bucket(1);
 	write_empty_bucket(1);
+
+	index_file.close();
+	index_file.open(index_path, std::ios::binary | std::ios::in | std::ios::out);
 }
 
 bool db2::index::extendible_hash::is_open() const
@@ -51,7 +61,7 @@ bool db2::index::extendible_hash::is_open() const
 void db2::index::extendible_hash::write_empty_bucket(size_t d)
 {
 	bucket_header bh{d, 0};
-	key_position kp{0,0};
+	key_position kp{SIZE_MAX, SIZE_MAX};
 	bucket_p no_bucket = 0;
 
 	index_file.write((char*)&bh, sizeof(bh));
