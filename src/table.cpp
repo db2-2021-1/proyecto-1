@@ -208,6 +208,11 @@ std::filesystem::path db2::table::metadata_path() const
 	return std::filesystem::path(table_name) / "metadata.json";
 }
 
+std::filesystem::path db2::table::data_path() const
+{
+	return std::filesystem::path(table_name) / "data.dat";
+}
+
 bool db2::table::read_metadata()
 {
 	FILE* file = fopen(metadata_path().string().c_str(), "r");
@@ -448,14 +453,11 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 	if(!check_data(data))
 		return false;
 
-	std::filesystem::path data_file = table_name;
-	data_file /= "data.dat";
-
-	std::ofstream ofs(data_file, std::ios::app);
+	std::ofstream ofs(data_path(), std::ios::app);
 
 	if(!ofs.is_open())
 	{
-		perror(data_file.c_str());
+		perror(data_path().c_str());
 		return false;
 	}
 
@@ -515,6 +517,8 @@ size_t db2::table::tuple_size() const
 	for(const auto& [str, type]: columns)
 	{
 		size += type.size;
+		if(type.t == statement::type::_type::VARCHAR)
+			size++;
 	}
 
 	return size + sizeof(bool);
@@ -554,7 +558,10 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 
 	for(const auto& [name, type]: columns)
 	{
-		is.read(buffer, type.size);
+		// Add one byte for the VARCHAR's '\0'
+		is.read(buffer, type.size + (type.t == statement::type::_type::VARCHAR? 1 : 0));
+		if(is.eof())
+			return statement::row{false,{}};
 
 		switch(type.t)
 		{
@@ -607,4 +614,37 @@ std::vector<db2::statement::row> db2::table::select_range(const statement::liter
 			break;
 	}
 	return rows;
+}
+
+std::vector<db2::statement::row> db2::table::select_all()
+{
+	std::vector<statement::row> rows;
+
+	std::ifstream ifs(data_path());
+
+	if(!ifs.is_open())
+	{
+		perror(data_path().c_str());
+		return rows;
+	}
+
+	char* buffer = (char*)malloc(tuple_size());
+
+	while(!ifs.eof())
+	{
+		auto row = read(ifs, buffer);
+		if(row.valid)
+			rows.push_back(std::move(row));
+	}
+
+	free(buffer);
+	return rows;
+}
+
+void db2::table::print_columns(std::ostream& os) const
+{
+	for(const auto& [name, type]: columns)
+	{
+		os << name << (name == columns.rbegin()->first? '\n' : ',');
+	}
 }

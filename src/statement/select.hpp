@@ -36,7 +36,6 @@ private:
 	select(const sql_statement_tree& tree);
 	virtual std::ostream& print(std::ostream& os) const;
 
-	void print_columns(std::ostream& os) const;
 	void print_row(std::ostream& os) const;
 public:
 	select(std::string table_name, std::vector<std::string> columns, std::optional<expression> expr = std::nullopt);

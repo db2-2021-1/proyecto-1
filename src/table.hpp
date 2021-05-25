@@ -46,6 +46,7 @@ private:
 
 	bool check_and_create_directory() const;
 	std::filesystem::path metadata_path() const;
+	std::filesystem::path data_path() const;
 
 	class json_handler:
 		public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, json_handler>
@@ -123,6 +124,9 @@ public:
 
 	std::vector<statement::row> select_equals(const statement::literal& key);
 	std::vector<statement::row> select_range(const statement::literal& ge, const statement::literal& le);
+	std::vector<statement::row> select_all();
+
+	void print_columns(std::ostream& os) const;
 };
 
 };

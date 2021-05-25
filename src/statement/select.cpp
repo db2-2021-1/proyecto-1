@@ -54,15 +54,14 @@ bool db2::statement::select::execute()
 	if(!t.read_metadata())
 		return false;
 
-	// Only punctual and range search are supported
-	if(!expr.has_value())
-		return false;
-
 	// Only * is supported, by now.
-	print_columns(std::cout);
+	t.print_columns(std::cout);
 
 	auto get_data = [&]() -> std::vector<row>
 	{
+		if(!expr.has_value())
+			return t.select_all();
+
 		switch(expr->t)
 		{
 			case expression::type::between:
@@ -80,12 +79,11 @@ bool db2::statement::select::execute()
 	{
 		for(const auto& cell: r.values)
 		{
-			std::cout << cell << ',';
+			std::cout << cell << (cell == *r.values.rbegin() ? '\n' : ',');
 		}
-		std::cout << '\n';
 	}
 
-	return false;
+	return true;
 }
 
 std::ostream& db2::statement::select::print(std::ostream& os) const
@@ -107,14 +105,4 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const select& s)
 		os << s.expr.value() << '\n';
 
 	return os;
-}
-
-void db2::statement::select::print_columns(std::ostream& os) const
-{
-	for(size_t i = 0; i < columns.size(); i++)
-	{
-		// TODO better csv printing
-		os << columns[i] << ',';
-	}
-	os << '\n';
 }
