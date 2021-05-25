@@ -54,6 +54,26 @@ private:
 
 	std::fstream index_file;
 
+	void write_empty_bucket(size_t d);
+
+	/// Get the size of bucket_header, it's pairs and the pointer.
+	size_t bucket_size() const;
+
+	/// Get the d least significant bits from the hash.
+	size_t d_bit(size_t d, size_t key_hash) const;
+
+	/// Get the D least significant bits from the hash.
+	size_t D_bit(size_t key_hash) const;
+
+	/// Get the position of the directory of a hash.
+	size_t get_directory(size_t key_hash) const;
+
+	/// Get the position of the first bucket.
+	size_t get_first_bucket() const;
+
+	/// Get the pointer of a bucket from a hash.
+	bucket_p get_bucket(size_t key_hash);
+
 public:
 	/// Use existing index.
 	extendible_hash(const std::filesystem::path& index_path);
@@ -68,6 +88,7 @@ public:
 	bool is_open() const;
 
 	std::vector<size_t> get_positions(size_t key_hash);
+	bool insert(size_t key_hash, size_t position);
 };
 
 };
