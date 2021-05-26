@@ -422,9 +422,7 @@ if (cursor != NULL)
 	//&& std::find(vector_.begin(), vector_.end(), cursor->key[i]) != vector_.end()
 	if (cursor->IS_LEAF && cursor->key[i] >= 10000 && 20000 >= cursor->key[i])
 	{
-	  xddd++;
 	  std::cout << "cursor->key[i]: " << cursor->key[i] << " posicion: " << ((cursor->values).find(cursor->key[i]))->second << "\n";
-	  std::cout << "xddd: " << xddd << "\n";
 	}
   }
   //std::cout << "\n";

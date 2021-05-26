@@ -28,8 +28,6 @@ struct Node
     int pos_registro = 0;
 };
 
-int xddd = 0;
-
 class b_plus_tree
 {
 private:
