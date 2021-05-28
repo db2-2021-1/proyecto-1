@@ -52,6 +52,7 @@ public:
 	create_index(std::string name, index_type type, std::string column_name);
 	create_index();
 
+	virtual std::string get_name() const;
 	virtual bool execute();
 	virtual ~create_index(){};
 

@@ -40,6 +40,11 @@ db2::statement::select::select(const sql_statement_tree& tree)
 
 db2::statement::select::select(){};
 
+std::string db2::statement::select::get_name() const
+{
+	return "SELECT";
+}
+
 bool db2::statement::select::execute()
 {
 	// select{

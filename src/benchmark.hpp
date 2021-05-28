@@ -23,6 +23,8 @@
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/writer.h>
 
+#include "statement.hpp"
+
 namespace db2
 {
 
@@ -43,7 +45,7 @@ public:
 	void end_benchmark();
 
 	void before_transaction();
-	void after_transaction();
+	void after_transaction(const statement::statement* s);
 
 	~benchmark();
 };

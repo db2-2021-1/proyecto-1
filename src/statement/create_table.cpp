@@ -34,6 +34,11 @@ db2::statement::create_table::create_table(const sql_statement_tree& tree)
 
 db2::statement::create_table::create_table(){};
 
+std::string db2::statement::create_table::get_name() const
+{
+	return "CREATE TABLE";
+}
+
 bool db2::statement::create_table::execute()
 {
 	// create_table{

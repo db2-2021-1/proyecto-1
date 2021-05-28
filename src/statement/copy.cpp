@@ -30,6 +30,11 @@ db2::statement::copy::copy(const sql_statement_tree& tree)
 
 db2::statement::copy::copy(){};
 
+std::string db2::statement::copy::get_name() const
+{
+	return "COPY";
+}
+
 bool db2::statement::copy::execute()
 {
 	// copy{

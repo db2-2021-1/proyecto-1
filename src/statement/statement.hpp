@@ -40,6 +40,7 @@ protected:
 
 	virtual std::ostream& print(std::ostream&) const = 0;
 public:
+	virtual std::string get_name() const = 0;
 	virtual bool execute() = 0;
 	virtual ~statement(){};
 

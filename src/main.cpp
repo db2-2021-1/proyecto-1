@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 				b.before_transaction();
 				if(!statement->execute())
 					prompt_i = 1;
-				b.after_transaction();
+				b.after_transaction(statement.get());
 			}
 		}
 

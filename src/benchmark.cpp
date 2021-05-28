@@ -95,11 +95,15 @@ void db2::benchmark::before_transaction()
 	std::cerr << "Before\n";
 }
 
-void db2::benchmark::after_transaction()
+void db2::benchmark::after_transaction(const statement::statement* s)
 {
-	if(!is_open())
+	if(!is_open() || !s)
 		return;
 
-	// TODO
-	std::cerr << "After\n";
+	writer.StartObject();
+
+	writer.Key("Statement");
+	writer.String(s->get_name());
+
+	writer.EndObject();
 }

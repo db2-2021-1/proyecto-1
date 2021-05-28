@@ -38,6 +38,7 @@ public:
 	copy(std::string table_name, std::string csv_name);
 	copy();
 
+	virtual std::string get_name() const;
 	virtual bool execute();
 	virtual ~copy(){};
 

@@ -52,7 +52,7 @@ void db2::args::parse(int argc, char* argv[])
 					b.before_transaction();
 					if(!statement->execute())
 						exit_code = EXIT_FAILURE;
-					b.after_transaction();
+					b.after_transaction(statement.get());
 				}
 				b.end_benchmark();
 				exit(exit_code);
@@ -68,7 +68,7 @@ void db2::args::parse(int argc, char* argv[])
 					b.before_transaction();
 					if(!statement->execute())
 						exit_code = EXIT_FAILURE;
-					b.after_transaction();
+					b.after_transaction(statement.get());
 				}
 				b.end_benchmark();
 				exit(exit_code);

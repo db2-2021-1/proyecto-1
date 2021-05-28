@@ -68,6 +68,11 @@ db2::statement::create_index::create_index(const sql_statement_tree& tree)
 
 db2::statement::create_index::create_index(){};
 
+std::string db2::statement::create_index::get_name() const
+{
+	return "CREATE INDEX";
+}
+
 bool db2::statement::create_index::execute()
 {
 	// create_index{

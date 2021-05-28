@@ -38,6 +38,7 @@ public:
 	delete_from(std::string table_name, expression expr);
 	delete_from();
 
+	virtual std::string get_name() const;
 	virtual bool execute();
 	virtual ~delete_from(){};
 

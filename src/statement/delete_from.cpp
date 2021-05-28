@@ -29,6 +29,11 @@ db2::statement::delete_from::delete_from(const sql_statement_tree& tree):
 
 db2::statement::delete_from::delete_from(){};
 
+std::string db2::statement::delete_from::get_name() const
+{
+	return "DELETE FROM";
+}
+
 bool db2::statement::delete_from::execute()
 {
 	// delete_from{

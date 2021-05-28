@@ -41,6 +41,11 @@ db2::statement::insert::insert(const sql_statement_tree& tree)
 
 db2::statement::insert::insert(){};
 
+std::string db2::statement::insert::get_name() const
+{
+	return "INSERT INTO";
+}
+
 bool db2::statement::insert::execute()
 {
 	// insert{

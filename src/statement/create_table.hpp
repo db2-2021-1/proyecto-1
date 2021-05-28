@@ -37,6 +37,7 @@ public:
 	create_table(std::string table_name, std::vector<std::pair<std::string, type>> data_types);
 	create_table();
 
+	virtual std::string get_name() const;
 	virtual bool execute();
 	virtual ~create_table(){};
 

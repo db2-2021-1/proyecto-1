@@ -41,6 +41,7 @@ public:
 	insert(std::string table_name, std::vector<row> data);
 	insert();
 
+	virtual std::string get_name() const;
 	virtual bool execute();
 	virtual ~insert(){};
 

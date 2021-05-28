@@ -41,6 +41,7 @@ public:
 	select(std::string table_name, std::vector<std::string> columns, std::optional<expression> expr = std::nullopt);
 	select();
 
+	virtual std::string get_name() const;
 	virtual bool execute();
 	virtual ~select(){};
 
