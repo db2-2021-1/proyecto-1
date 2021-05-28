@@ -20,6 +20,7 @@
 
 #include "args.hpp"
 #include "statement.hpp"
+#include "benchmark.hpp"
 
 void db2::args::parse(int argc, char* argv[])
 {
@@ -44,28 +45,38 @@ void db2::args::parse(int argc, char* argv[])
 			case 'c':
 			{
 				int exit_code = EXIT_SUCCESS;
+				db2::benchmark b(benchmark_file, benchmark);
+				b.start_benchmark();
 				for(auto& statement: db2::statement::from_string(optarg))
 				{
+					b.before_transaction();
 					if(!statement->execute())
 						exit_code = EXIT_FAILURE;
+					b.after_transaction();
 				}
+				b.end_benchmark();
 				exit(exit_code);
 			}
 
 			case 'f':
 			{
 				int exit_code = EXIT_SUCCESS;
+				db2::benchmark b(benchmark_file, benchmark);
+				b.start_benchmark();
 				for(auto& statement: db2::statement::from_file(optarg))
 				{
+					b.before_transaction();
 					if(!statement->execute())
 						exit_code = EXIT_FAILURE;
+					b.after_transaction();
 				}
+				b.end_benchmark();
 				exit(exit_code);
 			}
 
 			case 'b':
 				benchmark = true;
-				benchmark_file = optarg;
+				benchmark_file = optarg ? optarg : "";
 				break;
 
 			default:

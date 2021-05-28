@@ -22,6 +22,7 @@
 #include "args.hpp"
 #include "completion.hpp"
 #include "statement.hpp"
+#include "benchmark.hpp"
 
 #define C_LBLUE  "\001\e[1;36m\002"
 #define C_YELLOW "\001\e[1;33m\002"
@@ -37,6 +38,8 @@ int main(int argc, char* argv[])
 
 	a.parse(argc, argv);
 
+	db2::benchmark b(a.benchmark_file, a.benchmark);
+
 	init_readline();
 	init_history();
 
@@ -47,6 +50,7 @@ int main(int argc, char* argv[])
 		ERROR_PREFIX DEFAULT_PROMPT
 	};
 
+	b.start_benchmark();
 	while(char* line = readline(prompts[prompt_i]))
 	{
 		prompt_i = 0;
@@ -56,13 +60,16 @@ int main(int argc, char* argv[])
 
 			for(auto& statement: db2::statement::from_string(line))
 			{
+				b.before_transaction();
 				if(!statement->execute())
 					prompt_i = 1;
+				b.after_transaction();
 			}
 		}
 
 		free(line);
 	}
+	b.end_benchmark();
 
 	exit(EXIT_SUCCESS);
 }

@@ -37,6 +37,7 @@ target_sources(${PROJECT_NAME}
 
 		# C++
 		args.cpp
+		benchmark.cpp
 		completion.cpp
 		literal.cpp
 		main.cpp
