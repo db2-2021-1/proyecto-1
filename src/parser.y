@@ -102,6 +102,7 @@ new_columns
 
 name_type
 	: NAME TYPE { $$.name = $1; $$.type = $2; }
+	| STRING TYPE { $$.name = $1; $$.type = $2; }
 	;
 
 TYPE
