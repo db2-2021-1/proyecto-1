@@ -537,8 +537,8 @@ bool db2::table::write_data(std::vector<statement::row>& data)
 
 bool db2::table::update_hash_index(const std::vector<statement::row>& data)
 {
-	static const size_t default_D = 2;
-	static const size_t default_max_bucket_size = 4;
+	static const size_t default_D = 8;
+	static const size_t default_max_bucket_size = 32;
 
 	auto hash_index = std::filesystem::exists(index_path())?
 		db2::index::extendible_hash(index_path()):
