@@ -87,7 +87,7 @@ bool parse_file_init(const char* file)
 
 void parse_file_free(void)
 {
-	if(yyin && !fclose(yyin))
+	if(yyin && fclose(yyin) != 0)
 		perror("");
 	yyin = stdin;
 }
