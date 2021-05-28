@@ -58,6 +58,8 @@ WHERE   { return WHERE;   }
 [*(),;] { return yytext[0]; }
 
 [ \n\r\t]+ {}
+#.* ;
+"--"[ \t].* ;
 %%
 
 void parse_init(const char* str)

@@ -40,12 +40,15 @@ void db2::args::parse(int argc, char* argv[])
 				break;
 
 			case 'c':
-				if(auto statement = db2::statement::from_string(optarg))
+			{
+				int exit_code = EXIT_SUCCESS;
+				for(auto& statement: db2::statement::from_string(optarg))
 				{
-					if(statement->execute())
-						exit(EXIT_SUCCESS);
+					if(!statement->execute())
+						exit_code = EXIT_FAILURE;
 				}
-				exit(EXIT_FAILURE);
+				exit(exit_code);
+			}
 
 			default:
 				exit(EXIT_FAILURE);

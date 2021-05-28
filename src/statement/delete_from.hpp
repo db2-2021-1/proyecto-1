@@ -41,7 +41,7 @@ public:
 	virtual bool execute();
 	virtual ~delete_from(){};
 
-	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::vector<std::unique_ptr<statement>> from_tree(const sql_statement_tree* tree);
 	friend std::ostream& operator<<(std::ostream& os, const delete_from& i);
 	friend class statement;
 };

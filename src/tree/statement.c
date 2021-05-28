@@ -35,7 +35,8 @@ sql_statement_tree* sql_statement_tree_alloc()
 			.insert_values = NULL,
 			.expr          = NULL,
 			.new_columns   = NULL,
-			.csv_name      = NULL
+			.csv_name      = NULL,
+			.next          = NULL
 		};
 	}
 
@@ -161,6 +162,7 @@ void sql_statement_tree_free(sql_statement_tree* tree)
 		sql_expr_free(tree->expr);
 		sql_new_columns_free(tree->new_columns);
 		free(tree->csv_name);
+		sql_statement_tree_free(tree->next);
 	}
 
 	free(tree);

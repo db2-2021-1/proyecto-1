@@ -58,6 +58,8 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %token VARCHAR
 %token WHERE
 
+%type <statement> sql_toplevel
+%type <statement> sql_statement
 %type <statement> create_table
 %type <statement> create_index
 %type <statement> select_table
@@ -75,15 +77,18 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %type <new_columns> new_columns;
 
 %%
-sql: sql_statement ';'
+sql_toplevel
+	: sql_statement ';' { *tree = $1; $$ = $1; }
+	| sql_statement ';' sql_toplevel { *tree = $1; $1->next = $3; }
+	;
 
 sql_statement
-	: create_table      { *tree = $1; }
-	| create_index      { *tree = $1; }
-	| select_table      { *tree = $1; }
-	| insert_into_table { *tree = $1; }
-	| delete_from_table { *tree = $1; }
-	| copy              { *tree = $1; }
+	: create_table      { $$ = $1; }
+	| create_index      { $$ = $1; }
+	| select_table      { $$ = $1; }
+	| insert_into_table { $$ = $1; }
+	| delete_from_table { $$ = $1; }
+	| copy              { $$ = $1; }
 	;
 
 create_table

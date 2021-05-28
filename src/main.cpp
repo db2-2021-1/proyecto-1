@@ -54,13 +54,11 @@ int main(int argc, char* argv[])
 		{
 			add_history(line);
 
-			if(auto statement = db2::statement::from_string(line))
+			for(auto& statement: db2::statement::from_string(line))
 			{
 				if(!statement->execute())
 					prompt_i = 1;
 			}
-			else
-				prompt_i = 1;
 		}
 
 		free(line);

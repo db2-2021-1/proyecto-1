@@ -44,7 +44,7 @@ public:
 	virtual bool execute();
 	virtual ~select(){};
 
-	friend std::unique_ptr<statement> from_tree(const sql_statement_tree& tree);
+	friend std::vector<std::unique_ptr<statement>> from_tree(const sql_statement_tree* tree);
 	friend std::ostream& operator<<(std::ostream& os, const select& i);
 	friend class statement;
 };

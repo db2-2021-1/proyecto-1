@@ -23,46 +23,56 @@
 #include "statement.hpp"
 #include "copy.hpp"
 
-std::unique_ptr<db2::statement::statement>
-	db2::statement::from_tree(const sql_statement_tree& tree)
+std::vector<std::unique_ptr<db2::statement::statement>>
+	db2::statement::from_tree(const sql_statement_tree* tree)
 {
-	switch(tree.type)
+	std::vector<std::unique_ptr<db2::statement::statement>> v;
+
+	for(; tree != nullptr; tree = tree->next)
 	{
-		case SQL_CREATE_TABLE:
-			return std::unique_ptr<statement>(new(std::nothrow) create_table(tree));
+		switch(tree->type)
+		{
+			case SQL_CREATE_TABLE:
+				v.emplace_back(new(std::nothrow) create_table(*tree));
+				break;
 
-		case SQL_CREATE_INDEX:
-			return std::unique_ptr<statement>(new(std::nothrow) create_index(tree));
+			case SQL_CREATE_INDEX:
+				v.emplace_back(new(std::nothrow) create_index(*tree));
+				break;
 
-		case SQL_SELECT:
-			return std::unique_ptr<statement>(new(std::nothrow) select(tree));
+			case SQL_SELECT:
+				v.emplace_back(new(std::nothrow) select(*tree));
+				break;
 
-		case SQL_INSERT:
-			return std::unique_ptr<statement>(new(std::nothrow) insert(tree));
+			case SQL_INSERT:
+				v.emplace_back(new(std::nothrow) insert(*tree));
+				break;
 
-		case SQL_DELETE_FROM:
-			return std::unique_ptr<statement>(new(std::nothrow) delete_from(tree));
+			case SQL_DELETE_FROM:
+				v.emplace_back(new(std::nothrow) delete_from(*tree));
+				break;
 
-		case SQL_COPY:
-			return std::unique_ptr<statement>(new(std::nothrow) copy(tree));
-
-		default:
-			return nullptr;
+			case SQL_COPY:
+				v.emplace_back(new(std::nothrow) copy(*tree));
+				break;
+		}
 	}
+
+	return v;
 }
 
-std::unique_ptr<db2::statement::statement>
+std::vector<std::unique_ptr<db2::statement::statement>>
 	db2::statement::from_string(std::string_view str)
 {
 	if(sql_statement_tree* tree = parse(str.data()))
 	{
-		auto statement = from_tree(*tree);
+		auto statement = from_tree(tree);
 
 		sql_statement_tree_free(tree);
 		return statement;
 	}
 
-	return nullptr;
+	return {};
 }
 
 std::ostream& db2::statement::operator<<(std::ostream& os, const statement& i)

@@ -45,7 +45,8 @@ enum sql_index_type
 	SQL_HASH
 };
 
-typedef struct _sql_statement_tree
+typedef struct _sql_statement_tree sql_statement_tree;
+struct _sql_statement_tree
 {
 	int type;
 	int index_type;
@@ -55,7 +56,8 @@ typedef struct _sql_statement_tree
 	sql_expr* expr;
 	sql_new_columns* new_columns;
 	char* csv_name;
-} sql_statement_tree;
+	sql_statement_tree* next;
+};
 
 sql_statement_tree* sql_statement_tree_alloc();
 
