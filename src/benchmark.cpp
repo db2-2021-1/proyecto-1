@@ -17,8 +17,6 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <rapidjson/error/en.h>
-
 #include "benchmark.hpp"
 
 db2::benchmark::benchmark(std::filesystem::path file, bool _enabled):

@@ -156,7 +156,7 @@ public:
 
 	/// Get data.
 	std::vector<statement::row> get_data(
-		const std::optional<statement::expression>& expr
+		const std::optional<statement::expression>& expr = std::nullopt
 	);
 
 	void print_columns(std::ostream& os) const;
@@ -167,6 +167,8 @@ public:
 
 	/// Inserts valid rows and deletes otherwise.
 	bool update_index(std::vector<statement::row>& data);
+
+	bool reset_index();
 };
 
 };

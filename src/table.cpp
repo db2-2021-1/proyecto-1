@@ -937,3 +937,14 @@ bool db2::table::update_index(std::vector<statement::row>& data)
 
 	return true;
 }
+
+bool db2::table::reset_index()
+{
+	std::error_code e;
+
+	std::filesystem::remove(index_path(), e);
+
+	auto data = get_data();
+
+	return update_index(data);
+}

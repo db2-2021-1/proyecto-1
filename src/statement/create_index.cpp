@@ -88,7 +88,10 @@ bool db2::statement::create_index::execute()
 
 	t.set_index({column_name, type});
 
-	return t.write_metadata();
+	if(!t.write_metadata())
+		return false;
+
+	return t.reset_index();
 }
 
 std::ostream& db2::statement::create_index::print(std::ostream& os) const
