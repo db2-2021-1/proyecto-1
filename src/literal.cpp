@@ -49,7 +49,13 @@ std::ostream& std::operator<<(std::ostream& os, const db2::literal& l)
 		},
 		[&os](const std::string& str)
 		{
+			bool escaped = str.find(',') != std::string::npos;
+
+			if(escaped)
+				os << '"';
 			os << str;
+			if(escaped)
+				os << '"';
 		},
 	}, l);
 

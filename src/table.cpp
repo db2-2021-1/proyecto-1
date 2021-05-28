@@ -379,6 +379,8 @@ bool db2::table::read_csv(std::string_view csv_name)
 	ssize_t line_size;
 
 	char* token;
+	char* buffer_copy;
+	bool line_consumed;
 
 	/// Get line and trim the new line character.
 	auto get_csv_line = [&]() -> bool
@@ -391,13 +393,62 @@ bool db2::table::read_csv(std::string_view csv_name)
 		if(line_size > 0)
 			buffer[line_size-- - 1] = '\0';
 
+		line_consumed = false;
+		buffer_copy = buffer;
 		return true;
 	};
 
 	// Get a token from the csv line
 	auto get_token = [&]() -> bool
 	{
-		return (token = strsep(&buffer, ",")) != nullptr;
+		enum class state
+		{
+			not_escaped,
+			escaped
+		};
+
+		if(buffer_copy == nullptr)
+			return false;
+
+		token = buffer_copy;
+		state s = state::not_escaped;
+		while(!line_consumed)
+		{
+			switch(s)
+			{
+				case state::not_escaped:
+					switch(buffer_copy[0])
+					{
+						case ',':
+							buffer_copy[0] = '\0';
+							buffer_copy++;
+							return true;
+
+						case '\0':
+							line_consumed = true;
+							return true;
+
+						case '"':
+							token = buffer_copy+1;
+							s = state::escaped;
+							break;
+					}
+					break;
+
+				case state::escaped:
+					switch(buffer_copy[0])
+					{
+						case '"':
+							buffer_copy[0] = '\0';
+							s = state::not_escaped;
+							break;
+					}
+					break;
+			}
+			buffer_copy++;
+		}
+
+		return false;
 	};
 
 	auto push_token = [&](
@@ -448,6 +499,7 @@ bool db2::table::read_csv(std::string_view csv_name)
 
 	for(size_t column = 0; get_token(); column++)
 	{
+		std::cerr << token << '\n';
 		if(column >= columns.size())
 			fprintf(stderr, "Extra columns.\n");
 		else if(columns[column].first != token)
