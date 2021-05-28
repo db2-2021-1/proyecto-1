@@ -29,13 +29,14 @@ namespace db2
 class benchmark
 {
 private:
+	bool enabled;
 	FILE* output_file;
 	char buffer[PIPE_BUF];
 	rapidjson::FileWriteStream fws;
 	rapidjson::Writer<rapidjson::FileWriteStream> writer;
 
 public:
-	benchmark(std::filesystem::path file, bool active);
+	benchmark(std::filesystem::path file, bool enabled);
 	bool is_open() const;
 
 	void start_benchmark();

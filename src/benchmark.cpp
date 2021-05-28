@@ -21,31 +21,36 @@
 
 #include "benchmark.hpp"
 
-db2::benchmark::benchmark(std::filesystem::path file, bool active):
-	output_file([](const std::filesystem::path& file, bool active) -> FILE*
+db2::benchmark::benchmark(std::filesystem::path file, bool _enabled):
+	enabled(_enabled),
+	output_file([](std::filesystem::path& file, bool enabled) -> FILE*
 	{
 		FILE* new_file = nullptr;
 
-		if(!active)
-			return nullptr;
-
-		if(file.empty())
+		if(enabled)
 		{
-			if(!(new_file = fdopen(dup(fileno(stderr)), "a")))
+			if(file.empty())
 			{
-				perror("stderr");
+				if(!(new_file = fdopen(dup(fileno(stderr)), "a")))
+				{
+					perror("stderr");
+				}
+			}
+			else
+			{
+				if(!(new_file = fopen(file.c_str(), "a")))
+				{
+					perror(file.c_str());
+				}
 			}
 		}
 		else
 		{
-			if(!(new_file = fopen(file.c_str(), "a")))
-			{
-				perror(file.c_str());
-			}
+			return fopen("/dev/null", "w");
 		}
 
 		return new_file;
-	}(file, active)),
+	}(file, enabled)),
 	fws(output_file, buffer, sizeof(buffer)),
 	writer(fws)
 {}
