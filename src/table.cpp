@@ -391,7 +391,13 @@ bool db2::table::read_csv(std::string_view csv_name)
 			return false;
 
 		if(line_size > 0)
+		{
 			buffer[line_size-- - 1] = '\0';
+			if(line_size > 0 && buffer[line_size-1] == '\r')
+			{
+				buffer[line_size-- - 1] = '\0';
+			}
+		}
 
 		line_consumed = false;
 		buffer_copy = buffer;
@@ -499,7 +505,6 @@ bool db2::table::read_csv(std::string_view csv_name)
 
 	for(size_t column = 0; get_token(); column++)
 	{
-		std::cerr << token << '\n';
 		if(column >= columns.size())
 			fprintf(stderr, "Extra columns.\n");
 		else if(columns[column].first != token)
