@@ -39,6 +39,7 @@ target_sources(${PROJECT_NAME}
 		args.cpp
 		benchmark.cpp
 		completion.cpp
+		io_data.cpp
 		literal.cpp
 		main.cpp
 		table.cpp
