@@ -22,8 +22,11 @@ db2::statement::literal db2::statement::from_union(sql_literal l)
 {
 	switch(l.type)
 	{
-		case SQL_INT:
+		case SQL_NUMBER:
 			return l.value.number;
+
+		case SQL_REAL_NUMBER:
+			return l.value.real_number;
 
 		case SQL_STRING:
 			return l.value.str;
@@ -37,6 +40,10 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const literal& l)
 {
 	std::visit(overload{
 		[&os](int number)
+		{
+			os << number;
+		},
+		[&os](float number)
 		{
 			os << number;
 		},

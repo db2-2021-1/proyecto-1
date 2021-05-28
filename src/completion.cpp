@@ -85,6 +85,7 @@ char* key_word_generator(const char* text, int state)
 		"INTO",
 		"IS",
 		"ON",
+		"REAL",
 		"SELECT",
 		"TABLE",
 		"USING",

@@ -29,6 +29,17 @@ sql_literal sql_literal_number(int number)
 	return literal;
 }
 
+sql_literal sql_literal_real_number(float number)
+{
+	sql_literal literal =
+	{
+		.type              = SQL_REAL_NUMBER,
+		.value.real_number = number
+	};
+
+	return literal;
+}
+
 sql_literal sql_literal_string(char* str)
 {
 	sql_literal literal =
@@ -55,6 +66,10 @@ void sql_literal_print(sql_literal literal, FILE* file)
 	{
 		case SQL_NUMBER:
 			fprintf(file, "NUM: %d", literal.value.number);
+			break;
+
+		case SQL_REAL_NUMBER:
+			fprintf(file, "REAL_NUM: %f", literal.value.real_number);
 			break;
 
 		case SQL_STRING:

@@ -25,6 +25,7 @@ extern "C" {
 enum sql_literal_type
 {
 	SQL_NUMBER,
+	SQL_REAL_NUMBER,
 	SQL_STRING
 };
 
@@ -34,11 +35,13 @@ typedef struct _sql_literal
 	union
 	{
 		int number;
+		float real_number;
 		char* str;
 	} value;
 } sql_literal;
 
 sql_literal sql_literal_number(int number);
+sql_literal sql_literal_real_number(float number);
 sql_literal sql_literal_string(char* str);
 
 /// Only frees the string not the literal.

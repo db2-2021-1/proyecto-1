@@ -31,6 +31,7 @@ struct type
 		NONE,
 
 		INT,
+		REAL,
 		VARCHAR
 	};
 

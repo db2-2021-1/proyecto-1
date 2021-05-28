@@ -25,6 +25,7 @@ extern "C" {
 enum sql_type_type
 {
 	SQL_INT,
+	SQL_REAL,
 	SQL_VARCHAR
 };
 
@@ -35,6 +36,7 @@ typedef struct _sql_type
 } sql_type;
 
 sql_type sql_type_int();
+sql_type sql_type_real();
 sql_type sql_type_varchar(size_t size);
 
 void sql_type_print(sql_type type, FILE* file);

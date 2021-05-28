@@ -29,6 +29,17 @@ sql_type sql_type_int()
 	return type;
 }
 
+sql_type sql_type_real()
+{
+	sql_type type =
+	{
+		.type = SQL_REAL,
+		.size = sizeof(float)
+	};
+
+	return type;
+}
+
 sql_type sql_type_varchar(size_t size)
 {
 	sql_type type =
@@ -46,6 +57,10 @@ void sql_type_print(sql_type type, FILE* file)
 	{
 		case SQL_INT:
 			fprintf(file, "%s", "INT");
+			break;
+
+		case SQL_REAL:
+			fprintf(file, "%s", "REAL");
 			break;
 
 		case SQL_VARCHAR:

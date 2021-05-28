@@ -26,7 +26,7 @@
 namespace db2::statement
 {
 
-using literal = std::variant<int, std::string>;
+using literal = std::variant<int, float, std::string>;
 
 literal from_union(sql_literal l);
 

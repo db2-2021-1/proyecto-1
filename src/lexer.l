@@ -26,6 +26,7 @@ INT     { return INT;     }
 INTO    { return INTO;    }
 IS      { return IS;      }
 ON      { return ON;      }
+REAL    { return REAL;    }
 SELECT  { return SELECT;  }
 TABLE   { return TABLE;   }
 USING   { return USING;   }
@@ -45,6 +46,14 @@ WHERE   { return WHERE;   }
 }
 [a-z][a-z0-9_]*        { yylval.strval = strdup(yytext); return NAME;   }
 -?[0-9]+               { yylval.intval = atoi(yytext); return INTNUM; }
+-?[0-9]+"."[0-9]*             |
+-?"."[0-9]+                   |
+-?[0-9]+E[-+]?[0-9]+          |
+-?[0-9]+"."[0-9]*E[-+]?[0-9]+ |
+-?"."[0-9]+E[-+]?[0-9]+ {
+	yylval.realval = atof(yytext) ;
+	return REALNUM;
+}
 
 [*(),;] { return yytext[0]; }
 

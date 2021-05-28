@@ -415,6 +415,10 @@ bool db2::table::read_csv(std::string_view csv_name)
 				row.values.emplace_back(atoi(str));
 				break;
 
+			case statement::type::_type::REAL:
+				row.values.emplace_back(strtof(str, nullptr));
+				break;
+
 			case statement::type::_type::VARCHAR:
 				row.values.emplace_back(std::string(str,
 					std::min(columns[column].second.size, strlen(str))
@@ -661,6 +665,7 @@ size_t db2::table::tuple_size() const
 	for(const auto& [str, type]: columns)
 	{
 		size += type.size;
+		// The varchar is null terminated.
 		if(type.t == statement::type::_type::VARCHAR)
 			size++;
 	}
@@ -684,6 +689,10 @@ void db2::table::write(std::ostream& os, statement::row& r) const
 			[&os](int i)
 			{
 				os.write((char*)&i, sizeof(i));
+			},
+			[&os](float f)
+			{
+				os.write((char*)&f, sizeof(f));
 			},
 			[&os, size](const std::string& str)
 			{
@@ -716,6 +725,10 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 		{
 			case statement::type::_type::INT:
 				new_row.values.push_back(*(int*)buffer);
+				break;
+
+			case statement::type::_type::REAL:
+				new_row.values.push_back(*(float*)buffer);
 				break;
 
 			case statement::type::_type::VARCHAR:

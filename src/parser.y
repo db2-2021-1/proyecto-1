@@ -17,6 +17,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 
 %union {
 	int intval;
+	float realval;
 	char *strval;
 	sql_statement_tree *statement;
 	sql_expr *expr;
@@ -34,6 +35,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %nonassoc IS
 
 %token <intval> INTNUM;
+%token <realval> REALNUM;
 %token <strval> NAME;
 %token <strval> STRING
 
@@ -48,6 +50,7 @@ void yyerror(sql_statement_tree** tree, const char* s);
 %token INT
 %token INTO
 %token ON
+%token REAL
 %token SELECT
 %token TABLE
 %token USING
@@ -98,6 +101,7 @@ name_type
 
 TYPE
 	: INT                    { $$ = sql_type_int(); }
+	| REAL                   { $$ = sql_type_real(); }
 	| VARCHAR '(' INTNUM ')' { $$ = sql_type_varchar($3); }
 	;
 
@@ -131,8 +135,9 @@ expr
 	;
 
 literal
-	: INTNUM { $$ = sql_literal_number($1); }
-	| STRING { $$ = sql_literal_string($1); }
+	: INTNUM  { $$ = sql_literal_number($1); }
+	| REALNUM { $$ = sql_literal_real_number($1); }
+	| STRING  { $$ = sql_literal_string($1); }
 	;
 
 insert_into_table

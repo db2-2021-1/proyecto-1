@@ -26,6 +26,10 @@ db2::statement::type::type(sql_type sql_t)
 			t = _type::INT;
 			break;
 
+		case SQL_REAL:
+			t = _type::REAL;
+			break;
+
 		case SQL_VARCHAR:
 			t = _type::VARCHAR;
 			break;
@@ -50,6 +54,9 @@ std::string db2::statement::type::type2str(_type t)
 		case _type::INT:
 			return "INT";
 
+		case _type::REAL:
+			return "REAL";
+
 		case _type::VARCHAR:
 			return "VARCHAR";
 
@@ -63,6 +70,7 @@ db2::statement::type::_type db2::statement::type::str2type(std::string_view str)
 	static const std::unordered_map<std::string_view, _type> str2type_map
 	{
 		{"INT",     _type::INT},
+		{"REAL",    _type::REAL},
 		{"VARCHAR", _type::VARCHAR},
 	};
 
@@ -84,6 +92,10 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const type& t)
 	{
 		case type::_type::INT:
 			os << "INT";
+			break;
+
+		case type::_type::REAL:
+			os << "REAL";
 			break;
 
 		case type::_type::VARCHAR:
