@@ -4,6 +4,8 @@
 
 # Proyecto 1
 
+[Informe](informe.md)
+
 ## Dependencias
 
 * `bison`

@@ -81,3 +81,5 @@ hotel-benchmark | to-csv > hotel-hash-index.csv
 
 #create-hotel-bptree-index > /dev/null
 #hotel-benchmark | to-csv > hotel-bptree-index.csv
+
+./table.r
