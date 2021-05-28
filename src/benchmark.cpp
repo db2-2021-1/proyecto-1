@@ -88,22 +88,46 @@ void db2::benchmark::end_benchmark()
 
 void db2::benchmark::before_transaction()
 {
+	using namespace std::chrono;
+
 	if(!is_open())
 		return;
 
-	// TODO
-	std::cerr << "Before\n";
+	data.read();
+	start_time = duration_cast<microseconds>(system_clock::now().time_since_epoch());
 }
 
 void db2::benchmark::after_transaction(const statement::statement* s)
 {
+	using namespace std::chrono;
+
 	if(!is_open() || !s)
 		return;
 
+	microseconds transaction_time =
+		duration_cast<microseconds>(system_clock::now().time_since_epoch()) -
+		start_time
+	;
+
+	io_data after_data, diff_data;
+	after_data.read();
+
+	diff_data = after_data - data;
+
+
 	writer.StartObject();
 
-	writer.Key("Statement");
+	writer.Key("statement");
 	writer.String(s->get_name());
+
+	writer.Key("reads");
+	writer.Uint64(diff_data.syscr);
+
+	writer.Key("writes");
+	writer.Uint64(diff_data.syscw);
+
+	writer.Key("duration");
+	writer.Double(transaction_time.count()/1000.0);
 
 	writer.EndObject();
 }

@@ -19,10 +19,12 @@
 #include <climits>
 #include <cstdio>
 #include <filesystem>
+#include <chrono>
 
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/writer.h>
 
+#include "io_data.hpp"
 #include "statement.hpp"
 
 namespace db2
@@ -32,10 +34,14 @@ class benchmark
 {
 private:
 	bool enabled;
+
 	FILE* output_file;
 	char buffer[PIPE_BUF];
 	rapidjson::FileWriteStream fws;
 	rapidjson::Writer<rapidjson::FileWriteStream> writer;
+
+	io_data data;
+	std::chrono::microseconds start_time;
 
 public:
 	benchmark(std::filesystem::path file, bool enabled);

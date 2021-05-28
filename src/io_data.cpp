@@ -43,6 +43,8 @@ void db2::io_data::read_line(char* line)
 {
 	enum class member
 	{
+		before_name,
+
 		rchar,
 		wchar,
 		syscr,
@@ -65,20 +67,29 @@ void db2::io_data::read_line(char* line)
 	};
 
 	char* buffer;
+	member m = member::before_name;
 	for(char* token = strtok_r(line, delim, &buffer);
 		token;
 		token = strtok_r(nullptr, delim, &buffer)
 	)
 	{
-		auto it = parse_map.find(token);
-		if(it == parse_map.end())
+		if(m == member::before_name)
+		{
+			auto it = parse_map.find(token);
+			if(it != parse_map.end())
+				m = it->second;
+
 			continue;
+		}
 
 		size_t number;
 		sscanf(token, "%zu", &number);
 
-		switch(it->second)
+		switch(m)
 		{
+			case member::before_name:
+				break;
+
 			case member::rchar:
 				rchar = number;
 				break;
