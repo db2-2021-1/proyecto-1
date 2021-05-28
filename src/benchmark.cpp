@@ -17,33 +17,38 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <rapidjson/writer.h>
+#include <rapidjson/error/en.h>
 
 #include "benchmark.hpp"
 
-db2::benchmark::benchmark(std::filesystem::path file, bool active)
-{
-	if(!active)
+db2::benchmark::benchmark(std::filesystem::path file, bool active):
+	output_file([](const std::filesystem::path& file, bool active) -> FILE*
 	{
-		output_file = nullptr;
-		return;
-	}
+		FILE* new_file = nullptr;
 
-	if(file.empty())
-	{
-		if(!(output_file = fdopen(dup(fileno(stderr)), "a")))
+		if(!active)
+			return nullptr;
+
+		if(file.empty())
 		{
-			perror("stderr");
+			if(!(new_file = fdopen(dup(fileno(stderr)), "a")))
+			{
+				perror("stderr");
+			}
 		}
-	}
-	else
-	{
-		if(!(output_file = fopen(file.c_str(), "a")))
+		else
 		{
-			perror(file.c_str());
+			if(!(new_file = fopen(file.c_str(), "a")))
+			{
+				perror(file.c_str());
+			}
 		}
-	}
-}
+
+		return new_file;
+	}(file, active)),
+	fws(output_file, buffer, sizeof(buffer)),
+	writer(fws)
+{}
 
 bool db2::benchmark::is_open() const
 {
@@ -65,8 +70,7 @@ void db2::benchmark::start_benchmark()
 	if(!is_open())
 		return;
 
-	// TODO
-	std::cerr << "Start\n";
+	writer.StartArray();
 }
 
 void db2::benchmark::end_benchmark()
@@ -74,8 +78,7 @@ void db2::benchmark::end_benchmark()
 	if(!is_open())
 		return;
 
-	// TODO
-	std::cerr << "End\n";
+	writer.EndArray();
 }
 
 void db2::benchmark::before_transaction()
