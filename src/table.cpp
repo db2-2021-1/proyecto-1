@@ -853,7 +853,7 @@ std::vector<size_t> db2::table::select_range(
 }
 
 std::vector<db2::statement::row> db2::table::select_all(
-	std::optional<statement::expression> expr)
+	const std::optional<statement::expression>& expr)
 {
 	ssize_t expr_index = expr.has_value() ? name2index(expr->column) : -1;
 	auto valid = [&](const statement::row& r) -> bool

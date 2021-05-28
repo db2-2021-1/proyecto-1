@@ -122,7 +122,7 @@ private:
 	std::vector<size_t> select_range(const literal& ge, const literal& le);
 
 	std::vector<statement::row> select_all(
-		std::optional<statement::expression> expr = std::nullopt);
+		const std::optional<statement::expression>& expr = std::nullopt);
 
 public:
 	table(
