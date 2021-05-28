@@ -16,11 +16,16 @@
 
 #pragma once
 
+#include <filesystem>
+
 namespace db2
 {
 
 struct args
 {
+	bool benchmark = false;
+	std::filesystem::path benchmark_file;
+
 	void parse(int argc, char* argv[]);
 
 	[[noreturn]]

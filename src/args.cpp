@@ -24,12 +24,13 @@
 void db2::args::parse(int argc, char* argv[])
 {
 	int c;
-	static char shortopts[] = "hc:f:";
+	static char shortopts[] = "hc:f:b::";
 	static option options[] =
 	{
-		{"help",    no_argument,       nullptr, 'h'},
-		{"command", required_argument, nullptr, 'c'},
-		{"file",    required_argument, nullptr, 'f'},
+		{"help",      no_argument,       nullptr, 'h'},
+		{"command",   required_argument, nullptr, 'c'},
+		{"file",      required_argument, nullptr, 'f'},
+		{"benchmark", optional_argument, nullptr, 'b'},
 	};
 
 	while((c = getopt_long(argc, argv, shortopts, options, nullptr)) != -1)
@@ -62,6 +63,11 @@ void db2::args::parse(int argc, char* argv[])
 				exit(exit_code);
 			}
 
+			case 'b':
+				benchmark = true;
+				benchmark_file = optarg;
+				break;
+
 			default:
 				exit(EXIT_FAILURE);
 		}
@@ -72,9 +78,10 @@ void db2::args::usage(int exit_code)
 {
 	std::cout <<
 		"Usage: proyecto-1 OPTION\n"
-		"\t -h, --help            Show help and exit.\n"
-		"\t -c, --command=COMMAND Execute SQL command.\n"
-		"\t -f, --file=FILE       Execute SQL file.\n"
+		"\t-h, --help             Show help and exit.\n"
+		"\t-c, --command=COMMAND  Execute SQL command.\n"
+		"\t-f, --file=FILE        Execute SQL file.\n"
+		"\t-b, --benchmark[=FILE] Benchmark and print to stderr by default.\n"
 	;
 
 	exit(exit_code);
