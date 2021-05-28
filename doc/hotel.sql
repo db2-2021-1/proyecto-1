@@ -33,7 +33,7 @@
 --   reservation_status_date = col_date(format = "")
 -- )
 
-CREATE TABLE hotel2(
+CREATE TABLE hotel(
 	hotel                          VARCHAR(15),
 	is_canceled                    INT,
 	lead_time                      INT,

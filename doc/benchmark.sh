@@ -5,26 +5,38 @@ function run-sql()
 	proyecto-1 -b -f"$@" 2>&1 1>/dev/null
 }
 
+# https://www.kaggle.com/smithsonian/volcanic-eruptions
 function create-volcano()
 {
 	rm -rf volcano
 	run-sql volcano.sql
 }
 
+# https://www.kaggle.com/jessemostipak/hotel-booking-demand
 function create-hotel()
 {
 	rm -rf hotel
 	run-sql hotel.sql
 }
 
-function create-volcano-index()
+function create-volcano-hash-index()
 {
 	run-sql <(echo "CREATE INDEX ON volcano USING hash(Country);")
 }
 
-function create-hotel-index()
+function create-volcano-bptree-index()
+{
+	run-sql <(echo "CREATE INDEX ON volcano(Country);")
+}
+
+function create-hotel-hash-index()
 {
 	run-sql <(echo "CREATE INDEX ON hotel USING hash(country);")
+}
+
+function create-hotel-bptree-index()
+{
+	run-sql <(echo "CREATE INDEX ON hotel(country);")
 }
 
 function select-sql-n()
@@ -52,15 +64,20 @@ create-volcano > /dev/null
 
 volcano-benchmark | to-csv > volcano-no-index.csv
 
-create-volcano-index > /dev/null
-
+create-volcano-hash-index > /dev/null
 volcano-benchmark | to-csv > volcano-hash-index.csv
+
+#create-volcano-bptree-index > /dev/null
+#volcano-benchmark | to-csv > volcano-bptree-index.csv
+
 
 
 create-hotel > /dev/null
 
 hotel-benchmark | to-csv > hotel-no-index.csv
 
-create-hotel-index > /dev/null
-
+create-hotel-hash-index > /dev/null
 hotel-benchmark | to-csv > hotel-hash-index.csv
+
+#create-hotel-bptree-index > /dev/null
+#hotel-benchmark | to-csv > hotel-bptree-index.csv
