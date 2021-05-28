@@ -24,11 +24,12 @@
 void db2::args::parse(int argc, char* argv[])
 {
 	int c;
-	static char shortopts[] = "hc:";
+	static char shortopts[] = "hc:f:";
 	static option options[] =
 	{
 		{"help",    no_argument,       nullptr, 'h'},
 		{"command", required_argument, nullptr, 'c'},
+		{"file",    required_argument, nullptr, 'f'},
 	};
 
 	while((c = getopt_long(argc, argv, shortopts, options, nullptr)) != -1)
@@ -50,6 +51,17 @@ void db2::args::parse(int argc, char* argv[])
 				exit(exit_code);
 			}
 
+			case 'f':
+			{
+				int exit_code = EXIT_SUCCESS;
+				for(auto& statement: db2::statement::from_file(optarg))
+				{
+					if(!statement->execute())
+						exit_code = EXIT_FAILURE;
+				}
+				exit(exit_code);
+			}
+
 			default:
 				exit(EXIT_FAILURE);
 		}
@@ -62,6 +74,7 @@ void db2::args::usage(int exit_code)
 		"Usage: proyecto-1 OPTION\n"
 		"\t -h, --help            Show help and exit.\n"
 		"\t -c, --command=COMMAND Execute SQL command.\n"
+		"\t -f, --file=FILE       Execute SQL file.\n"
 	;
 
 	exit(exit_code);

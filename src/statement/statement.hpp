@@ -51,6 +51,7 @@ std::vector<std::unique_ptr<statement>> from_tree(const sql_statement_tree* tree
 /// Parses a SQL string to an abstract syntax tree. Then from_tree()
 /// is called.
 std::vector<std::unique_ptr<statement>> from_string(std::string_view str);
+std::vector<std::unique_ptr<statement>> from_file(std::string_view file);
 
 std::ostream& operator<<(std::ostream& os, const statement& i);
 }

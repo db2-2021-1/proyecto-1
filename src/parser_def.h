@@ -16,19 +16,32 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #include "tree.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void parse_init(const char* str);
+#if __GNUC__ >= 11
+__attribute__ ((malloc (sql_statement_tree_free, 1)))
+#endif
+sql_statement_tree* parse_str(const char* str);
+
+void parse_str_init(const char* str);
+void parse_str_free(void);
+
+
 
 #if __GNUC__ >= 11
 __attribute__ ((malloc (sql_statement_tree_free, 1)))
 #endif
-sql_statement_tree* parse(const char* str);
-void parse_free(void);
+sql_statement_tree* parse_file(const char* file);
+
+bool parse_file_init(const char* file);
+void parse_file_free(void);
+
 
 #ifdef __cplusplus
 } // extern "C"

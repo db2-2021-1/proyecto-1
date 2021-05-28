@@ -64,7 +64,21 @@ std::vector<std::unique_ptr<db2::statement::statement>>
 std::vector<std::unique_ptr<db2::statement::statement>>
 	db2::statement::from_string(std::string_view str)
 {
-	if(sql_statement_tree* tree = parse(str.data()))
+	if(sql_statement_tree* tree = parse_str(str.data()))
+	{
+		auto statement = from_tree(tree);
+
+		sql_statement_tree_free(tree);
+		return statement;
+	}
+
+	return {};
+}
+
+std::vector<std::unique_ptr<db2::statement::statement>>
+	db2::statement::from_file(std::string_view file)
+{
+	if(sql_statement_tree* tree = parse_file(file.data()))
 	{
 		auto statement = from_tree(tree);
 

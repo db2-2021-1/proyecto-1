@@ -62,12 +62,32 @@ WHERE   { return WHERE;   }
 "--"[ \t].* ;
 %%
 
-void parse_init(const char* str)
+void parse_str_init(const char* str)
 {
 	yy_scan_string(str);
 }
 
-void parse_free()
+void parse_str_free()
 {
 	yy_delete_buffer(YY_CURRENT_BUFFER);
+}
+
+bool parse_file_init(const char* file)
+{
+	yyin = fopen(file, "r");
+	if(!yyin)
+	{
+		yyin = NULL;
+		perror(file);
+		return false;
+	}
+
+	return true;
+}
+
+void parse_file_free(void)
+{
+	if(yyin && !fclose(yyin))
+		perror("");
+	yyin = stdin;
 }

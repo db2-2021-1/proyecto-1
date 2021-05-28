@@ -169,15 +169,30 @@ copy
 	: COPY NAME FROM STRING CSV HEADER { $$ = sql_copy($2, $4); }
 %%
 
-sql_statement_tree* parse(const char* str)
+sql_statement_tree* parse_str(const char* str)
 {
-	parse_init(str);
+	parse_str_init(str);
 
 	sql_statement_tree* tree = NULL;
 	if(yyparse(&tree) != 0)
 		fprintf(stderr, "%s\n", "Bad SQL.");
 
-	parse_free();
+	parse_str_free();
+
+	return tree;
+}
+
+sql_statement_tree* parse_file(const char* file)
+{
+	sql_statement_tree* tree = NULL;
+
+	if(parse_file_init(file))
+	{
+		if(yyparse(&tree) != 0)
+			fprintf(stderr, "%s\n", "Bad SQL.");
+
+	}
+	parse_file_free();
 
 	return tree;
 }
