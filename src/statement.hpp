@@ -22,7 +22,6 @@
 #include "statement/delete_from.hpp"
 #include "statement/expression.hpp"
 #include "statement/insert.hpp"
-#include "statement/literal.hpp"
 #include "statement/row.hpp"
 #include "statement/select.hpp"
 #include "statement/statement.hpp"

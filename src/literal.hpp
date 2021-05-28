@@ -23,63 +23,68 @@
 #include "overload.hpp"
 #include "tree.h"
 
-namespace db2::statement
+namespace db2
 {
 
 using literal = std::variant<int, float, std::string>;
 
 literal from_union(sql_literal l);
 
-std::ostream& operator<<(std::ostream& os, const literal& l);
-
 }
 
-inline bool operator<(const db2::statement::literal& l, int i)
+namespace std
 {
-	return l < db2::statement::literal(i);
-}
 
-inline bool operator<(const db2::statement::literal& l, const std::string& str)
+std::ostream& operator<<(std::ostream& os, const db2::literal& l);
+
+inline bool operator<(const db2::literal& l, int i)
 {
-	return l < db2::statement::literal(str);
+	return l < db2::literal(i);
 }
 
-inline bool operator>(const db2::statement::literal& l, int i)
+inline bool operator<(const db2::literal& l, const std::string& str)
 {
-	return l > db2::statement::literal(i);
+	return l < db2::literal(str);
 }
 
-inline bool operator>(const db2::statement::literal& l, const std::string& str)
+inline bool operator>(const db2::literal& l, int i)
 {
-	return l > db2::statement::literal(str);
+	return l > db2::literal(i);
 }
 
-inline bool operator>=(const db2::statement::literal& l, int i)
+inline bool operator>(const db2::literal& l, const std::string& str)
+{
+	return l > db2::literal(str);
+}
+
+inline bool operator>=(const db2::literal& l, int i)
 {
 	return !(l < i);
 }
 
-inline bool operator>=(const db2::statement::literal& l, const std::string& str)
+inline bool operator>=(const db2::literal& l, const std::string& str)
 {
 	return !(l < str);
 }
 
-inline bool operator<=(const db2::statement::literal& l, int i)
+inline bool operator<=(const db2::literal& l, int i)
 {
 	return !(l > i);
 }
 
-inline bool operator<=(const db2::statement::literal& l, const std::string& str)
+inline bool operator<=(const db2::literal& l, const std::string& str)
 {
 	return !(l > str);
 }
 
-inline bool operator==(const db2::statement::literal& l, const std::string& str)
+inline bool operator==(const db2::literal& l, const std::string& str)
 {
-	return l == db2::statement::literal(str);
+	return l == db2::literal(str);
 }
 
-inline bool operator!=(const db2::statement::literal& l, const std::string& str)
+inline bool operator!=(const db2::literal& l, const std::string& str)
 {
 	return !(l == str);
+}
+
 }

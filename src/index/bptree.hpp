@@ -54,18 +54,18 @@ public:
 
   /// ... WHEN name IS key
   std::vector<size_t> get_positions(
-    const db2::statement::literal& key
+    const db2::literal& key
   );
 
   /// ... WHEN name IS BETWEEN ge AND le
   std::vector<size_t> get_positions(
-    const db2::statement::literal& key_ge,
-    const db2::statement::literal& key_le
+    const db2::literal& key_ge,
+    const db2::literal& key_le
   );
 
   /// INSERT
-  bool insert(const db2::statement::literal& key, size_t position);
+  bool insert(const db2::literal& key, size_t position);
 
   /// DELETE FROM
-  bool delete_from(const db2::statement::literal& key, size_t position);
+  bool delete_from(const db2::literal& key, size_t position);
 };

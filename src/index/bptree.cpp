@@ -513,7 +513,7 @@ b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type):
     root = NULL;
 }
 
-std::vector<size_t> b_plus_tree::get_positions(const db2::statement::literal& key)
+std::vector<size_t> b_plus_tree::get_positions(const db2::literal& key)
 {
   // El tipo y tamaño del key están en key_type
   //TODO
@@ -521,21 +521,21 @@ std::vector<size_t> b_plus_tree::get_positions(const db2::statement::literal& ke
 }
 
 std::vector<size_t> b_plus_tree::get_positions(
-    const db2::statement::literal& key_ge,
-    const db2::statement::literal& key_le
+    const db2::literal& key_ge,
+    const db2::literal& key_le
   )
 {
   //TODO
   return {};
 }
 
-bool b_plus_tree::insert(const db2::statement::literal& key, size_t position)
+bool b_plus_tree::insert(const db2::literal& key, size_t position)
 {
   //TODO
   return false;
 }
 
-bool b_plus_tree::delete_from(const db2::statement::literal& key, size_t position)
+bool b_plus_tree::delete_from(const db2::literal& key, size_t position)
 {
   //TODO
   return false;

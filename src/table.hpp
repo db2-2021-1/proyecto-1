@@ -112,14 +112,14 @@ private:
 
 	/// Delete hashes and
 	bool delete_from_hash_index(
-		const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
+		const std::vector<std::pair<literal, size_t>>& deleted_key_pos
 	);
 
 	/// Must be called when the table has an index.
-	std::vector<size_t> select_equals(const statement::literal& key);
+	std::vector<size_t> select_equals(const literal& key);
 
 	/// Must be called when the table has an index.
-	std::vector<size_t> select_range(const statement::literal& ge, const statement::literal& le);
+	std::vector<size_t> select_range(const literal& ge, const literal& le);
 
 	std::vector<statement::row> select_all(
 		std::optional<statement::expression> expr = std::nullopt);

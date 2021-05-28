@@ -18,7 +18,7 @@
 
 #include "literal.hpp"
 
-db2::statement::literal db2::statement::from_union(sql_literal l)
+db2::literal db2::from_union(sql_literal l)
 {
 	switch(l.type)
 	{
@@ -36,9 +36,9 @@ db2::statement::literal db2::statement::from_union(sql_literal l)
 	}
 }
 
-std::ostream& db2::statement::operator<<(std::ostream& os, const literal& l)
+std::ostream& std::operator<<(std::ostream& os, const db2::literal& l)
 {
-	std::visit(overload{
+	std::visit(db2::overload{
 		[&os](int number)
 		{
 			os << number;

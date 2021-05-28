@@ -23,7 +23,6 @@ target_sources(${PROJECT_NAME}
 		delete_from.cpp
 		expression.cpp
 		insert.cpp
-		literal.cpp
 		row.cpp
 		select.cpp
 		statement.cpp

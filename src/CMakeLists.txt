@@ -38,6 +38,7 @@ target_sources(${PROJECT_NAME}
 		# C++
 		args.cpp
 		completion.cpp
+		literal.cpp
 		main.cpp
 		table.cpp
 )

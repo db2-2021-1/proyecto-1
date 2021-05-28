@@ -556,7 +556,7 @@ bool db2::table::update_hash_index(const std::vector<statement::row>& data)
 	if(column_index == -1)
 		return false;
 
-	auto hash = std::hash<statement::literal>{};
+	auto hash = std::hash<literal>{};
 	for(const auto& r: data)
 	{
 		size_t h = hash(r.values[column_index]);
@@ -584,7 +584,7 @@ bool db2::table::update_bptree_index(const std::vector<statement::row>& data)
 
 	for(const auto& r: data)
 	{
-		const statement::literal& key = r.values[column_index];
+		const literal& key = r.values[column_index];
 
 		if(r.valid)
 		{
@@ -602,7 +602,7 @@ bool db2::table::update_bptree_index(const std::vector<statement::row>& data)
 }
 
 bool db2::table::delete_from_hash_index(
-	const std::vector<std::pair<statement::literal, size_t>>& deleted_key_pos
+	const std::vector<std::pair<literal, size_t>>& deleted_key_pos
 )
 {
 	db2::index::extendible_hash hash_index(index_path());
@@ -610,7 +610,7 @@ bool db2::table::delete_from_hash_index(
 	if(!hash_index.is_open())
 		return false;
 
-	auto hash = std::hash<statement::literal>{};
+	auto hash = std::hash<literal>{};
 	for(const auto& [key, pos]: deleted_key_pos)
 	{
 		hash_index.delete_from(hash(key), pos);
@@ -745,7 +745,7 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 	return new_row;
 }
 
-std::vector<size_t> db2::table::select_equals(const statement::literal& key)
+std::vector<size_t> db2::table::select_equals(const literal& key)
 {
 	assert(table_index.has_value());
 
@@ -764,7 +764,7 @@ std::vector<size_t> db2::table::select_equals(const statement::literal& key)
 			if(!eh.is_open())
 				return {};
 
-			return eh.get_positions(std::hash<statement::literal>{}(key));
+			return eh.get_positions(std::hash<literal>{}(key));
 		}
 		default:
 			assert(false);
@@ -773,8 +773,8 @@ std::vector<size_t> db2::table::select_equals(const statement::literal& key)
 }
 
 std::vector<size_t> db2::table::select_range(
-	const statement::literal& ge,
-	const statement::literal& le
+	const literal& ge,
+	const literal& le
 	)
 {
 	switch(table_index->type)
