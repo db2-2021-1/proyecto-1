@@ -28,8 +28,6 @@ CREATE TABLE volcano(
 	"Tectonic Setting"    VARCHAR(63)
 );
 
-COPY volcano FROM "database.csv" CSV HEADER;
-
 -- SELECT * FROM volcano WHERE Country IS "Peru";
 
 -- CREATE INDEX ON volcano USING hash(Country);

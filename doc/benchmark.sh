@@ -19,6 +19,16 @@ function create-hotel()
 	run-sql hotel.sql
 }
 
+function volcano-insert()
+{
+	run-sql <(echo 'COPY volcano FROM "database.csv" CSV HEADER;')
+}
+
+function hotel-insert()
+{
+	run-sql <(echo 'COPY hotel FROM "hotel_bookings.csv" CSV HEADER;')
+}
+
 function create-volcano-hash-index()
 {
 	run-sql <(echo "CREATE INDEX ON volcano USING hash(Country);")
@@ -44,12 +54,12 @@ function select-sql-n()
 	run-sql <(yes "$1" | head -n "$2")
 }
 
-function volcano-benchmark()
+function volcano-select()
 {
 	select-sql-n 'SELECT * FROM volcano WHERE Country IS "Peru";' 100
 }
 
-function hotel-benchmark()
+function hotel-select()
 {
 	select-sql-n 'SELECT * FROM hotel WHERE country IS "PER";' 100
 }
@@ -61,25 +71,32 @@ function to-csv()
 }
 
 create-volcano > /dev/null
+volcano-insert | to-csv > volcano-no-index-insert.csv
+volcano-select | to-csv > volcano-no-index-select.csv
 
-volcano-benchmark | to-csv > volcano-no-index.csv
-
+create-volcano > /dev/null
 create-volcano-hash-index > /dev/null
-volcano-benchmark | to-csv > volcano-hash-index.csv
+volcano-insert | to-csv > volcano-hash-index-insert.csv
+volcano-select | to-csv > volcano-hash-index-select.csv
 
+#create-volcano > /dev/null
 #create-volcano-bptree-index > /dev/null
-#volcano-benchmark | to-csv > volcano-bptree-index.csv
-
+#volcano-insert | to-csv > volcano-bptree-index-insert.csv
+#volcano-select | to-csv > volcano-bptree-index-insert.csv
 
 
 create-hotel > /dev/null
+hotel-insert | to-csv > hotel-no-index-insert.csv
+hotel-select | to-csv > hotel-no-index-select.csv
 
-hotel-benchmark | to-csv > hotel-no-index.csv
-
+create-hotel > /dev/null
 create-hotel-hash-index > /dev/null
-hotel-benchmark | to-csv > hotel-hash-index.csv
+hotel-insert | to-csv > hotel-hash-index-insert.csv
+hotel-select | to-csv > hotel-hash-index-select.csv
 
+#create-hotel > /dev/null
 #create-hotel-bptree-index > /dev/null
-#hotel-benchmark | to-csv > hotel-bptree-index.csv
+#hotel-insert | to-csv > hotel-bptree-index-insert.csv
+#hotel-select | to-csv > hotel-bptree-index-select.csv
 
 ./table.r

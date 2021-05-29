@@ -67,5 +67,3 @@ CREATE TABLE hotel(
 	reservation_status             VARCHAR(15),
 	reservation_status_date        VARCHAR(7)
 );
-
-COPY hotel FROM "hotel_bookings.csv" CSV HEADER;
