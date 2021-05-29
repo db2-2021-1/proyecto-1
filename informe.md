@@ -12,16 +12,30 @@ https://www.kaggle.com/smithsonian/volcanic-eruptions
 
 ## Benchmark
 
+### INSERT
+
+`COPY volcano FROM "database.csv" CSV HEADER;`
+|Índice    |Lecturas|Escrituras|Tiempo    |
+|----------|--------|----------|----------|
+|Sin índice|69      |71        |20.337    |
+|Hash      |14800   |8569      |48.059    |
+
+`COPY hotel FROM "hotel_bookings.csv" CSV HEADER;`
+|Índice    |Lecturas|Escrituras|Tiempo    |
+|----------|--------|----------|----------|
+|Sin índice|4121    |3396      |646.712   |
+|Hash      |88032810|261432    |112510.605|
+
+
+### SELECT
 El promedio de 100 SELECTs.
 
-### Hoteles
 `SELECT * FROM volcano WHERE Country IS "Peru";`
 |Índice         |Lecturas|Escrituras|Tiempo   |
 |---------------|--------|----------|---------|
 |Sin índice     |3402    |1.07      |201.36222|
 |Hash extendible|795     |1.07      |2.01123  |
 
-### Volcanes
 `SELECT * FROM hotel WHERE country IS "PER";`
 |Índice         |Lecturas|Escrituras|Tiempo   |
 |---------------|--------|----------|---------|
