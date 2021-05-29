@@ -2,6 +2,9 @@
 
 ## Introducción
 
+https://www.kaggle.com/jessemostipak/hotel-booking-demand
+https://www.kaggle.com/smithsonian/volcanic-eruptions
+
 ## Técnicas
 
 - Hash extendible.
@@ -25,4 +28,15 @@ El promedio de 100 SELECTs.
 |Sin índice     |76      |0.69      |1.76824  |
 |Hash extendible|24      |0.69      |0.18064  |
 
-## Video
+## Uso y video
+`proyecto-1` soporta los siguientes comandos SQL.
+- `CREATE TABLE table_name (name type, ...);`
+- `CREATE INDEX ON table_name(column_name);`
+- `CREATE INDEX ON table_name USING hash(column_name);`
+- `SELECT * FROM table_name;`
+- `SELECT * FROM table_name WHERE column IS value;`
+- `SELECT * FROM table_name WHERE column BETWEEN value AND value;`
+- `INSERT INTO table_name VALUES (value,...), ...;`
+- `DELETE FROM table_name WHERE column IS value;`
+- `DELETE FROM table_name WHERE column BETWEEN value AND value;`
+- `COPY table_name FROM file.csv CSV HEADER;`
