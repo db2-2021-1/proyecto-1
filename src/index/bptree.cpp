@@ -241,10 +241,6 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
       }
       aux = 0;
     }
-    //std::cout << "leaf\n";
-
-    assert(cursor);
-    assert(!cursor->position_.empty());
 
     auto it = std::lower_bound(
         cursor->position_.cbegin(),
