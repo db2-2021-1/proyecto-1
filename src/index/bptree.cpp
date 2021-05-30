@@ -409,10 +409,15 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
 
 bool b_plus_tree::delete_from(const db2::literal &key, size_t position)
 {
+  auto cursor = findNode(key); 
+  if(cursor.get_node() != nullptr){
+    findNode(key).get_node()->position_[cursor.get_index()].second=-1;
+    return true;
+  }
   return false;
 }
 
 Node::iterator b_plus_tree::end()
 {
-    return Node::iterator(nullptr, 0);
+  return Node::iterator(nullptr, 0);
 }
