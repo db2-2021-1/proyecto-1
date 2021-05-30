@@ -1,28 +1,4 @@
 #include "bptree.hpp"
-Node *b_plus_tree::find_parent(Node *cursor, Node *child)
-{
-  Node *parent;
-  if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF)
-  {
-    return NULL;
-  }
-  for (int i = 0; i < cursor->size + 1; i++)
-  {
-    if (cursor->ptr[i] == child)
-    {
-      parent = cursor;
-      return parent;
-    }
-    else
-    {
-      parent = find_parent(cursor->ptr[i], child);
-      if (parent != NULL)
-        return parent;
-    }
-  }
-  return parent;
-}
-
 void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
 {
   if (cursor->size < MAX)

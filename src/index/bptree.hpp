@@ -46,7 +46,7 @@ private:
 public:
   b_plus_tree(std::string filename, db2::statement::type key_type);
 
-  void b_plus_tree::insertInternal(db2::literal& x, Node *cursor, Node *child, size_t pos);
+  void insertInternal(db2::literal& x, Node *cursor, Node *child, size_t pos);
   Node *find_node(int id);
   std::vector<size_t> find(keyType low);
   void insert(size_t reg);
