@@ -144,7 +144,7 @@ public:
 
   auto findNode(const db2::literal& id);
 
-  auto getMinNode(db2::literal);
+  Node::iterator getMinNode(db2::literal);
 
   /// ... WHEN name IS key
   std::vector<size_t> get_positions(

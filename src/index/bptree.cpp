@@ -245,20 +245,7 @@ b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type) : 
 
 std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
 {
-  // El tipo y tamaño del key están en key_type
-  //TODO
-  std::vector<size_t> retorno;
-  if (root == NULL)
-  {
-    return retorno;
-  }
-  auto nodo = findNode(key);
-  if (nodo.cursor_ != nullptr)
-  {
-    //retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
-    retorno.push_back(nodo.cursor_->position_[nodo.i].second);
-  }
-  return retorno; //el vector "retorno" deberia regresar vacio
+
 }
 
   size_t b_plus_tree::getPos(db2::literal id){
@@ -288,7 +275,7 @@ std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
   }
   }
 
-auto b_plus_tree::getMinNode(db2::literal keymin)
+Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
 {
   struct retorno
   {
@@ -323,57 +310,17 @@ auto b_plus_tree::getMinNode(db2::literal keymin)
       if ((cursor->position_[i].first == keymin ) || (keymin < cursor->position_[i+1].first && cursor->position_[i].first < keymin))
       {
         std::cout << "Found and in position: " << cursor->position_[i].second << "\n";
-        return retorno{cursor, i};
+        return Node::iterator{cursor, i};
       }
     }
-    return retorno{nullptr, -1};
-    std::cout << "Not found\n";
+    return cursor->end();
   }
-  //return retorno{cursor, i};
 }
 
 std::vector<size_t> b_plus_tree::get_positions(
     const db2::literal &key_ge,
     const db2::literal &key_le)
 {
-  std::vector<size_t> retorno;
-  auto nodo_min = getMinNode(key_ge);
-  auto cursor = nodo_min.cursor_;
-  int i = nodo_min.i;
-  /*if(cursor != nullptr){
-    int ite = i;
-    for(; i < cursor->size; ite++){
-      if(cursor->key[ite] < key_le)
-        retorno.push_back(cursor->position.find(cursor->key[ite])->second);
-    }
-    ite = 0;
-    for (int i = 0; i < cursor->size; i++)
-    {
-      if (key_ge < cursor->key[i] && cursor->key[i] < key_le)
-      {
-        cursor = cursor->ptr[i];
-        break;
-      }
-      if (i == cursor->size - 1)
-      {
-        cursor = cursor->ptr[i + 1];
-        break;
-      }
-    }   
-  }*/
-  while (cursor->position_[0].first <= key_le)
-    {
-      int i = 0;
-      for (i = 0; i < cursor->size; i++)
-      {
-        if (cursor->position_[i].first >= key_ge && cursor->position_[i].first <= key_le)
-        {
-          retorno.push_back(cursor->position_[i].second);
-        }
-      }
-      cursor = cursor->ptr_[cursor->size];
-    }
-  return retorno;
 }
 
 bool b_plus_tree::insert(const db2::literal &key, size_t position)
@@ -504,6 +451,5 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
 
 bool b_plus_tree::delete_from(const db2::literal &key, size_t position)
 {
-  //TODO
   return false;
 }
