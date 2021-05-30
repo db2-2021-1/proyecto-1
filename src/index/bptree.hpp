@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <map>
+#include <vector>
 
 #include "statement.hpp"
 
@@ -16,13 +17,14 @@ using keyType = int;
 struct Node
 {
     bool IS_LEAF;
-    int *key, size;
+    db2::literal *key;
+    int size;
     Node **ptr;
-    std::map<int, long> values; //int -> id, long -> posicion del registro
+    std::map<db2::literal, size_t> position; //int -> id, long -> posicion del registro
     friend class BPTree;
     Node()
     {
-        key = new int[MAX];
+        key = new db2::literal[MAX];
         ptr = new Node *[MAX + 1];
     }
     int pos_registro = 0;
@@ -33,24 +35,33 @@ class b_plus_tree
 private:
   Node *root;
   keyType firstid;
+  std::map<keyType,size_t> position;
 
   // Type and size of the key.
   db2::statement::type key_type;
 
-  void insert_internal(int x, Node *cursor, Node *child, long posicion, bool flag);
-  Node *find_parent(Node *cursor, Node *child);
+  //void insert_internal(db2::literal& x, Node *cursor, Node *child, long posicion, size_t flag);
+  //Node *find_parent(Node *cursor, Node *child);
 
 public:
   b_plus_tree(std::string filename, db2::statement::type key_type);
 
+  void b_plus_tree::insertInternal(db2::literal& x, Node *cursor, Node *child, size_t pos);
   Node *find_node(int id);
-  size_t find(int id);
+  std::vector<size_t> find(keyType low);
   void insert(size_t reg);
   void display(Node *cursor);
   Node* get_root();
   void print_leaf(Node *cursor);
   void remove(keyType key);
   std::vector<size_t> find(keyType beginKey, keyType endKey);
+  Node *find_parent(Node *cursor, Node *child);
+  size_t getPos(db2::literal);
+
+
+  auto findNode(const db2::literal& id);
+
+  auto getMinNode(db2::literal);
 
   /// ... WHEN name IS key
   std::vector<size_t> get_positions(

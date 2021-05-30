@@ -1,541 +1,498 @@
 #include "bptree.hpp"
-
-void b_plus_tree::insert_internal(int x, Node *cursor, Node *child, long posicion, bool flag)
+Node *b_plus_tree::find_parent(Node *cursor, Node *child)
 {
-//std::cout << "insertInternal" << std::endl;
-if (cursor->size < MAX)
-{
-  int i = 0;
-  while (x > cursor->key[i] && i < cursor->size)
-	i++;
-  for (int j = cursor->size; j > i; j--)
+  Node *parent;
+  if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF)
   {
-	cursor->key[j] = cursor->key[j - 1];
+    return NULL;
   }
-  for (int j = cursor->size + 1; j > i + 1; j--)
+  for (int i = 0; i < cursor->size + 1; i++)
   {
-	cursor->ptr[j] = cursor->ptr[j - 1];
-  }
-  cursor->key[i] = x;
-  //cursor->values.insert(std::make_pair(x, posicion));
-  cursor->size++;
-  cursor->values.insert(std::make_pair(x, posicion));
-  cursor->ptr[i + 1] = child;
-}
-else
-{
-  Node *newInternal = new Node;
-  int virtualKey[MAX + 1];
-  Node *virtualPtr[MAX + 2];
-  for (int i = 0; i < MAX; i++)
-  {
-	virtualKey[i] = cursor->key[i];
-	//std::cout<<"LINEA 52: \n\n"<<"cursor->values.find(cursor->key[i])->second: "<<cursor->values.find(cursor->key[i])->second<<"\n\n";
-	if (flag)
-	{
-	  std::cout << "insert Internal : LINEA 54 \n";
-	}
-	newInternal->values.insert(std::make_pair(cursor->key[i], cursor->values.find(cursor->key[i])->second));
-  }
-  for (int i = 0; i < MAX + 1; i++)
-  {
-	virtualPtr[i] = cursor->ptr[i];
-  }
-  int i = 0, j;
-  while (x > virtualKey[i] && i < MAX)
-	i++;
-  for (int j = MAX + 1; j > i; j--)
-  {
-	virtualKey[j] = virtualKey[j - 1];
-  }
-  virtualKey[i] = x;
-  for (int j = MAX + 2; j > i + 1; j--)
-  {
-	virtualPtr[j] = virtualPtr[j - 1];
-  }
-  virtualPtr[i + 1] = child;
-  newInternal->IS_LEAF = false;
-  cursor->size = (MAX + 1) / 2;
-  newInternal->size = MAX - (MAX + 1) / 2;
-  for (i = 0, j = cursor->size + 1; i < newInternal->size; i++, j++)
-  {
-	newInternal->key[i] = virtualKey[j];
-	//std::cout << "newInternal->key[i]: " << newInternal->key[i] << " newInternal->values.find(newInternal->key[i])->second: " << cursor->values.find(cursor->key[i])->second << std::endl;
-	newInternal->values.insert(std::make_pair(newInternal->key[i], cursor->values.find(cursor->key[i])->second));
-  }
-  for (i = 0, j = cursor->size + 1; i < newInternal->size + 1; i++, j++)
-  {
-	newInternal->ptr[i] = virtualPtr[j];
-  }
-  //std::cout << " LINEA 81\n";
-  //newInternal->values.insert()
-  if (cursor == root)
-  {
-	Node *newRoot = new Node;
-	newRoot->key[0] = cursor->key[cursor->size];
-	newRoot->ptr[0] = cursor;
-	newRoot->ptr[1] = newInternal;
-	newRoot->IS_LEAF = false;
-	newRoot->size = 1;
-	root = newRoot;
-  }
-  else
-  {
-	//std::cout<<"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-	posicion = cursor->values.find(cursor->key[cursor->size])->second;
-	if (flag)
-	{
-	  std::cout << "insertInternal llamada 106\n";
-	}
-	insert_internal(cursor->key[cursor->size], find_parent(root, cursor), newInternal, posicion, flag);
-  }
-}
-}
-
-Node* b_plus_tree::find_parent(Node *cursor, Node *child)
-{
-Node *parent;
-if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF)
-{
-  return NULL;
-}
-for (int i = 0; i < cursor->size + 1; i++)
-{
-  if (cursor->ptr[i] == child)
-  {
-	parent = cursor;
-	return parent;
-  }
-  else
-  {
-	parent = find_parent(cursor->ptr[i], child);
-	if (parent != NULL)
-	  return parent;
-  }
-}
-return parent;
-}
-
-Node* b_plus_tree::find_node(int id)
-{
-//std::cout<<"Node *findNode(int id): Node *findNode(int "<<id<<" )\n";
-if (root == NULL)
-{
-  std::cout << "Tree is empty\n";
-}
-else
-{
-  Node *cursor = root;
-  while (cursor->IS_LEAF == false)
-  {
-	for (int i = 0; i < cursor->size; i++)
-	{
-	  if (id < cursor->key[i])
-	  {
-		cursor = cursor->ptr[i];
-		break;
-	  }
-	  if (i == cursor->size - 1)
-	  {
-		cursor = cursor->ptr[i + 1];
-		break;
-	  }
-	}
-  }
-  for (int i = 0; i < cursor->size; i++)
-  {
-	if (cursor->key[i] == id)
-	{
-	  return cursor;
-	}
-  }
-  return nullptr;
-}
-}
-
-size_t b_plus_tree::find(int id)
-{
-//if (root == NULL)
-//{
-  //std::cout << "Tree is empty\n";
-//}
-//else
-//{
-  //Node *cursor = root;
-  //while (cursor->IS_LEAF == false)
-  //{
-	//for (int i = 0; i < cursor->size; i++)
-	//{
-	  //if (id < cursor->key[i])
-	  //{
-		//cursor = cursor->ptr[i];
-		//break;
-	  //}
-	  //if (i == cursor->size - 1)
-	  //{
-		//cursor = cursor->ptr[i + 1];
-		//break;
-	  //}
-	//}
-  //}
-  //if ((id == 17004 || id == 17013) && cursor->IS_LEAF)
-  //{
-	////std::cout << "id: " << id << " IS_LEAF: \n"<<"(cursor->values.find(id))->second: "<<(cursor->values.find(id))->second<<"\n";
-  //}
-  //std::cout << "LINEA 206\n";
-  //for (int i = 0; i < cursor->size; i++)
-  //{
-	//std::cout<<cursor->key[i]<<"=="<<id<<"\n";
-  //}
-  //for (int i = 0; i < cursor->size; i++)
-  //{
-	//std::cout<<"cursor->key[i]: "<<cursor->key[i]<<" id: "<<id<<"\n";
-	//if (cursor->key[i] == id)
-	//{
-	  //std::cout << "HOLHOLAHOOAH\n";
-	  //auto posicion_registro = (cursor->values.find(id))->second;
-	  //std::cout << "posicion_registro: " << posicion_registro << "\n";
-	  ////std::cout << "id: " << id << "\n";
-	  ////std::cout << "posicion_registro: " << posicion_registro << "\n";
-	  //if (id != firstid && posicion_registro == 0)
-	  //{
-		//std::cout << "return notFound();205\n";
-		//return -1;
-	  //}
-	  //std::fstream file;
-	  //std::string line;
-	  //file.open("");
-	  //file.seekg(posicion_registro);
-	  //auto *ptrReg = new Register;
-	  //file.read((char *)ptrReg, sizeof(Register));
-	  //file.close();
-	  //if ((id == 17004 || id == 17013) && cursor->IS_LEAF)
-	  //{
-		//std::cout <<"QWERQWEQEWQEWS\n";
-	  //}
-	  //return *ptrReg;
-	//}
-  //}
-  ////std::cout << "posicion_registro: " << posicion_registro << "\n";
-  ////std::cout << "id: " << id << std::endl;
-  //std::cout << "id: " << id << "\n";
-  //std::cout << "return notFound();219\n\n";
-  //return -1;
-//}
-}
-
-
-void b_plus_tree::insert(size_t reg)
-{
-//bool flag_debug = false;
-//int x = reg.id;
-//if (std::find(vector_.begin(), vector_.end(), reg.id) != vector_.end() && (reg.id == 17004 || reg.id == 17013))
-//{
-  //std::cout << "reg.id: " << reg.id << "\n";
-  //flag_debug = true;
-//}
-//std::fstream file;
-//file.open(filename);
-//file.seekg(0, std::ios::end);
-//long posicion_registro = file.tellg();
-//long aux = posicion_registro;
-//
-//file.write((char *)&reg, sizeof(Register));
-//file.close();
-//
-//if (root == NULL)
-//{
-  //if (flag_debug)
-  //{
-	//std::cout << "debug -> LINEA 245: \n";
-  //}
-  //root = new Node;
-  //root->key[0] = x;
-  //firstid = x;
-  //(root->values).insert(std::make_pair(x, posicion_registro));
-  //root->IS_LEAF = true;
-  //root->size = 1;
-//}
-//else
-//{
-  //if (flag_debug)
-  //{
-	//std::cout << "debug -> LINEA 258: \n";
-  //}
-  //Node *cursor = root;
-  //Node *parent;
-  //while (cursor->IS_LEAF == false)
-  //{
-	//parent = cursor;
-	//for (int i = 0; i < cursor->size; i++)
-	//{
-	  //if (x < cursor->key[i])
-	  //{
-		//cursor = cursor->ptr[i];
-		//break;
-	  //}
-	  //if (i == cursor->size - 1)
-	  //{
-		//cursor = cursor->ptr[i + 1];
-		//break;
-	  //}
-	//}
-  //}
-  //if (cursor->size < MAX)
-  //{
-	//if (flag_debug)
-	//{
-	  //std::cout << "debug -> LINEA 283: \n";
-	//}
-	//int i = 0;
-	//while (x > cursor->key[i] && i < cursor->size)
-	  //i++;
-	//for (int j = cursor->size; j > i; j--)
-	//{
-	  //cursor->key[j] = cursor->key[j - 1];
-	//}
-	//cursor->key[i] = x;
-	//cursor->size++;
-	//if (flag_debug)
-	//{
-	  //std::cout << "x: " << x << " posicion_registro: " << posicion_registro << "\n";
-	//}
-	//cursor->values.insert(std::make_pair(x, posicion_registro));
-	//cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
-	//cursor->ptr[cursor->size - 1] = NULL;
-  //}
-  //else
-  //{
-	//if (flag_debug)
-	//{
-	  //std::cout << "debug -> LINEA 302: \n";
-	//}
-	//Node *newLeaf = new Node;
-	//newLeaf->values.insert(std::make_pair(x, aux));
-	//int virtualNode[MAX + 1];
-	//for (int i = 0; i < MAX; i++)
-	//{
-	  //newLeaf->values.insert(std::make_pair(cursor->key[i], cursor->values.find(cursor->key[i])->second));
-	  //virtualNode[i] = cursor->key[i];
-	//}
-	//int i = 0, j;
-	//while (x > virtualNode[i] && i < MAX)
-	  //i++;
-	//for (int j = MAX + 1; j > i; j--)
-	//{
-	  //virtualNode[j] = virtualNode[j - 1];
-	//}
-	//virtualNode[i] = x;
-	//newLeaf->IS_LEAF = true;
-	//cursor->size = (MAX + 1) / 2;
-	//newLeaf->size = MAX + 1 - (MAX + 1) / 2;
-	//newLeaf->values.insert(std::make_pair(x, posicion_registro));
-	//cursor->ptr[cursor->size] = newLeaf;
-	//newLeaf->ptr[newLeaf->size] = cursor->ptr[MAX];
-	//int aux = posicion_registro;
-	//cursor->ptr[MAX] = NULL;
-	//for (i = 0; i < cursor->size; i++)
-	//{
-	  //cursor->key[i] = virtualNode[i];
-	  //cursor->values.insert(std::make_pair(cursor->key[i], aux));
-	//}
-	//for (i = 0, j = cursor->size; i < newLeaf->size; i++, j++)
-	//{
-	  //newLeaf->key[i] = virtualNode[j];
-	//}
-	//if (cursor == root)
-	//{
-	  //Node *newRoot = new Node;
-	  //newRoot->key[0] = newLeaf->key[0];
-	  //newRoot->ptr[0] = cursor;
-	  //newRoot->values.insert(std::make_pair(x, posicion_registro));
-	  //newRoot->ptr[1] = newLeaf;
-	  //newRoot->IS_LEAF = false;
-	  //newRoot->size = 1;
-	  //root = newRoot;
-	//}
-	//else
-	//{
-	  //if (flag_debug)
-	  //{
-		//std::cout << "debug ->insertInternal: \n";
-	  //}
-	  //insertInternal(newLeaf->key[0], parent, newLeaf, posicion_registro, flag_debug);
-	//}
-  //}
-  //if (flag_debug)
-  //{
-	//std::cout << "LINEA 366\n\n";
-  //}
-//}
-}
-void display(Node *cursor)
-{
-if (cursor != NULL)
-{
-  for (int i = 0; i < cursor->size; i++)
-  {
-	std::cout << cursor->key[i] << " ";
-  }
-  std::cout << "\n";
-  if (cursor->IS_LEAF != true)
-  {
-	for (int i = 0; i < cursor->size + 1; i++)
-	{
-	  display(cursor->ptr[i]);
-	}
-  }
-}
-}
-
-
-void b_plus_tree::display(Node *cursor)
-{
-if (cursor != NULL)
-{
-  for (int i = 0; i < cursor->size; i++)
-  {
-	std::cout << cursor->key[i] << " ";
-  }
-  std::cout << "\n";
-  if (cursor->IS_LEAF != true)
-  {
-	for (int i = 0; i < cursor->size + 1; i++)
-	{
-	  display(cursor->ptr[i]);
-	}
-  }
-}
-}
-
-Node* b_plus_tree::get_root()
-{
-    return root;
-}
-
-void b_plus_tree::print_leaf(Node *cursor)
-{
-if (cursor != NULL)
-{
-  for (int i = 0; i < cursor->size; i++)
-  {
-	//&& std::find(vector_.begin(), vector_.end(), cursor->key[i]) != vector_.end()
-	if (cursor->IS_LEAF && cursor->key[i] >= 10000 && 20000 >= cursor->key[i])
-	{
-	  std::cout << "cursor->key[i]: " << cursor->key[i] << " posicion: " << ((cursor->values).find(cursor->key[i]))->second << "\n";
-	}
-  }
-  //std::cout << "\n";
-  if (cursor->IS_LEAF != true)
-  {
-	for (int i = 0; i < cursor->size + 1; i++)
-	{
-	  print_leaf(cursor->ptr[i]);
-	}
-  }
-}
-}
-
-void b_plus_tree::remove(keyType key)
-{
-    if (root == NULL)
+    if (cursor->ptr[i] == child)
     {
-      std::cout << "Tree is empty\n";
+      parent = cursor;
+      return parent;
     }
     else
     {
-      Node *cursor = root;
-      while (cursor->IS_LEAF == false)
-      {
-        for (int i = 0; i < cursor->size; i++)
-        {
-          if (key < cursor->key[i])
-          {
-            cursor = cursor->ptr[i];
-            break;
-          }
-          if (i == cursor->size - 1)
-          {
-            cursor = cursor->ptr[i + 1];
-            break;
-          }
-        }
-      }
+      parent = find_parent(cursor->ptr[i], child);
+      if (parent != NULL)
+        return parent;
+    }
+  }
+  return parent;
+}
+
+void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
+{
+  if (cursor->size < MAX)
+  {
+    int i = 0;
+    while (x > cursor->key[i] && i < cursor->size)
+      i++;
+    for (int j = cursor->size; j > i; j--)
+    {
+      //cursor->key[j][0] = cursor->key[j - 1][0];
+      //cursor->key[j][1] = cursor->key[j - 1][1];
+
+      cursor->key[j] = cursor->key[j - 1];
+      cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
+    }
+    for (int j = cursor->size + 1; j > i + 1; j--)
+    {
+      cursor->ptr[j] = cursor->ptr[j - 1];
+    }
+    //cursor->key[i][0] = x;
+    //cursor->key[i][1] = pos;
+
+    cursor->key[i] = x;
+    cursor->position.insert(std::make_pair(cursor->key[i], pos));
+
+    cursor->size++;
+    cursor->ptr[i + 1] = child;
+  }
+  else
+  {
+    Node *newInternal = new Node;
+    //int virtualKey[MAX + 1][MAX + 1];
+
+    db2::literal virtualKey[MAX + 1];
+    std::map<db2::literal, long> aux_map;
+
+    Node *virtualPtr[MAX + 2];
+    for (int i = 0; i < MAX; i++)
+    {
+      //virtualKey[i][0] = cursor->key[i][0];
+      //virtualKey[i][1] = cursor->key[i][1];
+
+      virtualKey[i] = cursor->key[i];
+      aux_map.insert(std::make_pair(cursor->key[i], cursor->position.find(cursor->key[i])->second));
+    }
+    for (int i = 0; i < MAX + 1; i++)
+    {
+      virtualPtr[i] = cursor->ptr[i];
+    }
+    int i = 0, j;
+    while (x > virtualKey[i] && i < MAX)
+      i++;
+    for (int j = MAX + 1; j > i; j--)
+    {
+      //virtualKey[j][0] = virtualKey[j - 1][0];
+      //virtualKey[j][1] = virtualKey[j - 1][1];
+
+      virtualKey[j] = virtualKey[j - 1];
+      aux_map.insert(std::make_pair(virtualKey[j], aux_map.find(virtualKey[j - 1])->second));
+    }
+    //virtualKey[i][0] = x;
+    //virtualKey[i][1] = pos;
+
+    virtualKey[i] = x;
+    aux_map.insert(std::make_pair(virtualKey[i], pos));
+
+    for (int j = MAX + 2; j > i + 1; j--)
+    {
+      virtualPtr[j] = virtualPtr[j - 1];
+    }
+    virtualPtr[i + 1] = child;
+    newInternal->IS_LEAF = false;
+    cursor->size = (MAX + 1) / 2;
+    newInternal->size = MAX - (MAX + 1) / 2;
+    for (i = 0, j = cursor->size + 1; i < newInternal->size; i++, j++)
+    {
+      //newInternal->key[i][0] = virtualKey[j][0];
+      //newInternal->key[i][1] = virtualKey[j][1];
+
+      //newInternal->position = aux_map.find(virtualKey[i])->second;
+
+      newInternal->key[i] = virtualKey[i];
+      newInternal->position.insert(std::make_pair(virtualKey[i], aux_map.find(virtualKey[i])->second));
+    }
+    for (i = 0, j = cursor->size + 1; i < newInternal->size + 1; i++, j++)
+    {
+      newInternal->ptr[i] = virtualPtr[j];
+    }
+    if (cursor == root)
+    {
+      Node *newRoot = new Node;
+      //newRoot->key[0][0] = cursor->key[cursor->size][0];
+      //newRoot->key[0][1] = cursor->key[cursor->size][1];
+
+      newRoot->key[0] = cursor->key[cursor->size];
+      newRoot->position.insert(std::make_pair(cursor->key[cursor->size], cursor->position.find(cursor->key[cursor->size])->second));
+
+      newRoot->ptr[0] = cursor;
+      newRoot->ptr[1] = newInternal;
+      newRoot->IS_LEAF = false;
+      newRoot->size = 1;
+      root = newRoot;
+    }
+    else
+    {
+      //insertInternal(cursor->key[cursor->size][0], findParent(root, cursor), newInternal,cursor->key[cursor->size][1]);
+
+      insertInternal(cursor->key[cursor->size], find_parent(root, cursor), newInternal, cursor->position.find(cursor->key[cursor->size])->second);
+    }
+  }
+}
+Node *b_plus_tree::find_parent(Node *cursor, Node *child)
+{
+  Node *parent;
+  if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF)
+  {
+    return NULL;
+  }
+  for (int i = 0; i < cursor->size + 1; i++)
+  {
+    if (cursor->ptr[i] == child)
+    {
+      parent = cursor;
+      return parent;
+    }
+    else
+    {
+      parent = find_parent(cursor->ptr[i], child);
+      if (parent != NULL)
+        return parent;
+    }
+  }
+  return parent;
+}
+
+auto b_plus_tree::findNode(const db2::literal &id)
+{
+  struct retorno
+  {
+    Node *cursor_;
+    int i;
+  };
+  if (root == NULL)
+  {
+    std::cout << "Tree is empty\n";
+  }
+  else
+  {
+    Node *cursor = root;
+    while (cursor->IS_LEAF == false)
+    {
       for (int i = 0; i < cursor->size; i++)
       {
-        if (cursor->key[i] == key)
+        if (id < cursor->key[i])
         {
-          std::cout << "key: " << key;
-          cursor->values.erase(key);
-          return;
+          cursor = cursor->ptr[i];
+          break;
+        }
+        if (i == cursor->size - 1)
+        {
+          cursor = cursor->ptr[i + 1];
+          break;
         }
       }
-      return;
     }
+    for (int i = 0; i < cursor->size; i++)
+    {
+      if (cursor->key[i] == id)
+      {
+        std::cout << "Found and in position: " << cursor->position.find(cursor->key[i])->second << "\n";
+        return retorno{cursor, i};
+      }
+    }
+    return retorno{nullptr, -1};
+    std::cout << "Not found\n";
+  }
+}
+
+std::vector<size_t> b_plus_tree::find(keyType low)
+{
+  std::vector<size_t> retorno;
+  if (root == NULL)
+  {
+    return retorno;
+  }
+  auto nodo = findNode(low);
+  if (nodo.cursor_ != nullptr)
+  {
+    retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
+  }
+  return retorno; //el vector "retorno" deberia regresar vacio
+}
+
+void b_plus_tree::display(Node *cursor)
+{
+  if (cursor != NULL)
+  {
+    for (int i = 0; i < cursor->size; i++)
+    {
+      std::cout << cursor->key[i] << " ";
+    }
+    std::cout << "\n";
+    if (cursor->IS_LEAF != true)
+    {
+      for (int i = 0; i < cursor->size + 1; i++)
+      {
+        display(cursor->ptr[i]);
+      }
+    }
+  }
+}
+
+Node *b_plus_tree::get_root()
+{
+  return root;
+}
+void b_plus_tree::print_leaf(Node *cursor)
+{
 }
 
 std::vector<size_t> b_plus_tree::find(keyType beginKey, keyType endKey)
 {
-    std::vector<size_t> registros;
-    int ite = beginKey;
-    Node *reg = find_node(ite);
-    while (reg == nullptr)
-    {
-      ite++;
-      if (ite > endKey)
-      {
-        return registros;
-      }
-      reg = find_node(ite);
-    }
-    std::cout << "Linea 472: (reg->key[0]): " << reg->key[0] << " beginKey: " << beginKey << "\n";
-    while (reg->key[0] <= endKey)
-    {
-      int i = 0;
-      for (i = 0; i < reg->size; i++)
-      {
-        if (reg->key[i] >= beginKey && reg->key[i] <= endKey)
-        {
-          std::cout << "find(keyType beginKey, keyType endKey): --> " << reg->key[i] << "\n";
-          registros.push_back(find(reg->key[i]));
-        }
-      }
-      reg = reg->ptr[reg->size];
-    }
-    return registros;
 }
 
-b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type):
-	key_type(key_type)
+b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type) : key_type(key_type)
 {
-    std::fstream file;
-    file.open(filename, std::ofstream::out | std::ofstream::trunc);
-    root = NULL;
+  std::fstream file;
+  file.open(filename, std::ofstream::out | std::ofstream::trunc);
+  root = NULL;
 }
 
-std::vector<size_t> b_plus_tree::get_positions(const db2::literal& key)
+std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
 {
   // El tipo y tamaño del key están en key_type
   //TODO
-  return {};
+  std::vector<size_t> retorno;
+  if (root == NULL)
+  {
+    return retorno;
+  }
+  auto nodo = findNode(key);
+  if (nodo.cursor_ != nullptr)
+  {
+    retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
+  }
+  return retorno; //el vector "retorno" deberia regresar vacio
+}
+
+  size_t b_plus_tree::getPos(db2::literal id){
+      if (root == NULL) {
+    std::cout << "Tree is empty\n";
+  } else {
+    Node *cursor = root;
+    while (cursor->IS_LEAF == false) {
+      for (int i = 0; i < cursor->size; i++) {
+        if (id < cursor->key[i]) {
+          cursor = cursor->ptr[i];
+          break;
+        }
+        if (i == cursor->size - 1) {
+          cursor = cursor->ptr[i + 1];
+          break;
+        }
+      }
+    }
+    for (int i = 0; i < cursor->size; i++) {
+      if (cursor->key[i] == id) {
+        std::cout << "Found and in position: "<< cursor->position.find(cursor->key[i])->second <<"\n";
+        return cursor->position.find(cursor->key[i])->second;
+      }
+    }
+    std::cout << "Not found\n";
+  }
+  }
+
+auto b_plus_tree::getMinNode(db2::literal keymin)
+{
+  struct retorno
+  {
+    Node *cursor_;
+    int i;
+  };
+  if (root == NULL)
+  {
+    std::cout << "Tree is empty\n";
+  }
+  else
+  {
+    Node *cursor = root;
+    while (cursor->IS_LEAF == false)
+    {
+      for (int i = 0; i < cursor->size; i++)
+      {
+        if (keymin < cursor->key[i])
+        {
+          cursor = cursor->ptr[i];
+          break;
+        }
+        if (i == cursor->size - 1)
+        {
+          cursor = cursor->ptr[i + 1];
+          break;
+        }
+      }
+    }
+    for (int i = 0; i < cursor->size; i++)
+    {
+      if ((cursor->key[i] == keymin ) || (keymin < cursor->key[i+1] && cursor->key[i] < keymin))
+      {
+        std::cout << "Found and in position: " << cursor->position.find(cursor->key[i])->second << "\n";
+        return retorno{cursor, i};
+      }
+    }
+    return retorno{nullptr, -1};
+    std::cout << "Not found\n";
+  }
+  //return retorno{cursor, i};
 }
 
 std::vector<size_t> b_plus_tree::get_positions(
-    const db2::literal& key_ge,
-    const db2::literal& key_le
-  )
+    const db2::literal &key_ge,
+    const db2::literal &key_le)
 {
-  //TODO
-  return {};
+  std::vector<size_t> retorno;
+  auto nodo_min = getMinNode(key_ge);
+  auto cursor = nodo_min.cursor_;
+  int i = nodo_min.i;
+  /*if(cursor != nullptr){
+    int ite = i;
+    for(; i < cursor->size; ite++){
+      if(cursor->key[ite] < key_le)
+        retorno.push_back(cursor->position.find(cursor->key[ite])->second);
+    }
+    ite = 0;
+    for (int i = 0; i < cursor->size; i++)
+    {
+      if (key_ge < cursor->key[i] && cursor->key[i] < key_le)
+      {
+        cursor = cursor->ptr[i];
+        break;
+      }
+      if (i == cursor->size - 1)
+      {
+        cursor = cursor->ptr[i + 1];
+        break;
+      }
+    }   
+  }*/
+  while (cursor->key[0] <= key_le)
+    {
+      int i = 0;
+      for (i = 0; i < cursor->size; i++)
+      {
+        if (cursor->key[i] >= key_ge && cursor->key[i] <= key_le)
+        {
+          retorno.push_back(cursor->position.find(cursor->key[i])->second);
+        }
+      }
+      cursor = cursor->ptr[cursor->size];
+    }
+  return retorno;
 }
 
-bool b_plus_tree::insert(const db2::literal& key, size_t position)
+bool b_plus_tree::insert(const db2::literal &key, size_t position)
 {
-  //TODO
+  auto x = key;
+  size_t posicion_registro = position;
+  if (root == NULL)
+  {
+    root = new Node;
+    root->key[0] = x;
+    root->position.insert(std::make_pair(x, posicion_registro));
+    root->IS_LEAF = true;
+    root->size = 1;
+  }
+  else
+  {
+    Node *cursor = root;
+    Node *parent;
+    while (cursor->IS_LEAF == false)
+    {
+      parent = cursor;
+      for (int i = 0; i < cursor->size; i++)
+      {
+        if (x < cursor->key[i])
+        {
+          cursor = cursor->ptr[i];
+          break;
+        }
+        if (i == cursor->size - 1)
+        {
+          cursor = cursor->ptr[i + 1];
+          break;
+        }
+      }
+    }
+    if (cursor->size < MAX)
+    {
+      int i = 0;
+      while (x > cursor->key[i] && i < cursor->size)
+        i++;
+      for (int j = cursor->size; j > i; j--)
+      {
+        cursor->key[j] = cursor->key[j - 1];
+        cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
+      }
+      cursor->key[i] = x;
+      cursor->position.insert(std::make_pair(x, posicion_registro));
+      cursor->size++;
+      cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
+      cursor->ptr[cursor->size - 1] = NULL;
+    }
+    else
+    {
+      Node *newLeaf = new Node;
+      db2::literal virtualNode[MAX + 1];
+      std::map<db2::literal, long> aux_map;
+      for (int i = 0; i < MAX; i++)
+      {
+        virtualNode[i] = cursor->key[i];
+        aux_map.insert(std::make_pair(virtualNode[i], cursor->position.find(cursor->key[i])->second));
+      }
+      int i = 0, j;
+      while (x > virtualNode[i] && i < MAX)
+        i++;
+      for (int j = MAX + 1; j > i; j--)
+      {
+        virtualNode[j] = virtualNode[j - 1];
+        aux_map.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j - 1])->second));
+      }
+      virtualNode[i] = x;
+      aux_map.insert(std::make_pair(virtualNode[i], posicion_registro));
+      newLeaf->IS_LEAF = true;
+      cursor->size = (MAX + 1) / 2;
+      newLeaf->size = MAX + 1 - (MAX + 1) / 2;
+      cursor->ptr[cursor->size] = newLeaf;
+      newLeaf->ptr[newLeaf->size] = cursor->ptr[MAX];
+      cursor->ptr[MAX] = NULL;
+      for (i = 0; i < cursor->size; i++)
+      {
+        cursor->key[i] = virtualNode[i];
+        cursor->position.insert(std::make_pair(virtualNode[i], aux_map.find(virtualNode[i])->second));
+      }
+      for (i = 0, j = cursor->size; i < newLeaf->size; i++, j++)
+      {
+        newLeaf->key[i] = virtualNode[j];
+        newLeaf->position.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j])->second));
+      }
+      if (cursor == root)
+      {
+        Node *newRoot = new Node;
+        newRoot->key[0] = newLeaf->key[0];
+        newRoot->position.insert(std::make_pair(newLeaf->key[0], aux_map.find(newLeaf->key[0])->second));
+
+        newRoot->ptr[0] = cursor;
+        newRoot->ptr[1] = newLeaf;
+        newRoot->IS_LEAF = false;
+        newRoot->size = 1;
+        root = newRoot;
+      }
+      else
+      {
+        insertInternal(newLeaf->key[0], parent, newLeaf, newLeaf->position.find(newLeaf->key[0])->second);
+      }
+    }
+  }
   return false;
 }
 
-bool b_plus_tree::delete_from(const db2::literal& key, size_t position)
+bool b_plus_tree::delete_from(const db2::literal &key, size_t position)
 {
   //TODO
   return false;
