@@ -4,10 +4,10 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
 {
   if (cursor->size < MAX)
   {
-    int i = 0;
+    size_t i = 0;
     while (x > cursor->position_[i].first && i < cursor->size)
       i++;
-    for (int j = cursor->size; j > i; j--)
+    for (size_t j = cursor->size; j > i; j--)
     {
       //cursor->key[j][0] = cursor->key[j - 1][0];
       //cursor->key[j][1] = cursor->key[j - 1][1];
@@ -15,7 +15,7 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
       //cursor->position_[j].first = cursor->position_[j - 1].first;
       //cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
     }
-    for (int j = cursor->size + 1; j > i + 1; j--)
+    for (size_t j = cursor->size + 1; j > i + 1; j--)
     {
       cursor->ptr_[j] = cursor->ptr_[j - 1];
     }
@@ -39,7 +39,7 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
 
     Node *virtualPtr[MAX + 2];
     
-    for (int i = 0; i < MAX; i++)
+    for (size_t i = 0; i < MAX; i++)
     {
       //virtualKey[i][0] = cursor->key[i][0];
       //virtualKey[i][1] = cursor->key[i][1];
@@ -47,14 +47,14 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
       //virtualKey[i] = cursor->key[i];
       //aux_map.insert(std::make_pair(cursor->key[i], cursor->position.find(cursor->key[i])->second));
     }
-    for (int i = 0; i < MAX + 1; i++)
+    for (size_t i = 0; i < MAX + 1; i++)
     {
       virtualPtr[i] = cursor->ptr_[i];
     }
-    int i = 0, j;
+    size_t i = 0, j;
     while (x > position_[i].first && i < MAX)
       i++;
-    for (int j = MAX + 1; j > i; j--)
+    for (size_t j = MAX + 1; j > i; j--)
     {
       //virtualKey[j][0] = virtualKey[j - 1][0];
       //virtualKey[j][1] = virtualKey[j - 1][1];
@@ -71,7 +71,7 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
 
     position_[i] = std::make_pair(x,pos);
 
-    for (int j = MAX + 2; j > i + 1; j--)
+    for (size_t j = MAX + 2; j > i + 1; j--)
     {
       virtualPtr[j] = virtualPtr[j - 1];
     }
@@ -129,7 +129,7 @@ Node *b_plus_tree::find_parent(Node *cursor, Node *child)
   {
     return NULL;
   }
-  for (int i = 0; i < cursor->size + 1; i++)
+  for (size_t i = 0; i < cursor->size + 1; i++)
   {
     if (cursor->ptr_[i] == child)
     {
@@ -146,13 +146,8 @@ Node *b_plus_tree::find_parent(Node *cursor, Node *child)
   return parent;
 }
 
-auto b_plus_tree::findNode(const db2::literal &id)
+Node::iterator b_plus_tree::findNode(const db2::literal &id)
 {
-  struct retorno
-  {
-    Node *cursor_;
-    int i;
-  };
   if (root == NULL)
   {
     std::cout << "Tree is empty\n";
@@ -162,7 +157,7 @@ auto b_plus_tree::findNode(const db2::literal &id)
     Node *cursor = root;
     while (cursor->IS_LEAF == false)
     {
-      for (int i = 0; i < cursor->size; i++)
+      for (size_t i = 0; i < cursor->size; i++)
       {
         if (id < cursor->position_[i].first)
         {
@@ -176,65 +171,25 @@ auto b_plus_tree::findNode(const db2::literal &id)
         }
       }
     }
-    for (int i = 0; i < cursor->size; i++)
+    for (size_t i = 0; i < cursor->size; i++)
     {
       if (cursor->position_[i].first == id)
       {
         std::cout << "Found and in position: " << cursor->position_[i].second << "\n";
-        return retorno{cursor, i};
+        return Node::iterator{cursor,i};
       }
     }
-    return retorno{nullptr, -1};
+    return cursor->end();
     std::cout << "Not found\n";
   }
-}
-
-std::vector<size_t> b_plus_tree::find(keyType low)
-{
-  std::vector<size_t> retorno;
-  if (root == NULL)
-  {
-    return retorno;
-  }
-  auto nodo = findNode(low);
-  if (nodo.cursor_ != nullptr)
-  {
-    //retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
-    retorno.push_back(nodo.cursor_->position_[nodo.i].second);
-  }
-  return retorno; //el vector "retorno" deberia regresar vacio
-}
-
-void b_plus_tree::display(Node *cursor)
-{
-  if (cursor != NULL)
-  {
-    for (int i = 0; i < cursor->size; i++)
-    {
-      std::cout << cursor->position_[i].first << " ";
-    }
-    std::cout << "\n";
-    if (cursor->IS_LEAF != true)
-    {
-      for (int i = 0; i < cursor->size + 1; i++)
-      {
-        display(cursor->ptr_[i]);
-      }
-    }
-  }
+  return end();
 }
 
 Node *b_plus_tree::get_root()
 {
   return root;
 }
-void b_plus_tree::print_leaf(Node *cursor)
-{
-}
 
-std::vector<size_t> b_plus_tree::find(keyType beginKey, keyType endKey)
-{
-}
 
 b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type) : key_type(key_type)
 {
@@ -257,32 +212,7 @@ std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
   return positions;
 }
 
-  size_t b_plus_tree::getPos(db2::literal id){
-      if (root == NULL) {
-    std::cout << "Tree is empty\n";
-  } else {
-    Node *cursor = root;
-    while (cursor->IS_LEAF == false) {
-      for (int i = 0; i < cursor->size; i++) {
-        if (id < cursor->position_[i].first) {
-          cursor = cursor->ptr_[i];
-          break;
-        }
-        if (i == cursor->size - 1) {
-          cursor = cursor->ptr_[i + 1];
-          break;
-        }
-      }
-    }
-    for (int i = 0; i < cursor->size; i++) {
-      if (cursor->position_[i].first == id) {
-        std::cout << "Found and in position: "<< cursor->position_[i].second <<"\n";
-        return cursor->position_[i].second;
-      }
-    }
-    std::cout << "Not found\n";
-  }
-  }
+
 
 Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
 {
@@ -298,10 +228,10 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
   }
   else
   {
-    int aux  = 0 ;
+    size_t aux  = 0 ;
     while (cursor->IS_LEAF == false)
     {
-      for (aux; aux < cursor->size; aux++)
+      for (; aux < cursor->size; aux++)
       {
         if (keymin < cursor->position_[aux].first)
         {
@@ -317,9 +247,9 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
       aux = 0;
     }
     bool flag = false;
-    int ite = 0;
+    size_t ite = 0;
     while(true){
-      for(int i = 0 ; i < cursor->size; i ++ ){
+      for(size_t i = 0 ; i < cursor->size; i ++ ){
         if(cursor->position_[i].first > keymin){
           flag = true;
           ite=i;
@@ -371,7 +301,7 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
     while (cursor->IS_LEAF == false)
     {
       parent = cursor;
-      for (int i = 0; i < cursor->size; i++)
+      for (size_t i = 0; i < cursor->size; i++)
       {
         //if (x < cursor->key[i])
         if(x < cursor->position_[i].first)
@@ -390,10 +320,10 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
     }
     if (cursor->size < MAX)
     {
-      int i = 0;
+      size_t i = 0;
       while (x > cursor->position_[i].first && i < cursor->size)
         i++;
-      for (int j = cursor->size; j > i; j--)
+      for (size_t j = cursor->size; j > i; j--)
       {
         cursor->position_[j].first = cursor->position_[j - 1].first;
         cursor->position_.push_back(std::make_pair(cursor->position_[j].first, cursor->position_[j-1].second));
@@ -420,15 +350,15 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       std::vector<size_t> posiciones;
       std::vector<std::pair<db2::literal, size_t>> posiciones_ = cursor->position_;
       //std::map<db2::literal, long> aux_map;
-      for (int i = 0; i < MAX; i++)
+      for (size_t i = 0; i < MAX; i++)
       {
         //virtualNode[i] = cursor->position_[i].first;
         //aux_map.insert(std::make_pair(virtualNode[i], cursor->position.find(cursor->key[i])->second));
       }
-      int i = 0, j;
+      size_t i = 0, j;
       while (x > posiciones_[i].first && i < MAX)
       i++;
-      for (int j = MAX + 1; j > i; j--)
+      for (size_t j = MAX + 1; j > i; j--)
       {
         //virtualNode[j] = virtualNode[j - 1];
         //aux_map.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j - 1])->second));
