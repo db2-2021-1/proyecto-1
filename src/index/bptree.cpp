@@ -1,3 +1,5 @@
+#include <span>
+
 #include "bptree.hpp"
 
 void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
@@ -245,7 +247,16 @@ b_plus_tree::b_plus_tree(std::string filename, db2::statement::type key_type) : 
 
 std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
 {
+  std::vector<size_t> positions;
 
+  for(auto it = getMinNode(key); it != end(); it++)
+  {
+    if(it->first != key)
+      break;
+    positions.push_back(it->second);
+  }
+
+  return positions;
 }
 
   size_t b_plus_tree::getPos(db2::literal id){
@@ -284,7 +295,7 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
   };
   if (root == NULL)
   {
-    std::cout << "Tree is empty\n";
+    return end();
   }
   else
   {
@@ -310,7 +321,7 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
       if ((cursor->position_[i].first == keymin ) || (keymin < cursor->position_[i+1].first && cursor->position_[i].first < keymin))
       {
         std::cout << "Found and in position: " << cursor->position_[i].second << "\n";
-        return Node::iterator{cursor, i};
+        return Node::iterator{cursor, (size_t)i};
       }
     }
     return cursor->end();
@@ -321,6 +332,16 @@ std::vector<size_t> b_plus_tree::get_positions(
     const db2::literal &key_ge,
     const db2::literal &key_le)
 {
+  std::vector<size_t> positions;
+
+  for(auto it = getMinNode(key_ge); it != end(); it++)
+  {
+    if(it->first > key_le)
+      break;
+    positions.push_back(it->second);
+  }
+
+  return positions;
 }
 
 bool b_plus_tree::insert(const db2::literal &key, size_t position)
@@ -452,4 +473,9 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
 bool b_plus_tree::delete_from(const db2::literal &key, size_t position)
 {
   return false;
+}
+
+Node::iterator b_plus_tree::end()
+{
+    return Node::iterator(nullptr, 0);
 }

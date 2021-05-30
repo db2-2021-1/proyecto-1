@@ -66,6 +66,8 @@ struct Node
             index(index)
         {};
 
+        iterator(){};
+
         reference operator*() const
         {
             return node->position_[index];
@@ -97,6 +99,16 @@ struct Node
         friend bool operator!=(const iterator& l, const iterator& r)
         {
             return !(l == r);
+        }
+
+        Node* get_node()
+        {
+            return node;
+        }
+
+        size_t get_index()
+        {
+            return index;
         }
     };
 
@@ -162,4 +174,6 @@ public:
 
   /// DELETE FROM
   bool delete_from(const db2::literal& key, size_t position);
+
+  Node::iterator end();
 };
