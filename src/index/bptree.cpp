@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "bptree.hpp"
 
 void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
@@ -38,12 +40,12 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
     std::vector<std::pair<db2::literal, size_t>> position_ = cursor->position_;
 
     Node *virtualPtr[MAX + 2];
-    
+
     for (size_t i = 0; i < MAX; i++)
     {
       //virtualKey[i][0] = cursor->key[i][0];
       //virtualKey[i][1] = cursor->key[i][1];
-    
+
       //virtualKey[i] = cursor->key[i];
       //aux_map.insert(std::make_pair(cursor->key[i], cursor->position.find(cursor->key[i])->second));
     }
@@ -88,9 +90,9 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
 
       //newInternal->key[i] = virtualKey[i];
       //newInternal->position.insert(std::make_pair(virtualKey[i], aux_map.find(virtualKey[i])->second));
-    
-      newInternal->position_[i] = position_[j]; 
-    
+
+      newInternal->position_[i] = position_[j];
+
     }
     for (i = 0, j = cursor->size + 1; i < newInternal->size + 1; i++, j++)
     {
@@ -104,8 +106,8 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
 
       //newRoot->key[0] = cursor->key[cursor->size];
       //newRoot->position.insert(std::make_pair(cursor->key[cursor->size], cursor->position.find(cursor->key[cursor->size])->second));
-      
-      newRoot->position_.push_back(cursor->position_[cursor->size]); 
+
+      newRoot->position_.push_back(cursor->position_[cursor->size]);
 
 
       newRoot->ptr_[0] = cursor;
@@ -216,11 +218,6 @@ std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
 
 Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
 {
-  struct retorno
-  {
-    Node *cursor_;
-    int i;
-  };
   Node *cursor = root;
   if (root == NULL)
   {
@@ -246,22 +243,21 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
       }
       aux = 0;
     }
-    bool flag = false;
-    size_t ite = 0;
-    while(true){
-      for(size_t i = 0 ; i < cursor->size; i ++ ){
-        if(cursor->position_[i].first > keymin){
-          flag = true;
-          ite=i;
-          break;
-        }
-      }
-      if(flag){
-        return Node::iterator{cursor,ite};
-      }
-      cursor = cursor->ptr_[cursor->size];
-    }
-    return cursor->end();
+    std::cout << "leaf\n";
+
+    assert(cursor);
+    assert(!cursor->position_.empty());
+
+    auto it = std::lower_bound(
+        cursor->position_.cbegin(),
+        cursor->position_.cend(),
+        std::make_pair(keymin, 0UL)
+    );
+
+    if(it == cursor->position_.end())
+        return end();
+
+    return Node::iterator(cursor, it - cursor->position_.begin());
   }
 }
 
@@ -317,7 +313,9 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
           break;
         }
       }
+      assert(cursor);
     }
+    assert(cursor);
     if (cursor->size < MAX)
     {
       size_t i = 0;
@@ -331,10 +329,10 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       }
       //cursor->key[i] = x;
       //cursor->position.insert(std::make_pair(x, posicion_registro));
-      
+
       //cursor->position_.push_back(std::make_pair());
       cursor->position_[i] = std::make_pair(x,posicion_registro);
-      
+
       cursor->size++;
       cursor->ptr_[cursor->size] = cursor->ptr_[cursor->size -1];
       cursor->ptr_[cursor->size - 1] = NULL;
@@ -362,7 +360,7 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       {
         //virtualNode[j] = virtualNode[j - 1];
         //aux_map.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j - 1])->second));
-        posiciones_[j] = posiciones_[j - 1]; 
+        posiciones_[j] = posiciones_[j - 1];
       }
       //virtualNode[i] = x;
       //aux_map.insert(std::make_pair(virtualNode[i], posicion_registro));
@@ -404,12 +402,12 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       }
     }
   }
-  return false;
+  return true;
 }
 
 bool b_plus_tree::delete_from(const db2::literal &key, size_t position)
 {
-  auto cursor = findNode(key); 
+  auto cursor = findNode(key);
   if(cursor.get_node() != nullptr){
     findNode(key).get_node()->position_[cursor.get_index()].second=-1;
     return true;

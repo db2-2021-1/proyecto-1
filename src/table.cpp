@@ -1001,6 +1001,9 @@ bool db2::table::reset_index()
 
 	std::filesystem::remove(index_path(), e);
 
+	if(!std::filesystem::exists(data_path()))
+		return true;
+
 	auto data = get_data();
 
 	return update_index(data);
