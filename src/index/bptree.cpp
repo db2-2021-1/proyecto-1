@@ -293,39 +293,49 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
     Node *cursor_;
     int i;
   };
+  Node *cursor = root;
   if (root == NULL)
   {
     return end();
   }
   else
   {
-    Node *cursor = root;
+    int aux  = 0 ;
     while (cursor->IS_LEAF == false)
     {
-      for (int i = 0; i < cursor->size; i++)
+      for (aux; aux < cursor->size; aux++)
       {
-        if (keymin < cursor->position_[i].first)
+        if (keymin < cursor->position_[aux].first)
         {
-          cursor = cursor->ptr_[i];
+          cursor = cursor->ptr_[aux];
           break;
         }
-        if (i == cursor->size - 1)
+        if (aux == cursor->size - 1)
         {
-          cursor = cursor->ptr_[i + 1];
+          cursor = cursor->ptr_[aux + 1];
           break;
         }
       }
+      aux = 0;
     }
-    for (int i = 0; i < cursor->size; i++)
-    {
-      if ((cursor->position_[i].first == keymin ) || (keymin < cursor->position_[i+1].first && cursor->position_[i].first < keymin))
-      {
-        std::cout << "Found and in position: " << cursor->position_[i].second << "\n";
-        return Node::iterator{cursor, (size_t)i};
+    bool flag = false;
+    int ite = 0;
+    while(true){
+      for(int i = 0 ; i < cursor->size; i ++ ){
+        if(cursor->key[i] > keymin){
+          flag = true;
+          ite=i;
+          break;
+        }
       }
+      if(flag){
+        return Node::iterator{cursor,ite};
+      }
+      cursor = cursor->ptr[cursor->size];
     }
     return cursor->end();
   }
+  return  Node::iterator{cursor,i}
 }
 
 std::vector<size_t> b_plus_tree::get_positions(
