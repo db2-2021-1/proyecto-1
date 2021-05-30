@@ -1,5 +1,3 @@
-#include <span>
-
 #include "bptree.hpp"
 
 void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
@@ -322,7 +320,7 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
     int ite = 0;
     while(true){
       for(int i = 0 ; i < cursor->size; i ++ ){
-        if(cursor->key[i] > keymin){
+        if(cursor->position_[i].first > keymin){
           flag = true;
           ite=i;
           break;
@@ -331,11 +329,10 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
       if(flag){
         return Node::iterator{cursor,ite};
       }
-      cursor = cursor->ptr[cursor->size];
+      cursor = cursor->ptr_[cursor->size];
     }
     return cursor->end();
   }
-  return  Node::iterator{cursor,i}
 }
 
 std::vector<size_t> b_plus_tree::get_positions(
