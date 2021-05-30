@@ -26,7 +26,13 @@ add_executable(${TEST_BIN}
 
 add_test(NAME ${TEST_BIN} COMMAND ${TEST_BIN})
 
+# Shared libraries
+pkg_check_modules(gtest_lib
+	REQUIRED IMPORTED_TARGET
+		gtest
+)
+
 target_link_libraries(${TEST_BIN}
 	PUBLIC
-		gtest
+		PkgConfig::gtest_lib
 )
