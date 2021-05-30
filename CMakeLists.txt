@@ -39,6 +39,8 @@ include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CPack)
 
+set(ENABLE_TESTS TRUE CACHE BOOL "Enable gtest")
+
 # Packages
 find_package(FLEX)
 find_package(BISON)

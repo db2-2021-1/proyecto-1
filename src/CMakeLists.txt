@@ -59,3 +59,7 @@ target_include_directories(${PROJECT_NAME}
 add_subdirectory(index)
 add_subdirectory(statement)
 add_subdirectory(tree)
+
+if(ENABLE_TESTS)
+	add_subdirectory(test)
+endif()

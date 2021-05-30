@@ -16,7 +16,7 @@
 
 ## Compilación
 ``` bash
-sudo apt install build-essential cmake libreadline-dev bison libfl-dev rapidjson-dev
+sudo apt install build-essential cmake libreadline-dev bison libfl-dev rapidjson-dev googletest
 
 mkdir -p build && cd build
 
