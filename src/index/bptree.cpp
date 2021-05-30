@@ -323,9 +323,10 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
         i++;
       for (size_t j = cursor->size; j > i; j--)
       {
-        cursor->position_[j].first = cursor->position_[j - 1].first;
-        cursor->position_.push_back(std::make_pair(cursor->position_[j].first, cursor->position_[j-1].second));
+        //cursor->position_[j].first = cursor->position_[j - 1].first;
+        //cursor->position_.push_back(std::make_pair(cursor->position_[j].first, cursor->position_[j-1].second));
         //cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
+        cursor->position_[j] = cursor->position_[j-1];
       }
       //cursor->key[i] = x;
       //cursor->position.insert(std::make_pair(x, posicion_registro));
