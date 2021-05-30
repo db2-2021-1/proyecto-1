@@ -15,7 +15,7 @@ jobs:
     - uses: ammaraskar/gcc-problem-matcher@master
 
     - name: deps
-      run: sudo apt install libreadline-dev bison libfl-dev rapidjson-dev googletest
+      run: sudo apt install libreadline-dev bison libfl-dev rapidjson-dev libgtest-dev
 
     - name: configure
       run: cmake
