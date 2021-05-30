@@ -5,66 +5,71 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
   if (cursor->size < MAX)
   {
     int i = 0;
-    while (x > cursor->key[i] && i < cursor->size)
+    while (x > cursor->position_[i].first && i < cursor->size)
       i++;
     for (int j = cursor->size; j > i; j--)
     {
       //cursor->key[j][0] = cursor->key[j - 1][0];
       //cursor->key[j][1] = cursor->key[j - 1][1];
-
-      cursor->key[j] = cursor->key[j - 1];
-      cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
+      cursor->position_[j] = cursor->position_[j-1];
+      //cursor->position_[j].first = cursor->position_[j - 1].first;
+      //cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
     }
     for (int j = cursor->size + 1; j > i + 1; j--)
     {
-      cursor->ptr[j] = cursor->ptr[j - 1];
+      cursor->ptr_[j] = cursor->ptr_[j - 1];
     }
     //cursor->key[i][0] = x;
     //cursor->key[i][1] = pos;
-
-    cursor->key[i] = x;
-    cursor->position.insert(std::make_pair(cursor->key[i], pos));
+    cursor->position_.push_back(std::make_pair(x,pos));
+    //cursor->key[i] = x;
+    //cursor->position.insert(std::make_pair(cursor->key[i], pos));
 
     cursor->size++;
-    cursor->ptr[i + 1] = child;
+    cursor->ptr_[i + 1] = child;
   }
   else
   {
     Node *newInternal = new Node;
     //int virtualKey[MAX + 1][MAX + 1];
 
-    db2::literal virtualKey[MAX + 1];
-    std::map<db2::literal, long> aux_map;
+    //db2::literal virtualKey[MAX + 1];
+    //std::map<db2::literal, long> aux_map;
+    std::vector<std::pair<db2::literal, size_t>> position_ = cursor->position_;
 
     Node *virtualPtr[MAX + 2];
+    
     for (int i = 0; i < MAX; i++)
     {
       //virtualKey[i][0] = cursor->key[i][0];
       //virtualKey[i][1] = cursor->key[i][1];
-
-      virtualKey[i] = cursor->key[i];
-      aux_map.insert(std::make_pair(cursor->key[i], cursor->position.find(cursor->key[i])->second));
+    
+      //virtualKey[i] = cursor->key[i];
+      //aux_map.insert(std::make_pair(cursor->key[i], cursor->position.find(cursor->key[i])->second));
     }
     for (int i = 0; i < MAX + 1; i++)
     {
-      virtualPtr[i] = cursor->ptr[i];
+      virtualPtr[i] = cursor->ptr_[i];
     }
     int i = 0, j;
-    while (x > virtualKey[i] && i < MAX)
+    while (x > position_[i].first && i < MAX)
       i++;
     for (int j = MAX + 1; j > i; j--)
     {
       //virtualKey[j][0] = virtualKey[j - 1][0];
       //virtualKey[j][1] = virtualKey[j - 1][1];
 
-      virtualKey[j] = virtualKey[j - 1];
-      aux_map.insert(std::make_pair(virtualKey[j], aux_map.find(virtualKey[j - 1])->second));
+      //virtualKey[j] = virtualKey[j - 1];
+      //aux_map.insert(std::make_pair(virtualKey[j], aux_map.find(virtualKey[j - 1])->second));
+      position_[j] = position_[j-1];
     }
     //virtualKey[i][0] = x;
     //virtualKey[i][1] = pos;
 
-    virtualKey[i] = x;
-    aux_map.insert(std::make_pair(virtualKey[i], pos));
+    //virtualKey[i] = x;
+    //aux_map.insert(std::make_pair(virtualKey[i], pos));
+
+    position_[i] = std::make_pair(x,pos);
 
     for (int j = MAX + 2; j > i + 1; j--)
     {
@@ -81,12 +86,15 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
 
       //newInternal->position = aux_map.find(virtualKey[i])->second;
 
-      newInternal->key[i] = virtualKey[i];
-      newInternal->position.insert(std::make_pair(virtualKey[i], aux_map.find(virtualKey[i])->second));
+      //newInternal->key[i] = virtualKey[i];
+      //newInternal->position.insert(std::make_pair(virtualKey[i], aux_map.find(virtualKey[i])->second));
+    
+      newInternal->position_[i] = position_[j]; 
+    
     }
     for (i = 0, j = cursor->size + 1; i < newInternal->size + 1; i++, j++)
     {
-      newInternal->ptr[i] = virtualPtr[j];
+      newInternal->ptr_[i] = virtualPtr[j];
     }
     if (cursor == root)
     {
@@ -94,11 +102,14 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
       //newRoot->key[0][0] = cursor->key[cursor->size][0];
       //newRoot->key[0][1] = cursor->key[cursor->size][1];
 
-      newRoot->key[0] = cursor->key[cursor->size];
-      newRoot->position.insert(std::make_pair(cursor->key[cursor->size], cursor->position.find(cursor->key[cursor->size])->second));
+      //newRoot->key[0] = cursor->key[cursor->size];
+      //newRoot->position.insert(std::make_pair(cursor->key[cursor->size], cursor->position.find(cursor->key[cursor->size])->second));
+      
+      newRoot->position_.push_back(cursor->position_[cursor->size]); 
 
-      newRoot->ptr[0] = cursor;
-      newRoot->ptr[1] = newInternal;
+
+      newRoot->ptr_[0] = cursor;
+      newRoot->ptr_[1] = newInternal;
       newRoot->IS_LEAF = false;
       newRoot->size = 1;
       root = newRoot;
@@ -107,27 +118,27 @@ void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, siz
     {
       //insertInternal(cursor->key[cursor->size][0], findParent(root, cursor), newInternal,cursor->key[cursor->size][1]);
 
-      insertInternal(cursor->key[cursor->size], find_parent(root, cursor), newInternal, cursor->position.find(cursor->key[cursor->size])->second);
+      insertInternal(cursor->position_[cursor->size].first, find_parent(root, cursor), newInternal, cursor->position_[cursor->size].second);
     }
   }
 }
 Node *b_plus_tree::find_parent(Node *cursor, Node *child)
 {
   Node *parent;
-  if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF)
+  if (cursor->IS_LEAF || (cursor->ptr_[0])->IS_LEAF)
   {
     return NULL;
   }
   for (int i = 0; i < cursor->size + 1; i++)
   {
-    if (cursor->ptr[i] == child)
+    if (cursor->ptr_[i] == child)
     {
       parent = cursor;
       return parent;
     }
     else
     {
-      parent = find_parent(cursor->ptr[i], child);
+      parent = find_parent(cursor->ptr_[i], child);
       if (parent != NULL)
         return parent;
     }
@@ -153,23 +164,23 @@ auto b_plus_tree::findNode(const db2::literal &id)
     {
       for (int i = 0; i < cursor->size; i++)
       {
-        if (id < cursor->key[i])
+        if (id < cursor->position_[i].first)
         {
-          cursor = cursor->ptr[i];
+          cursor = cursor->ptr_[i];
           break;
         }
         if (i == cursor->size - 1)
         {
-          cursor = cursor->ptr[i + 1];
+          cursor = cursor->ptr_[i + 1];
           break;
         }
       }
     }
     for (int i = 0; i < cursor->size; i++)
     {
-      if (cursor->key[i] == id)
+      if (cursor->position_[i].first == id)
       {
-        std::cout << "Found and in position: " << cursor->position.find(cursor->key[i])->second << "\n";
+        std::cout << "Found and in position: " << cursor->position_[i].second << "\n";
         return retorno{cursor, i};
       }
     }
@@ -188,7 +199,8 @@ std::vector<size_t> b_plus_tree::find(keyType low)
   auto nodo = findNode(low);
   if (nodo.cursor_ != nullptr)
   {
-    retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
+    //retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
+    retorno.push_back(nodo.cursor_->position_[nodo.i].second);
   }
   return retorno; //el vector "retorno" deberia regresar vacio
 }
@@ -199,14 +211,14 @@ void b_plus_tree::display(Node *cursor)
   {
     for (int i = 0; i < cursor->size; i++)
     {
-      std::cout << cursor->key[i] << " ";
+      std::cout << cursor->position_[i].first << " ";
     }
     std::cout << "\n";
     if (cursor->IS_LEAF != true)
     {
       for (int i = 0; i < cursor->size + 1; i++)
       {
-        display(cursor->ptr[i]);
+        display(cursor->ptr_[i]);
       }
     }
   }
@@ -243,7 +255,8 @@ std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
   auto nodo = findNode(key);
   if (nodo.cursor_ != nullptr)
   {
-    retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
+    //retorno.push_back(nodo.cursor_->position.find(nodo.cursor_->key[nodo.i])->second);
+    retorno.push_back(nodo.cursor_->position_[nodo.i].second);
   }
   return retorno; //el vector "retorno" deberia regresar vacio
 }
@@ -255,20 +268,20 @@ std::vector<size_t> b_plus_tree::get_positions(const db2::literal &key)
     Node *cursor = root;
     while (cursor->IS_LEAF == false) {
       for (int i = 0; i < cursor->size; i++) {
-        if (id < cursor->key[i]) {
-          cursor = cursor->ptr[i];
+        if (id < cursor->position_[i].first) {
+          cursor = cursor->ptr_[i];
           break;
         }
         if (i == cursor->size - 1) {
-          cursor = cursor->ptr[i + 1];
+          cursor = cursor->ptr_[i + 1];
           break;
         }
       }
     }
     for (int i = 0; i < cursor->size; i++) {
-      if (cursor->key[i] == id) {
-        std::cout << "Found and in position: "<< cursor->position.find(cursor->key[i])->second <<"\n";
-        return cursor->position.find(cursor->key[i])->second;
+      if (cursor->position_[i].first == id) {
+        std::cout << "Found and in position: "<< cursor->position_[i].second <<"\n";
+        return cursor->position_[i].second;
       }
     }
     std::cout << "Not found\n";
@@ -293,23 +306,23 @@ auto b_plus_tree::getMinNode(db2::literal keymin)
     {
       for (int i = 0; i < cursor->size; i++)
       {
-        if (keymin < cursor->key[i])
+        if (keymin < cursor->position_[i].first)
         {
-          cursor = cursor->ptr[i];
+          cursor = cursor->ptr_[i];
           break;
         }
         if (i == cursor->size - 1)
         {
-          cursor = cursor->ptr[i + 1];
+          cursor = cursor->ptr_[i + 1];
           break;
         }
       }
     }
     for (int i = 0; i < cursor->size; i++)
     {
-      if ((cursor->key[i] == keymin ) || (keymin < cursor->key[i+1] && cursor->key[i] < keymin))
+      if ((cursor->position_[i].first == keymin ) || (keymin < cursor->position_[i+1].first && cursor->position_[i].first < keymin))
       {
-        std::cout << "Found and in position: " << cursor->position.find(cursor->key[i])->second << "\n";
+        std::cout << "Found and in position: " << cursor->position_[i].second << "\n";
         return retorno{cursor, i};
       }
     }
@@ -348,17 +361,17 @@ std::vector<size_t> b_plus_tree::get_positions(
       }
     }   
   }*/
-  while (cursor->key[0] <= key_le)
+  while (cursor->position_[0].first <= key_le)
     {
       int i = 0;
       for (i = 0; i < cursor->size; i++)
       {
-        if (cursor->key[i] >= key_ge && cursor->key[i] <= key_le)
+        if (cursor->position_[i].first >= key_ge && cursor->position_[i].first <= key_le)
         {
-          retorno.push_back(cursor->position.find(cursor->key[i])->second);
+          retorno.push_back(cursor->position_[i].second);
         }
       }
-      cursor = cursor->ptr[cursor->size];
+      cursor = cursor->ptr_[cursor->size];
     }
   return retorno;
 }
@@ -429,55 +442,60 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
     {
       Node *newLeaf = new Node;
       db2::literal virtualNode[MAX + 1];
-      std::map<db2::literal, long> aux_map;
+      std::vector<size_t> posiciones;
+      std::vector<std::pair<db2::literal, size_t>> posiciones_ = cursor->position_;
+      //std::map<db2::literal, long> aux_map;
       for (int i = 0; i < MAX; i++)
       {
-        virtualNode[i] = cursor->position_[i].first;
-        aux_map.insert(std::make_pair(virtualNode[i], cursor->position.find(cursor->key[i])->second));
-
-
+        //virtualNode[i] = cursor->position_[i].first;
+        //aux_map.insert(std::make_pair(virtualNode[i], cursor->position.find(cursor->key[i])->second));
       }
       int i = 0, j;
-      while (x > virtualNode[i] && i < MAX)
-        i++;
+      while (x > posiciones_[i].first && i < MAX)
+      i++;
       for (int j = MAX + 1; j > i; j--)
       {
-        virtualNode[j] = virtualNode[j - 1];
-        aux_map.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j - 1])->second));
+        //virtualNode[j] = virtualNode[j - 1];
+        //aux_map.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j - 1])->second));
+        posiciones_[j] = posiciones_[j - 1]; 
       }
-      virtualNode[i] = x;
-      aux_map.insert(std::make_pair(virtualNode[i], posicion_registro));
+      //virtualNode[i] = x;
+      //aux_map.insert(std::make_pair(virtualNode[i], posicion_registro));
+
+      posiciones_.push_back(std::make_pair(x,posicion_registro));
       newLeaf->IS_LEAF = true;
       cursor->size = (MAX + 1) / 2;
       newLeaf->size = MAX + 1 - (MAX + 1) / 2;
-      cursor->ptr[cursor->size] = newLeaf;
-      newLeaf->ptr[newLeaf->size] = cursor->ptr[MAX];
-      cursor->ptr[MAX] = NULL;
+      cursor->ptr_[cursor->size] = newLeaf;
+      newLeaf->ptr_[newLeaf->size] = cursor->ptr_[MAX];
+      cursor->ptr_[MAX] = NULL;
       for (i = 0; i < cursor->size; i++)
       {
         //cursor->key[i] = virtualNode[i];
         //cursor->position.insert(std::make_pair(virtualNode[i], aux_map.find(virtualNode[i])->second));
+        cursor->position_[i] = posiciones_[i];
       }
       for (i = 0, j = cursor->size; i < newLeaf->size; i++, j++)
       {
         //newLeaf->key[i] = virtualNode[j];
         //newLeaf->position.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j])->second));
+        newLeaf->position_[i] = posiciones_[j];
       }
       if (cursor == root)
       {
         Node *newRoot = new Node;
-        newRoot->key[0] = newLeaf->key[0];
-        newRoot->position.insert(std::make_pair(newLeaf->key[0], aux_map.find(newLeaf->key[0])->second));
-
-        newRoot->ptr[0] = cursor;
-        newRoot->ptr[1] = newLeaf;
+        //newRoot->key[0] = newLeaf->key[0];
+        //newRoot->position_[0].first = newLeaf->position_[0].first;
+        newRoot->position_.push_back(posiciones_[0]);
+        newRoot->ptr_[0] = cursor;
+        newRoot->ptr_[1] = newLeaf;
         newRoot->IS_LEAF = false;
         newRoot->size = 1;
         root = newRoot;
       }
       else
       {
-        insertInternal(newLeaf->key[0], parent, newLeaf, newLeaf->position.find(newLeaf->key[0])->second);
+        insertInternal(newLeaf->position_[0].first, parent, newLeaf,newLeaf->position_[0].second);
       }
     }
   }

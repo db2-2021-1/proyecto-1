@@ -18,21 +18,15 @@ using keyType = int;
 struct Node
 {
     bool IS_LEAF;
-    db2::literal *key;
+    //db2::literal *key;
     int size;
-    Node **ptr; // std::vector<>
-    std::map<db2::literal, size_t> position;
+    //Node **ptr; // std::vector<>
+    //std::map<db2::literal, size_t> position;
 
     std::vector<Node*>ptr_;
     std::vector<std::pair<db2::literal, size_t>> position_;
     //int -> id, long -> posicion del registro
     friend class BPTree;
-    Node()
-    {
-        key = new db2::literal[MAX];
-        ptr = new Node *[MAX + 1];
-    }
-    int pos_registro = 0;
 
     class iterator
     {
@@ -115,6 +109,8 @@ struct Node
     {
         return iterator(nullptr, 0);
     }
+
+    Node():ptr_(MAX+1){}
 };
 
 class b_plus_tree
