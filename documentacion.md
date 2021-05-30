@@ -1,4 +1,4 @@
-﻿# Extendible Hash
+# Extendible Hash
 ## General
 Un extendible hash es una estructura de datos utilizable para la indexación de bases de datos, el cual garantiza inserciones y búsquedas singulares ágiles. En este caso se está trabajando con un archivo **.csv** de 5110 registros para la experimentación. La llave en este caso es un elemento entero **ID** que representa el número de identificación de la persona examinada.
 >La función hash es toma un entero y devuelve en un string el módulo de n-binario de este, donde n = hashSize.
