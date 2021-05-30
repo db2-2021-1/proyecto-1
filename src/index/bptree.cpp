@@ -1,4 +1,5 @@
 #include "bptree.hpp"
+
 void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
 {
   if (cursor->size < MAX)
@@ -369,8 +370,9 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
   if (root == NULL)
   {
     root = new Node;
-    root->key[0] = x;
-    root->position.insert(std::make_pair(x, posicion_registro));
+    //root->key[0] = x;
+    //root->position.insert(std::make_pair(x, posicion_registro));
+    root->position_.push_back(std::make_pair(x, posicion_registro));
     root->IS_LEAF = true;
     root->size = 1;
   }
@@ -383,14 +385,17 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       parent = cursor;
       for (int i = 0; i < cursor->size; i++)
       {
-        if (x < cursor->key[i])
+        //if (x < cursor->key[i])
+        if(x < cursor->position_[i].first)
         {
-          cursor = cursor->ptr[i];
+          //cursor = cursor->ptr[i];
+          cursor = cursor->ptr_[i];
           break;
         }
         if (i == cursor->size - 1)
         {
-          cursor = cursor->ptr[i + 1];
+          //cursor = cursor->ptr[i + 1];
+          cursor = cursor->ptr_[i+1];
           break;
         }
       }
@@ -398,18 +403,27 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
     if (cursor->size < MAX)
     {
       int i = 0;
-      while (x > cursor->key[i] && i < cursor->size)
+      while (x > cursor->position_[i].first && i < cursor->size)
         i++;
       for (int j = cursor->size; j > i; j--)
       {
-        cursor->key[j] = cursor->key[j - 1];
-        cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
+        cursor->position_[j].first = cursor->position_[j - 1].first;
+        cursor->position_.push_back(std::make_pair(cursor->position_[j].first, cursor->position_[j-1].second));
+        //cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
       }
-      cursor->key[i] = x;
-      cursor->position.insert(std::make_pair(x, posicion_registro));
+      //cursor->key[i] = x;
+      //cursor->position.insert(std::make_pair(x, posicion_registro));
+      
+      //cursor->position_.push_back(std::make_pair());
+      cursor->position_[i] = std::make_pair(x,posicion_registro);
+      
       cursor->size++;
-      cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
-      cursor->ptr[cursor->size - 1] = NULL;
+      cursor->ptr_[cursor->size] = cursor->ptr_[cursor->size -1];
+      cursor->ptr_[cursor->size - 1] = NULL;
+
+
+      //cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
+      //cursor->ptr[cursor->size - 1] = NULL;
     }
     else
     {
@@ -418,8 +432,10 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       std::map<db2::literal, long> aux_map;
       for (int i = 0; i < MAX; i++)
       {
-        virtualNode[i] = cursor->key[i];
+        virtualNode[i] = cursor->position_[i].first;
         aux_map.insert(std::make_pair(virtualNode[i], cursor->position.find(cursor->key[i])->second));
+
+
       }
       int i = 0, j;
       while (x > virtualNode[i] && i < MAX)
@@ -439,13 +455,13 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       cursor->ptr[MAX] = NULL;
       for (i = 0; i < cursor->size; i++)
       {
-        cursor->key[i] = virtualNode[i];
-        cursor->position.insert(std::make_pair(virtualNode[i], aux_map.find(virtualNode[i])->second));
+        //cursor->key[i] = virtualNode[i];
+        //cursor->position.insert(std::make_pair(virtualNode[i], aux_map.find(virtualNode[i])->second));
       }
       for (i = 0, j = cursor->size; i < newLeaf->size; i++, j++)
       {
-        newLeaf->key[i] = virtualNode[j];
-        newLeaf->position.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j])->second));
+        //newLeaf->key[i] = virtualNode[j];
+        //newLeaf->position.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j])->second));
       }
       if (cursor == root)
       {

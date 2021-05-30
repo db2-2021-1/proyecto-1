@@ -19,8 +19,12 @@ struct Node
     bool IS_LEAF;
     db2::literal *key;
     int size;
-    Node **ptr;
-    std::map<db2::literal, size_t> position; //int -> id, long -> posicion del registro
+    Node **ptr; // std::vector<>
+    std::map<db2::literal, size_t> position;
+
+    std::vector<Node*>ptr_;
+    std::vector<std::pair<db2::literal, size_t>> position_;
+    //int -> id, long -> posicion del registro
     friend class BPTree;
     Node()
     {

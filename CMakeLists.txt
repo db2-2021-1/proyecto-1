@@ -50,7 +50,7 @@ add_subdirectory(pkg) # Packaging
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		CXX_STANDARD 17
+		CXX_STANDARD 20
 )
 
 # Shared libraries
