@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <iterator>
 
 #include "statement.hpp"
 
@@ -32,6 +33,88 @@ struct Node
         ptr = new Node *[MAX + 1];
     }
     int pos_registro = 0;
+
+    class iterator
+    {
+    private:
+        Node* node;
+        size_t index;
+
+        void next_value()
+        {
+            size_t node_size = node->position_.size();
+
+            if(node == nullptr || !node->IS_LEAF) // end
+            {
+                node = nullptr;
+                index = 0;
+            }
+            else if(index >= node_size-1) // Last element
+            {
+                node = node->ptr_.back();
+                index = 0;
+            }
+            else
+            {
+                index++;
+            }
+        }
+
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type = std::ptrdiff_t;
+        using value_type = std::pair<db2::literal, size_t>;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+        iterator(Node* node, size_t index):
+            node(node),
+            index(index)
+        {};
+
+        reference operator*() const
+        {
+            return node->position_[index];
+        }
+
+        pointer operator->()
+        {
+            return &node->position_[index];
+        }
+
+        iterator& operator++()
+        {
+            next_value();
+            return *this;
+        }
+
+        iterator operator++(int)
+        {
+            iterator temp = *this;
+            next_value();
+            return temp;
+        }
+
+        friend bool operator==(const iterator& l, const iterator& r)
+        {
+            return (l.node == r.node) && (l.index == r.index);
+        };
+
+        friend bool operator!=(const iterator& l, const iterator& r)
+        {
+            return !(l == r);
+        }
+    };
+
+    iterator begin()
+    {
+        return iterator(position_.empty()? nullptr : this, 0);
+    }
+
+    iterator end()
+    {
+        return iterator(nullptr, 0);
+    }
 };
 
 class b_plus_tree
