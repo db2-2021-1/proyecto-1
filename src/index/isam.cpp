@@ -48,7 +48,7 @@ db2::index::isam::~isam()
 	for(const auto& [key, pos]: index)
 	{
 		write(key, key_type.size, ofs);
-		ofs.write((char*)pos, sizeof(pos));
+		ofs.write((char*)&pos, sizeof(pos));
 	}
 }
 
