@@ -61,3 +61,25 @@ std::ostream& std::operator<<(std::ostream& os, const db2::literal& l)
 
 	return os;
 }
+
+void db2::write(const literal& l, size_t size, std::ostream& os)
+{
+	std::visit(overload{
+		[&os](int i)
+		{
+			os.write((char*)&i, sizeof(i));
+		},
+		[&os](float f)
+		{
+			os.write((char*)&f, sizeof(f));
+		},
+		[&os, size](const std::string& str)
+		{
+			os.write(str.c_str(), str.size());
+			for(size_t i = str.size(); i < size+1; i++)
+			{
+				os << '\0';
+			}
+		},
+	}, l);
+}

@@ -742,24 +742,7 @@ void db2::table::write(std::ostream& os, statement::row& r) const
 	{
 		size_t size = columns[i++].second.size;
 
-		std::visit(overload{
-			[&os](int i)
-			{
-				os.write((char*)&i, sizeof(i));
-			},
-			[&os](float f)
-			{
-				os.write((char*)&f, sizeof(f));
-			},
-			[&os, size](const std::string& str)
-			{
-				os.write(str.c_str(), str.size());
-				for(size_t i = str.size(); i < size+1; i++)
-				{
-					os << '\0';
-				}
-			},
-		}, cell);
+		db2::write(cell, size, os);
 	}
 
 	os.write((char*)&r.valid, sizeof(r.valid));

@@ -30,11 +30,14 @@ using literal = std::variant<int, float, std::string>;
 
 literal from_union(sql_literal l);
 
+void write(const literal& l, size_t size, std::ostream& os);
+
 }
 
 namespace std
 {
 
+/// Csv write
 std::ostream& operator<<(std::ostream& os, const db2::literal& l);
 
 inline bool operator<(const db2::literal& l, int i)

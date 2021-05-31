@@ -19,4 +19,5 @@ target_sources(${PROJECT_NAME}
 		# C++
 		bptree.cpp
 		extendible_hash.cpp
+		isam.cpp
 )
