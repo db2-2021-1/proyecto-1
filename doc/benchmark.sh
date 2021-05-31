@@ -34,7 +34,7 @@ function create-volcano-hash-index()
 	run-sql <(echo "CREATE INDEX ON volcano USING hash(Country);")
 }
 
-function create-volcano-bptree-index()
+function create-volcano-isam-index()
 {
 	run-sql <(echo "CREATE INDEX ON volcano(Country);")
 }
@@ -44,7 +44,7 @@ function create-hotel-hash-index()
 	run-sql <(echo "CREATE INDEX ON hotel USING hash(country);")
 }
 
-function create-hotel-bptree-index()
+function create-hotel-isam-index()
 {
 	run-sql <(echo "CREATE INDEX ON hotel(country);")
 }
@@ -79,10 +79,10 @@ create-volcano-hash-index > /dev/null
 volcano-insert | to-csv > volcano-hash-index-insert.csv
 volcano-select | to-csv > volcano-hash-index-select.csv
 
-#create-volcano > /dev/null
-#create-volcano-bptree-index > /dev/null
-#volcano-insert | to-csv > volcano-bptree-index-insert.csv
-#volcano-select | to-csv > volcano-bptree-index-insert.csv
+create-volcano > /dev/null
+create-volcano-isam-index > /dev/null
+volcano-insert | to-csv > volcano-isam-index-insert.csv
+volcano-select | to-csv > volcano-isam-index-select.csv
 
 
 create-hotel > /dev/null
@@ -94,9 +94,9 @@ create-hotel-hash-index > /dev/null
 hotel-insert | to-csv > hotel-hash-index-insert.csv
 hotel-select | to-csv > hotel-hash-index-select.csv
 
-#create-hotel > /dev/null
-#create-hotel-bptree-index > /dev/null
-#hotel-insert | to-csv > hotel-bptree-index-insert.csv
-#hotel-select | to-csv > hotel-bptree-index-select.csv
+create-hotel > /dev/null
+create-hotel-isam-index > /dev/null
+hotel-insert | to-csv > hotel-isam-index-insert.csv
+hotel-select | to-csv > hotel-isam-index-select.csv
 
 ./table.r
