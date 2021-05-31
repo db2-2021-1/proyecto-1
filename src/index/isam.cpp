@@ -1,10 +1,55 @@
+#include <fstream>
+
 #include "isam.hpp"
 
 db2::index::isam::isam(
 	const std::filesystem::path& index_path,
 	db2::statement::type key_type
-)
+):
+	index_path(index_path),
+	key_type(key_type)
 {
+	std::ifstream ifs(index_path, std::ios::binary);
+
+	if(!ifs.is_open())
+		return;
+
+	size_t key_size = key_type.size +
+		(key_type.t == statement::type::_type::VARCHAR? 1 : 0);
+
+	size_t pair_size = key_size + sizeof(size_t);
+
+	char* buffer = (char*)malloc(pair_size);
+
+	std::pair<db2::literal, size_t> new_pair;
+	while(!ifs.eof())
+	{
+		ifs.read(buffer, pair_size);
+
+		new_pair.first = read(buffer, key_type);
+		new_pair.second = *(size_t*)(buffer+key_size);
+
+		index.insert(std::move(new_pair));
+	}
+
+	free(buffer);
+}
+
+db2::index::isam::~isam()
+{
+	std::ofstream ofs(index_path, std::ios::binary);
+
+	if(!ofs.is_open())
+	{
+		perror(index_path.c_str());
+		return;
+	}
+
+	for(const auto& [key, pos]: index)
+	{
+		write(key, key_type.size, ofs);
+		ofs.write((char*)pos, sizeof(pos));
+	}
 }
 
 std::vector<size_t> db2::index::isam::get_positions(const db2::literal& key)

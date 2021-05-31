@@ -17,6 +17,7 @@
 #include <iostream>
 
 #include "literal.hpp"
+#include "statement.hpp"
 
 db2::literal db2::from_union(sql_literal l)
 {
@@ -82,4 +83,25 @@ void db2::write(const literal& l, size_t size, std::ostream& os)
 			}
 		},
 	}, l);
+}
+
+db2::literal db2::read(char* buffer, const statement::type& t)
+{
+	literal l;
+
+	switch(t.t)
+	{
+		case statement::type::_type::INT:
+			return *(int*)buffer;
+
+		case statement::type::_type::REAL:
+			return *(float*)buffer;
+
+		case statement::type::_type::VARCHAR:
+			return std::string(buffer);
+
+		case statement::type::_type::NONE:
+			break;
+	}
+	return 0;
 }

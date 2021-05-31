@@ -26,11 +26,17 @@
 namespace db2
 {
 
+namespace statement
+{
+	struct type;
+};
+
 using literal = std::variant<int, float, std::string>;
 
 literal from_union(sql_literal l);
 
 void write(const literal& l, size_t size, std::ostream& os);
+literal read(char* buffer, const statement::type& t);
 
 }
 

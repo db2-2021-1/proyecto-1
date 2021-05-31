@@ -761,23 +761,7 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 		if(is.eof())
 			return statement::row{false,-1,{}};
 
-		switch(type.t)
-		{
-			case statement::type::_type::INT:
-				new_row.values.push_back(*(int*)buffer);
-				break;
-
-			case statement::type::_type::REAL:
-				new_row.values.push_back(*(float*)buffer);
-				break;
-
-			case statement::type::_type::VARCHAR:
-				new_row.values.push_back(std::string(buffer));
-				break;
-
-			default:
-				break;
-		}
+		new_row.values.push_back(db2::read(buffer, type));
 	}
 
 	is.read((char*)&new_row.valid, sizeof(new_row.valid));
