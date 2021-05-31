@@ -4,6 +4,10 @@
 
 # Proyecto 1
 
+- Alberto Oporto
+- Andrés Lostanau
+- Esteban Principe
+
 [Informe](informe.md)
 
 ## Dependencias
