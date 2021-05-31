@@ -4,7 +4,7 @@
 
 El hash extendible y el indexed sequential access method ISAM son técnicas
 de indexación muy conocidas y mediante las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
-El ISAM combina las grandes facultades de los métodos de acceso secuencial y random. Usualmente se implementa usando un Index File y un Data File. 
+El ISAM combina las grandes facultades de los métodos de acceso secuencial y random. Usualmente se implementa usando un Index File y un Data File.
 
 El Index File está compuesto de 2 columnas, la primera es la llave a la que 
 se aplica el método de indexación, y la otra es la dirección o posición donde se encuentra el registra con la llave correspondiente.
@@ -76,3 +76,5 @@ El promedio de 100 SELECTs.
 - `DELETE FROM table_name WHERE column IS value;`
 - `DELETE FROM table_name WHERE column BETWEEN value AND value;`
 - `COPY table_name FROM file.csv CSV HEADER;`
+
+https://user-images.githubusercontent.com/39320840/120132166-773e7c80-c18f-11eb-879d-d1d8ebf63934.mp4
