@@ -2,13 +2,18 @@
 
 ## Introducción
 
-El hash extendible y el B+ tree son técnicas de indexación muy conocidas y mediante
-las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
+El hash extendible y el indexed sequential access method ISAM son técnicas 
+de indexación muy conocidas y mediante las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
+El ISAM combina las grandes facultades de los métodos de acceso secuencial y random. Usualmente se implementa usando un Index File y un Data File. 
 
-El B+ tree tiene 2 formas de ser implementado, el primero es el clustered
+El Index File está compuesto de 2 columnas, la primera es la llave a la que 
+se aplica el método de indexación, y la otra es la dirección o posición donde se encuentra el registra con la llave correspondiente.
+Por otra parte, el Data File va a contener los datos con los registros, la cantidad de datos en cada columna puedes ser variante por lo que el tamaño de cada registro también puede cambiar. 
+
+![Getting Started](./ISAM.JPG)
 
 
- se caracteiza por mantener las forma de un B tree con la diferencia de pode
+se caracteiza por mantener las forma de un B tree con la diferencia de pode
 
 
 
