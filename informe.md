@@ -2,7 +2,7 @@
 
 ## Introducción
 
-El hash extendible y el indexed sequential access method ISAM son técnicas 
+El hash extendible y el indexed sequential access method ISAM son técnicas
 de indexación muy conocidas y mediante las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
 El ISAM combina las grandes facultades de los métodos de acceso secuencial y random. Usualmente se implementa usando un Index File y un Data File. 
 
@@ -17,45 +17,52 @@ se caracteiza por mantener las forma de un B tree con la diferencia de pode
 
 
 
-https://www.kaggle.com/jessemostipak/hotel-booking-demand
-https://www.kaggle.com/smithsonian/volcanic-eruptions
-
 ## Técnicas
 
 - Hash extendible.
-- B+ tree.
+- ISAM
+
+- https://www.kaggle.com/jessemostipak/hotel-booking-demand
+- https://www.kaggle.com/smithsonian/volcanic-eruptions
 
 ## Benchmark
 
 ### INSERT
 
 `COPY volcano FROM "database.csv" CSV HEADER;`
-|Índice    |Lecturas|Escrituras|Tiempo    |
-|----------|--------|----------|----------|
-|Sin índice|69      |71        |20.337    |
-|Hash      |14800   |8569      |48.059    |
+|Índice    |Lecturas|Escrituras|Tiempo|
+|----------|--------|----------|------|
+|Sin índice|69      |71        |19.466|
+|Hash      |14799   |8570      |56.276|
+|ISAM      |69      |85        |21.673|
+
 
 `COPY hotel FROM "hotel_bookings.csv" CSV HEADER;`
-|Índice    |Lecturas|Escrituras|Tiempo    |
-|----------|--------|----------|----------|
-|Sin índice|4121    |3396      |646.712   |
-|Hash      |88032810|261432    |112510.605|
+|Índice    |Lecturas|Escrituras|Tiempo|
+|----------|--------|----------|------|
+|Sin índice|4121    |3396      |1025.771|
+|Hash      |88032809|261433    |130883.331|
+|ISAM      |4121    |3630      |909.145|
 
 
 ### SELECT
 El promedio de 100 SELECTs.
 
 `SELECT * FROM volcano WHERE Country IS "Peru";`
-|Índice         |Lecturas|Escrituras|Tiempo   |
-|---------------|--------|----------|---------|
-|Sin índice     |3402    |1.07      |201.36222|
-|Hash extendible|795     |1.07      |2.01123  |
+|Índice    |Lecturas|Escrituras|Tiempo|
+|----------|--------|----------|------|
+|Sin índice|76      |0.69      |3.07605|
+|Hash      |24      |0.69      |0.21495|
+|ISAM      |35      |14.69     |4.4432|
+
 
 `SELECT * FROM hotel WHERE country IS "PER";`
-|Índice         |Lecturas|Escrituras|Tiempo   |
-|---------------|--------|----------|---------|
-|Sin índice     |76      |0.69      |1.76824  |
-|Hash extendible|24      |0.69      |0.18064  |
+|Índice    |Lecturas|Escrituras|Tiempo|
+|----------|--------|----------|------|
+|Sin índice|3402    |1.07      |373.66265|
+|Hash      |795     |1.07      |1.79106|
+|ISAM      |268     |235.07    |107.27113|
+
 
 ## Uso y video
 `proyecto-1` soporta los siguientes comandos SQL.
