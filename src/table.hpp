@@ -110,10 +110,7 @@ private:
 
 	bool update_bptree_index(const std::vector<statement::row>& data);
 
-	/// Delete hashes and
-	bool delete_from_hash_index(
-		const std::vector<std::pair<literal, size_t>>& deleted_key_pos
-	);
+	bool update_isam_index(const std::vector<statement::row>& data);
 
 	/// Must be called when the table has an index.
 	std::vector<size_t> select_equals(const literal& key);

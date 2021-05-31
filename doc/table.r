@@ -6,16 +6,20 @@ library(readr)
 
 volcano_select_no_index <- read_csv("volcano-no-index-select.csv")
 volcano_select_hash <- read_csv("volcano-hash-index-select.csv")
+volcano_select_isam <- read_csv("volcano-isam-index-select.csv")
 
 hotel_select_no_index <- read_csv("hotel-no-index-select.csv")
 hotel_select_hash <- read_csv("hotel-hash-index-select.csv")
+hotel_select_isam <- read_csv("hotel-isam-index-select.csv")
 
 
 volcano_insert_no_index <- read_csv("volcano-no-index-insert.csv")
 volcano_insert_hash <- read_csv("volcano-hash-index-insert.csv")
+volcano_insert_isam <- read_csv("volcano-isam-index-insert.csv")
 
 hotel_insert_no_index <- read_csv("hotel-no-index-insert.csv")
 hotel_insert_hash <- read_csv("hotel-hash-index-insert.csv")
+hotel_insert_isam <- read_csv("hotel-isam-index-insert.csv")
 
 add_row <- function(df, index, table) {
     new_row <- data.frame(
@@ -42,16 +46,20 @@ hotel_insert <- volcano_select
 
 volcano_select <- add_row(volcano_select, "Sin índice", volcano_select_no_index)
 volcano_select <- add_row(volcano_select, "Hash", volcano_select_hash)
+volcano_select <- add_row(volcano_select, "ISAM", volcano_select_isam)
 
 hotel_select <- add_row(hotel_select, "Sin índice", hotel_select_no_index)
 hotel_select <- add_row(hotel_select, "Hash", hotel_select_hash)
+hotel_select <- add_row(hotel_select, "ISAM", hotel_select_isam)
 
 
 volcano_insert <- add_row(volcano_insert, "Sin índice", volcano_insert_no_index)
 volcano_insert <- add_row(volcano_insert, "Hash", volcano_insert_hash)
+volcano_insert <- add_row(volcano_insert, "ISAM", volcano_insert_isam)
 
 hotel_insert <- add_row(hotel_insert, "Sin índice", hotel_insert_no_index)
 hotel_insert <- add_row(hotel_insert, "Hash", hotel_insert_hash)
+hotel_insert <- add_row(hotel_insert, "ISAM", hotel_insert_isam)
 
 write_csv(volcano_select, "volcano-select-benchmark.csv")
 write_csv(hotel_select, "hotel-select-benchmark.csv")

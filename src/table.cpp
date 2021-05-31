@@ -633,6 +633,31 @@ bool db2::table::update_hash_index(const std::vector<statement::row>& data)
 	return true;
 }
 
+bool db2::table::update_isam_index(const std::vector<statement::row>& data)
+{
+	ssize_t column_index = key_index();
+
+	auto index = db2::index::isam(index_path(), columns[column_index].second);
+
+	for(const auto& r: data)
+	{
+		const literal& key = r.values[column_index];
+
+		if(r.valid)
+		{
+			if(!index.insert(key, r.pos))
+				return false;
+		}
+		else
+		{
+			if(!index.delete_from(key, r.pos))
+				return false;
+		}
+	}
+
+	return true;
+}
+
 bool db2::table::update_bptree_index(const std::vector<statement::row>& data)
 {
 	b_plus_tree bp_tree(index_path(), columns[key_index()].second);
@@ -653,24 +678,6 @@ bool db2::table::update_bptree_index(const std::vector<statement::row>& data)
 			if(!bp_tree.delete_from(key, r.pos))
 				return false;
 		}
-	}
-
-	return true;
-}
-
-bool db2::table::delete_from_hash_index(
-	const std::vector<std::pair<literal, size_t>>& deleted_key_pos
-)
-{
-	db2::index::extendible_hash hash_index(index_path());
-
-	if(!hash_index.is_open())
-		return false;
-
-	auto hash = std::hash<literal>{};
-	for(const auto& [key, pos]: deleted_key_pos)
-	{
-		hash_index.delete_from(hash(key), pos);
 	}
 
 	return true;
@@ -742,24 +749,7 @@ void db2::table::write(std::ostream& os, statement::row& r) const
 	{
 		size_t size = columns[i++].second.size;
 
-		std::visit(overload{
-			[&os](int i)
-			{
-				os.write((char*)&i, sizeof(i));
-			},
-			[&os](float f)
-			{
-				os.write((char*)&f, sizeof(f));
-			},
-			[&os, size](const std::string& str)
-			{
-				os.write(str.c_str(), str.size());
-				for(size_t i = str.size(); i < size+1; i++)
-				{
-					os << '\0';
-				}
-			},
-		}, cell);
+		db2::write(cell, size, os);
 	}
 
 	os.write((char*)&r.valid, sizeof(r.valid));
@@ -778,23 +768,7 @@ db2::statement::row db2::table::read(std::istream& is, char* buffer) const
 		if(is.eof())
 			return statement::row{false,-1,{}};
 
-		switch(type.t)
-		{
-			case statement::type::_type::INT:
-				new_row.values.push_back(*(int*)buffer);
-				break;
-
-			case statement::type::_type::REAL:
-				new_row.values.push_back(*(float*)buffer);
-				break;
-
-			case statement::type::_type::VARCHAR:
-				new_row.values.push_back(std::string(buffer));
-				break;
-
-			default:
-				break;
-		}
+		new_row.values.push_back(db2::read(buffer, type));
 	}
 
 	is.read((char*)&new_row.valid, sizeof(new_row.valid));
@@ -823,10 +797,18 @@ std::vector<size_t> db2::table::select_equals(const literal& key)
 
 			return eh.get_positions(std::hash<literal>{}(key));
 		}
-		default:
-			assert(false);
-			return {};
+
+		case statement::index_type::isam:
+		{
+			db2::index::isam isam(index_path(), columns[key_index()].second);
+
+			return isam.get_positions(key);
+		}
+
+		case statement::index_type::none:
+			break;
 	}
+	return {};
 }
 
 std::vector<size_t> db2::table::select_range(
@@ -844,12 +826,18 @@ std::vector<size_t> db2::table::select_range(
 		}
 
 		case statement::index_type::e_hash:
-			return {};
-
-		default:
-			assert(false);
+		case statement::index_type::none:
 			break;
+
+		case statement::index_type::isam:
+		{
+			db2::index::isam isam(index_path(), columns[key_index()].second);
+
+			return isam.get_positions(ge, le);
+		}
 	}
+
+	return {};
 }
 
 std::vector<db2::statement::row> db2::table::select_all(
@@ -987,7 +975,10 @@ bool db2::table::update_index(std::vector<statement::row>& data)
 			case statement::index_type::bp_tree:
 				return update_bptree_index(data);
 
-			default:
+			case statement::index_type::isam:
+				return update_isam_index(data);
+
+			case statement::index_type::none:
 				break;
 		}
 	}

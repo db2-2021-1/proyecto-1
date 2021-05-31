@@ -127,6 +127,10 @@ std::ostream& db2::statement::operator<<(std::ostream& os, const create_index& c
 			os << "Hash";
 			break;
 
+		case index_type::isam:
+			os << "Isam";
+			break;
+
 		case index_type::none:
 			os << "None";
 			break;

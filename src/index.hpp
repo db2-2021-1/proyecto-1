@@ -18,3 +18,4 @@
 
 #include "index/bptree.hpp"
 #include "index/extendible_hash.hpp"
+#include "index/isam.hpp"
