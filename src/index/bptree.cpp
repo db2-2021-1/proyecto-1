@@ -243,9 +243,13 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
     }
 
     auto it = std::lower_bound(
-        cursor->position_.cbegin(),
-        cursor->position_.cend(),
-        std::make_pair(keymin, 0UL)
+        cursor->position_.begin(),
+        cursor->position_.begin()+cursor->size,
+        std::make_pair(keymin, 0UL),
+        [](const auto& l, const auto& r)
+        {
+            return l.first < r.first;
+        }
     );
 
     if(it == cursor->position_.end())
