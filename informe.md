@@ -4,16 +4,28 @@
 
 El hash extendible y el indexed sequential access method ISAM son técnicas 
 de indexación muy conocidas y mediante las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
+
+
+>ISAM
+
 El ISAM combina las grandes facultades de los métodos de acceso secuencial y random. Usualmente se implementa usando un Index File y un Data File. 
 
 El Index File está compuesto de 2 columnas, la primera es la llave a la que 
-se aplica el método de indexación, y la otra es la dirección o posición donde se encuentra el registra con la llave correspondiente.
-Por otra parte, el Data File va a contener los datos con los registros, la cantidad de datos en cada columna puedes ser variante por lo que el tamaño de cada registro también puede cambiar. 
+se aplica el método de indexación, y la otra es la dirección o posición donde se encuentra el registra con la llave correspondiente. Además, existen 
+2 tipos de index file dentro de los ISAM, estos son los dense y los sparse.
+La diferencia más notoria es la de la poca cantidad de entradas en el Sparse Index File, debido a que cada entrada del Index File va a apuntar a un grupo de registros en el Data File, cuyos registros en el Data File tienen que estar ordenados según su llave. Por otro, lado em el Dense Index File, cada registro en el Data File tiene su respectivo mapeo en el Dense Index File, por lo que el dense index file tiende a tener más filas o tuplas. Sin embargo, la búsqueda de un registro es más lento en un dense index file.
+
+Por otra parte, el Data File va a contener los datos con los registros, la cantidad de datos en cada columna puedes ser variante por lo que el tamaño 
+de cada registro también puede cambiar. 
 
 ![Getting Started](./ISAM.JPG)
 
 
-se caracteiza por mantener las forma de un B tree con la diferencia de pode
+Así como se puede tener un index file con un data file, se puede incluso mapear llaves con otro index file, con el fin de aligerar la búsqueda de un registro o los registros cuyos valores de llave están dentro de un rango. A este concepto se la llama multilevel index_file;
+
+![Getting Started](./multilevelindexfile.JPG)
+
+
 
 
 
