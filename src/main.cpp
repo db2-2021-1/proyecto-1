@@ -38,15 +38,13 @@ int main(int argc, char* argv[])
 {
 	b_plus_tree tree("a", db2::statement::type());
 
-	tree.insert("a", 1);
-	tree.insert("b", 2);
-
-	for(auto pos: tree.get_positions("a"))
+	//tree.insert(1,1);
+	for(int i = 1; i < 100; i++)
 	{
-		printf("%ld\n", pos);
+		tree.insert(i, i);
 	}
 
-	for(auto pos: tree.get_positions("b"))
+	for(auto pos: tree.get_positions(1))
 	{
 		printf("%ld\n", pos);
 	}
