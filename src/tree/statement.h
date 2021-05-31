@@ -42,7 +42,8 @@ enum sql_statement_type
 enum sql_index_type
 {
 	SQL_BPTREE,
-	SQL_HASH
+	SQL_HASH,
+	SQL_ISAM
 };
 
 typedef struct _sql_statement_tree sql_statement_tree;

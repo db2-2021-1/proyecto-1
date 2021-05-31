@@ -32,7 +32,10 @@ enum class index_type
 	e_hash,
 
 	/// B+ tree.
-	bp_tree
+	bp_tree,
+
+	/// ISAM
+	isam
 };
 
 std::string index_type2str(index_type type);

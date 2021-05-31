@@ -64,7 +64,7 @@ sql_statement_tree* sql_create_index(char* table_name, sql_columns* columns)
 	if(tree)
 	{
 		tree->type       = SQL_CREATE_INDEX;
-		tree->index_type = SQL_BPTREE;
+		tree->index_type = SQL_ISAM,
 		tree->table_name = table_name;
 		tree->columns    = columns;
 	}

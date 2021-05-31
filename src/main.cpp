@@ -32,25 +32,8 @@
 #define DEFAULT_PROMPT C_LBLUE "SQL" C_YELLOW ">" C_RESET " "
 #define ERROR_PREFIX C_RED "!!!" C_RESET " "
 
-#include "index.hpp"
-
 int main(int argc, char* argv[])
 {
-	b_plus_tree tree("a", db2::statement::type());
-
-	//tree.insert(1,1);
-	for(int i = 1; i < 100; i++)
-	{
-		tree.insert(i, i);
-	}
-
-	for(auto pos: tree.get_positions(1))
-	{
-		printf("%ld\n", pos);
-	}
-
-	return 0;
-
 	db2::args a;
 
 	a.parse(argc, argv);

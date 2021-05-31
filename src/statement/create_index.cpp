@@ -27,6 +27,9 @@ std::string db2::statement::index_type2str(index_type type)
 		case index_type::e_hash:
 			return "e_hash";
 
+		case index_type::isam:
+			return "isam";
+
 		default:
 			return "";
 	}
@@ -35,11 +38,19 @@ std::string db2::statement::index_type2str(index_type type)
 db2::statement::index_type db2::statement::str2index_type(std::string_view str)
 {
 	// Add a map if there are more than two index types.
+	const std::unordered_map<std::string_view, index_type> parse_map =
+	{
+		{"bp_tree", index_type::bp_tree},
+		{"e_hash",  index_type::e_hash},
+		{"isam",    index_type::isam},
+	};
 
-	if(str == "e_hash")
-		return index_type::e_hash;
-	else
-		return index_type::bp_tree;
+	auto it = parse_map.find(str);
+
+	if(it == parse_map.end())
+		return index_type::none;
+
+	return it->second;
 }
 
 db2::statement::create_index::create_index(std::string name, index_type type, std::string column_name):
@@ -59,6 +70,10 @@ db2::statement::create_index::create_index(const sql_statement_tree& tree)
 
 		case SQL_BPTREE:
 			type = index_type::bp_tree;
+			break;
+
+		case SQL_ISAM:
+			type = index_type::isam;
 			break;
 	}
 
