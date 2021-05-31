@@ -1,4 +1,3 @@
-
 #include "bptree.hpp"
 
 void b_plus_tree::insertInternal(db2::literal &x, Node *cursor, Node *child, size_t pos)
@@ -242,10 +241,6 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
       }
       aux = 0;
     }
-    std::cout << "leaf\n";
-
-    assert(cursor);
-    assert(!cursor->position_.empty());
 
     auto it = std::lower_bound(
         cursor->position_.cbegin(),
@@ -283,9 +278,7 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
   if (root == NULL)
   {
     root = new Node;
-    //root->key[0] = x;
-    //root->position.insert(std::make_pair(x, posicion_registro));
-    root->position_.push_back(std::make_pair(x, posicion_registro));
+    root->position_.front() = std::make_pair(x, posicion_registro);
     root->IS_LEAF = true;
     root->size = 1;
   }
@@ -312,9 +305,7 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
           break;
         }
       }
-      assert(cursor);
     }
-    assert(cursor);
     if (cursor->size < MAX)
     {
       size_t i = 0;
@@ -322,24 +313,13 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
         i++;
       for (size_t j = cursor->size; j > i; j--)
       {
-        //cursor->position_[j].first = cursor->position_[j - 1].first;
-        //cursor->position_.push_back(std::make_pair(cursor->position_[j].first, cursor->position_[j-1].second));
-        //cursor->position.insert(std::make_pair(cursor->key[j], cursor->position.find(cursor->key[j - 1])->second));
-        cursor->position_[j] = cursor->position_[j-1];
+        cursor->position_.at(j) = cursor->position_.at(j-1);
       }
-      //cursor->key[i] = x;
-      //cursor->position.insert(std::make_pair(x, posicion_registro));
-
-      //cursor->position_.push_back(std::make_pair());
-      cursor->position_[i] = std::make_pair(x,posicion_registro);
+      cursor->position_.at(i) = std::make_pair(x,posicion_registro);
 
       cursor->size++;
-      cursor->ptr_[cursor->size] = cursor->ptr_[cursor->size -1];
-      cursor->ptr_[cursor->size - 1] = NULL;
-
-
-      //cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
-      //cursor->ptr[cursor->size - 1] = NULL;
+      cursor->ptr_.at(cursor->size) = cursor->ptr_.at(cursor->size -1);
+      cursor->ptr_.at(cursor->size - 1) = NULL;
     }
     else
     {

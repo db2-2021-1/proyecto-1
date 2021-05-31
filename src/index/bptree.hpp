@@ -115,7 +115,10 @@ struct Node
         return iterator(nullptr, 0);
     }
 
-    Node():ptr_(MAX+1){}
+    Node():
+        ptr_(MAX+1),
+        position_(MAX)
+    {}
 };
 
 class b_plus_tree

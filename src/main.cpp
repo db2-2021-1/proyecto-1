@@ -39,11 +39,16 @@ int main(int argc, char* argv[])
 	b_plus_tree tree("a", db2::statement::type());
 
 	tree.insert("a", 1);
-	tree.insert("a", 2);
+	tree.insert("b", 2);
 
 	for(auto pos: tree.get_positions("a"))
 	{
-		std::cout << "pos: " << pos << '\n';
+		printf("%ld\n", pos);
+	}
+
+	for(auto pos: tree.get_positions("b"))
+	{
+		printf("%ld\n", pos);
 	}
 
 	return 0;

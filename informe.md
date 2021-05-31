@@ -2,6 +2,16 @@
 
 ## Introducción
 
+El hash extendible y el B+ tree son técnicas de indexación muy conocidas y mediante
+las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
+
+El B+ tree tiene 2 formas de ser implementado, el primero es el clustered
+
+
+ se caracteiza por mantener las forma de un B tree con la diferencia de pode
+
+
+
 https://www.kaggle.com/jessemostipak/hotel-booking-demand
 https://www.kaggle.com/smithsonian/volcanic-eruptions
 
