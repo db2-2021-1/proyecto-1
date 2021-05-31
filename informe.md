@@ -5,7 +5,7 @@
 El hash extendible y el indexed sequential access method ISAM son técnicas
 de indexación muy conocidas y mediante las muestras de  tiempo vamos a poder notar la diferencia entre ambas.
 
->ISAM
+>Indexed sequential access method (ISAM)
 
 El ISAM combina las grandes facultades de los métodos de acceso secuencial y random. Usualmente se implementa usando un Index File y un Data File. 
 
@@ -17,16 +17,26 @@ La diferencia más notoria es la de la poca cantidad de entradas en el Sparse In
 Por otra parte, el Data File va a contener los datos con los registros, la cantidad de datos en cada columna puedes ser variante por lo que el tamaño 
 de cada registro también puede cambiar. 
 
-![Getting Started](./ISAM.JPG)
+![ISAM](./ISAM.JPG)
 
 
-Así como se puede tener un index file con un data file, se puede incluso mapear llaves con otro index file, con el fin de aligerar la búsqueda de un registro o los registros cuyos valores de llave están dentro de un rango. A este concepto se la llama multilevel index_file;
+Así como se puede tener un index file con un data file, se puede incluso mapear llaves con otro index file, con el fin de aligerar la búsqueda de un registro o los registros cuyos valores de llave están dentro de un rango. A este concepto se la llama multilevel index file;
 
-![Getting Started](./multilevelindexfile.JPG)
-
-
+![Multi level index file](./multilevelindexfile.JPG)
 
 
+>Hash extendible
+
+Es un tipo de hash que crece y reduce su tamaño en el tiempo. Como todo hash,
+hace uso de una función hash con el detalle de generar una secuencia de bits.
+Solo se usa un prefijo o sufijo del valor binario para indexar los registros en una tabla de direcciones de buckets.
+
+Las ventaja de el extendible hashing es que la eficiencia no se disminuye con el tamaño del archivos de datos (Data file).
+
+Por otro lado, el índice podría llegar a ser muy grande por lo que ocupa 
+espacio de memoria. Además no soporta las búsquedas por rango.
+
+![Extendible hashing](./extendible.JPG)
 
 ## Técnicas
 
@@ -37,7 +47,7 @@ Así como se puede tener un index file con un data file, se puede incluso mapear
 - https://www.kaggle.com/smithsonian/volcanic-eruptions
 
 ## Benchmark
-
+Ahora presentamos los tiempos que tomaron las diversas operaciones usando los 2 métodos de indexación y hacemos una comparación entre ambos.
 ### INSERT
 
 `COPY volcano FROM "database.csv" CSV HEADER;`
