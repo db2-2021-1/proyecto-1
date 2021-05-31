@@ -243,9 +243,13 @@ Node::iterator b_plus_tree::getMinNode(db2::literal keymin)
     }
 
     auto it = std::lower_bound(
-        cursor->position_.cbegin(),
-        cursor->position_.cend(),
-        std::make_pair(keymin, 0UL)
+        cursor->position_.begin(),
+        cursor->position_.begin()+cursor->size,
+        std::make_pair(keymin, 0UL),
+        [](const auto& l, const auto& r)
+        {
+            return l.first < r.first;
+        }
     );
 
     if(it == cursor->position_.end())
@@ -334,13 +338,12 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
         //aux_map.insert(std::make_pair(virtualNode[i], cursor->position.find(cursor->key[i])->second));
       }
       size_t i = 0, j;
-      while (x > posiciones_[i].first && i < MAX)
-      i++;
+      while (i < MAX && x > posiciones_[i].first)
+          i++;
+
       for (size_t j = MAX + 1; j > i; j--)
       {
-        //virtualNode[j] = virtualNode[j - 1];
-        //aux_map.insert(std::make_pair(virtualNode[j], aux_map.find(virtualNode[j - 1])->second));
-        posiciones_[j] = posiciones_[j - 1];
+        posiciones_.at(j) = posiciones_.at(j - 1);
       }
       //virtualNode[i] = x;
       //aux_map.insert(std::make_pair(virtualNode[i], posicion_registro));
@@ -349,9 +352,9 @@ bool b_plus_tree::insert(const db2::literal &key, size_t position)
       newLeaf->IS_LEAF = true;
       cursor->size = (MAX + 1) / 2;
       newLeaf->size = MAX + 1 - (MAX + 1) / 2;
-      cursor->ptr_[cursor->size] = newLeaf;
-      newLeaf->ptr_[newLeaf->size] = cursor->ptr_[MAX];
-      cursor->ptr_[MAX] = NULL;
+      cursor->ptr_.at(cursor->size) = newLeaf;
+      newLeaf->ptr_.at(newLeaf->size) = cursor->ptr_.at(MAX);
+      cursor->ptr_.at(MAX) = NULL;
       for (i = 0; i < cursor->size; i++)
       {
         //cursor->key[i] = virtualNode[i];
