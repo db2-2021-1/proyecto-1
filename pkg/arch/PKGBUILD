@@ -1,7 +1,7 @@
 # Maintainer: Otreblan <otreblain@gmail.com>
 
 pkgname=proyecto-1-git
-pkgver=0.4.0.r38.gd3d17ea
+pkgver=1.0.0.r1.ga08c7b7
 pkgrel=1
 epoch=
 pkgdesc="Proyecto 1"

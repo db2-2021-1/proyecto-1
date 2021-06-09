@@ -44,6 +44,7 @@ set(ENABLE_TESTS FALSE CACHE BOOL "Enable gtest")
 # Packages
 find_package(FLEX)
 find_package(BISON)
+find_package(bash-completion)
 
 add_subdirectory(src) # Sources list
 add_subdirectory(pkg) # Packaging
@@ -81,7 +82,16 @@ target_compile_definitions(${PROJECT_NAME}
 		RAPIDJSON_HAS_STDSTRING
 )
 
+file(WRITE ${CMAKE_BINARY_DIR}/bash-completion/${PROJECT_NAME}
+	"complete -F _longopt ${PROJECT_NAME}"
+)
+
 # Install target
 install(TARGETS ${PROJECT_NAME}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(FILES
+	${CMAKE_BINARY_DIR}/bash-completion/${PROJECT_NAME}
+	DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR}/
 )
