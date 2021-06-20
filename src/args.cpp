@@ -32,6 +32,7 @@ void db2::args::parse(int argc, char* argv[])
 		{"command",   required_argument, nullptr, 'c'},
 		{"file",      required_argument, nullptr, 'f'},
 		{"benchmark", optional_argument, nullptr, 'b'},
+		{0, 0, 0, 0},
 	};
 
 	while((c = getopt_long(argc, argv, shortopts, options, nullptr)) != -1)
